@@ -35,6 +35,14 @@ public class AircraftTypeEntity implements Serializable {
         this.aircraftTypeId = aircraftTypeId;
     }
 
+    public String getAircraftTypeName() {
+        return aircraftTypeName;
+    }
+
+    public void setAircraftTypeName(String aircraftTypeName) {
+        this.aircraftTypeName = aircraftTypeName;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
