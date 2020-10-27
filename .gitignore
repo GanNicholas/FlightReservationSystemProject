@@ -32,9 +32,13 @@ FlightReservationSystem-ejb/dist/
 # FlightReservationSystem-war/build/
 # FlightReservationSystem-war/dist/
 
-FlightReservationSystemClient/nbproject/private/
-FlightReservationSystemClient/build/
-FlightReservationSystemClient/dist/
+ManagementClient/nbproject/private/
+ManagementClient/build/
+ManagementClient/dist/
+
+ReservationClient/nbproject/private/
+ReservationClient/build/
+ReservationClient/dist/
 
 FlightReservationSystemLibrary/nbproject/private/
 FlightReservationSystemLibrary/build/
