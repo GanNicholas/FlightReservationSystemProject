@@ -32,13 +32,13 @@ public class FlightScheduleEntity implements Serializable {
     @ManyToOne(optional = true)
     private FlightSchedulePlanEntity flightSchedulePlan;
     @OneToMany
-    private List<List<Seat>> seatingPlan;
+    private List<List<SeatEntity>> seatingPlan;
 
     public FlightScheduleEntity() {
-        seatingPlan = new ArrayList<List<Seat>>();
+        seatingPlan = new ArrayList<List<SeatEntity>>();
     }
 
-    public FlightScheduleEntity(GregorianCalendar departureDateTime, double flightDuration, FlightSchedulePlanEntity flightSchedulePlan, List<List<Seat>> seatingPlan) {
+    public FlightScheduleEntity(GregorianCalendar departureDateTime, double flightDuration, FlightSchedulePlanEntity flightSchedulePlan, List<List<SeatEntity>> seatingPlan) {
         this.departureDateTime = departureDateTime;
         this.flightDuration = flightDuration;
         this.flightSchedulePlan = flightSchedulePlan;
@@ -69,11 +69,11 @@ public class FlightScheduleEntity implements Serializable {
         this.flightSchedulePlan = flightSchedulePlan;
     }
 
-    public List<List<Seat>> getSeatingPlan() {
+    public List<List<SeatEntity>> getSeatingPlan() {
         return seatingPlan;
     }
 
-    public void setSeatingPlan(List<List<Seat>> seatingPlan) {
+    public void setSeatingPlan(List<List<SeatEntity>> seatingPlan) {
         this.seatingPlan = seatingPlan;
     }
 

@@ -10,5 +10,5 @@ package util.enumeration;
  * @author nickg
  */
 public enum CabinClassType {
-    FIRSTCLASS, BUSINESSCLASS, PREMIUMECON, ECON;
+    F, J, W, Y;
 }

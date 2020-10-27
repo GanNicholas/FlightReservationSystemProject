@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,9 +14,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import util.enumeration.UserRole;
 
 /**
@@ -23,71 +27,52 @@ import util.enumeration.UserRole;
  * @author nickg
  */
 @Entity
-public class UserEntity implements Serializable {
+public class PartnerEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long partnerId;
 
-    @NotNull
-    @Min(2)
-    @Max(80)
+    @NotEmpty(message = "First Name cannot be empty!")
+    @Size(min = 2, max = 80, message = "Name needs to be between 2 to 80 characters")
     @Column(nullable = false, length = 80)
-    private String firstName;
-    @NotNull
-    @Min(2)
-    @Max(80)
-    @Column(nullable = false, length = 80)
-    private String lastName;
-    @NotNull
-    @Min(6)
-    @Max(16)
+    private String name;
+
+    @NotBlank(message = "Login ID cannot contain spaces or be empty!")
+    @Size(min = 6, max = 16, message = "Login ID has to be minimum 6 characters and maximum 25")
     @Column(nullable = false, length = 16, unique = true)
     private String loginId;
-    @NotNull
-    @Min(8)
-    @Max(16)
+
+    @NotBlank(message = "Login Password cannot contain spaces or be empty!")
+    @Size(min = 8, max = 16, message = "Login Password has to be minimum 8 characters and maximum 25")
     @Column(nullable = false, length = 16)
     private String loginPw;
+    
     @NotNull
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
-    public UserEntity() {
+    @NotNull
+    @OneToMany
+    @JoinColumn(nullable = false)
+    private List<FlightReservationEntity> listOfFlightReservation;
+    
+    public Long getPartnerId() {
+        return partnerId;
     }
 
-    public UserEntity(String firstName, String lastName, String loginId, String loginPw, UserRole userRole) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.loginId = loginId;
-        this.loginPw = loginPw;
-        this.userRole = userRole;
+    public void setPartnerId(Long partnerId) {
+        this.partnerId = partnerId;
     }
 
-    public Long getUserId() {
-        return userId;
+    public String getName() {
+        return name;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getLoginId() {
@@ -113,18 +98,18 @@ public class UserEntity implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (getUserId() != null ? getUserId().hashCode() : 0);
+        hash += (partnerId != null ? partnerId.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the userId fields are not set
-        if (!(object instanceof UserEntity)) {
+        // TODO: Warning - this method won't work in the case the partnerId fields are not set
+        if (!(object instanceof PartnerEntity)) {
             return false;
         }
-        UserEntity other = (UserEntity) object;
-        if ((this.getUserId() == null && other.getUserId() != null) || (this.getUserId() != null && !this.userId.equals(other.userId))) {
+        PartnerEntity other = (PartnerEntity) object;
+        if ((this.partnerId == null && other.partnerId != null) || (this.partnerId != null && !this.partnerId.equals(other.partnerId))) {
             return false;
         }
         return true;
@@ -132,7 +117,6 @@ public class UserEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.EmployeeEntity[ id=" + getUserId() + " ]";
+        return "entity.PartnerEntity[ id=" + partnerId + " ]";
     }
-
 }

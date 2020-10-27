@@ -35,15 +35,15 @@ public abstract class FlightSchedulePlanEntity implements Serializable {
     private List<FlightScheduleEntity> listOfFlightSchedule;
     private FlightSchedulePlanEntity returnFlightSchedulePlan;
     @OneToMany
-    private List<Fare> listOfFare;
+    private List<FareEntity> listOfFare;
     private boolean isDeleted;
     @ManyToOne
     private FlightEntity flightEntity;
     public FlightSchedulePlanEntity() {
-        listOfFare = new ArrayList<Fare>();
+        listOfFare = new ArrayList<FareEntity>();
     }
 
-    public FlightSchedulePlanEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity flightSchedulePlan, List<Fare> listOfFare, boolean isDeleted) {
+    public FlightSchedulePlanEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity flightSchedulePlan, List<FareEntity> listOfFare, boolean isDeleted) {
         this.flightNumber = flightNumber;
         this.listOfFlightSchedule = listOfFlightSchedule;
         this.returnFlightSchedulePlan = flightSchedulePlan;
@@ -106,11 +106,11 @@ public abstract class FlightSchedulePlanEntity implements Serializable {
         this.returnFlightSchedulePlan = returnFlightSchedulePlan;
     }
 
-    public List<Fare> getListOfFare() {
+    public List<FareEntity> getListOfFare() {
         return listOfFare;
     }
 
-    public void setListOfFare(List<Fare> listOfFare) {
+    public void setListOfFare(List<FareEntity> listOfFare) {
         this.listOfFare = listOfFare;
     }
 

@@ -26,7 +26,7 @@ public class RecurringScheduleEntity extends FlightSchedulePlanEntity implements
     private String flightNumber;
     private List<FlightScheduleEntity> listOfFlightSchedule;
     private FlightSchedulePlanEntity returnFlightSchedulePlan;
-    private List<Fare> listOfFare;
+    private List<FareEntity> listOfFare;
     private boolean isDeleted;
     private int recurrentFreq;
     private GregorianCalendar endDate;
@@ -34,10 +34,10 @@ public class RecurringScheduleEntity extends FlightSchedulePlanEntity implements
     public RecurringScheduleEntity() {
         super();
         listOfFlightSchedule = new ArrayList<FlightScheduleEntity>();
-        listOfFare = new ArrayList<Fare>();
+        listOfFare = new ArrayList<FareEntity>();
     }
 
-    public RecurringScheduleEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity returnFlightSchedulePlan, List<Fare> listOfFare, boolean isDeleted, int recurrentFreq, GregorianCalendar endDate) {
+    public RecurringScheduleEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity returnFlightSchedulePlan, List<FareEntity> listOfFare, boolean isDeleted, int recurrentFreq, GregorianCalendar endDate) {
         this.flightNumber = flightNumber;
         this.listOfFlightSchedule = listOfFlightSchedule;
         this.returnFlightSchedulePlan = returnFlightSchedulePlan;
@@ -102,11 +102,11 @@ public class RecurringScheduleEntity extends FlightSchedulePlanEntity implements
         this.returnFlightSchedulePlan = returnFlightSchedulePlan;
     }
 
-    public List<Fare> getListOfFare() {
+    public List<FareEntity> getListOfFare() {
         return listOfFare;
     }
 
-    public void setListOfFare(List<Fare> listOfFare) {
+    public void setListOfFare(List<FareEntity> listOfFare) {
         this.listOfFare = listOfFare;
     }
 

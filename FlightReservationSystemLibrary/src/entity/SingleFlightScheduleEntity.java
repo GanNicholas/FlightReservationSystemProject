@@ -24,20 +24,20 @@ public class SingleFlightScheduleEntity extends FlightSchedulePlanEntity impleme
     private Long flightSchedulePlanId;
     private String flightNumber;
     private List<FlightScheduleEntity> listOfFlightSchedule;
-    private FlightSchedulePlanEntity flightSchedulePlan;
-    private List<Fare> listOfFare;
+    private FlightSchedulePlanEntity returnFlightSchedulePlan;
+    private List<FareEntity> listOfFare;
     private boolean isDeleted;
 
     public SingleFlightScheduleEntity() {
         super();
         listOfFlightSchedule = new ArrayList<FlightScheduleEntity>();
-        listOfFare = new ArrayList<Fare>();
+        listOfFare = new ArrayList<FareEntity>();
     }
 
-    public SingleFlightScheduleEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity flightSchedulePlan, List<Fare> listOfFare, boolean isDeleted) {
+    public SingleFlightScheduleEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity flightSchedulePlan, List<FareEntity> listOfFare, boolean isDeleted) {
         this.flightNumber = flightNumber;
         this.listOfFlightSchedule = listOfFlightSchedule;
-        this.flightSchedulePlan = flightSchedulePlan;
+        this.returnFlightSchedulePlan = flightSchedulePlan;
         this.listOfFare = listOfFare;
         this.isDeleted = isDeleted;
     }
@@ -67,24 +67,25 @@ public class SingleFlightScheduleEntity extends FlightSchedulePlanEntity impleme
         this.listOfFlightSchedule = listOfFlightSchedule;
     }
 
-    @Override
-    public FlightSchedulePlanEntity getReturnFlightSchedulePlan() {
-        return flightSchedulePlan;
-    }
 
     @Override
-    publicsetReturnFlightSchedulePlanlePlan(FlightSchedulePlanEntity flightSchedulePlan) {
-        this.flightSchedulePlan = flightSchedulePlan;
-    }
-
-    @Override
-    public List<Fare> getListOfFare() {
+    public List<FareEntity> getListOfFare() {
         return listOfFare;
     }
 
     @Override
-    public void setListOfFare(List<Fare> listOfFare) {
+    public void setListOfFare(List<FareEntity> listOfFare) {
         this.listOfFare = listOfFare;
+    }
+
+    @Override
+    public FlightSchedulePlanEntity getReturnFlightSchedulePlan() {
+        return returnFlightSchedulePlan;
+    }
+
+    @Override
+    public void setReturnFlightSchedulePlan(FlightSchedulePlanEntity returnFlightSchedulePlan) {
+        this.returnFlightSchedulePlan = returnFlightSchedulePlan;
     }
 
     @Override

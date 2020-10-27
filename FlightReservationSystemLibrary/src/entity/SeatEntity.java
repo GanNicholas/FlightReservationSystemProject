@@ -17,7 +17,7 @@ import javax.persistence.OneToOne;
  * @author sohqi
  */
 @Entity
-public class Seat implements Serializable {
+public class SeatEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -25,9 +25,9 @@ public class Seat implements Serializable {
     private Long seatId;
     private String seatNumber;
     private boolean reserved;
-    private Passenger passenger;
+    private PassengerEntity passenger;
     @OneToOne
-    private Fare fare;
+    private FareEntity fare;
     public Long getSeatId() {
         return seatId;
     }
@@ -47,10 +47,10 @@ public class Seat implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the seatId fields are not set
-        if (!(object instanceof Seat)) {
+        if (!(object instanceof SeatEntity)) {
             return false;
         }
-        Seat other = (Seat) object;
+        SeatEntity other = (SeatEntity) object;
         if ((this.seatId == null && other.seatId != null) || (this.seatId != null && !this.seatId.equals(other.seatId))) {
             return false;
         }
@@ -78,19 +78,19 @@ public class Seat implements Serializable {
         this.reserved = reserved;
     }
 
-    public Passenger getPassenger() {
+    public PassengerEntity getPassenger() {
         return passenger;
     }
 
-    public void setPassenger(Passenger passenger) {
+    public void setPassenger(PassengerEntity passenger) {
         this.passenger = passenger;
     }
 
-    public Fare getFare() {
+    public FareEntity getFare() {
         return fare;
     }
 
-    public void setFare(Fare fare) {
+    public void setFare(FareEntity fare) {
         this.fare = fare;
     }
     

@@ -26,18 +26,18 @@ public class RecurringWeeklyScheduleEntity extends FlightSchedulePlanEntity impl
     private String flightNumber;
     private List<FlightScheduleEntity> listOfFlightSchedule;
     private FlightSchedulePlanEntity returnFLightSchedulePlan;
-    private List<Fare> listOfFare;
+    private List<FareEntity> listOfFare;
     private boolean isDeleted;
     private GregorianCalendar endDate;
 
     public RecurringWeeklyScheduleEntity() {
         super();
         listOfFlightSchedule = new ArrayList<FlightScheduleEntity>();
-        listOfFare = new ArrayList<Fare>();
+        listOfFare = new ArrayList<FareEntity>();
 
     }
 
-    public RecurringWeeklyScheduleEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity returnFLightSchedulePlan, List<Fare> listOfFare, boolean isDeleted, GregorianCalendar endDate) {
+    public RecurringWeeklyScheduleEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity returnFLightSchedulePlan, List<FareEntity> listOfFare, boolean isDeleted, GregorianCalendar endDate) {
         this.flightNumber = flightNumber;
         this.listOfFlightSchedule = listOfFlightSchedule;
         this.returnFLightSchedulePlan = returnFLightSchedulePlan;
@@ -60,7 +60,7 @@ public class RecurringWeeklyScheduleEntity extends FlightSchedulePlanEntity impl
             return false;
         }
         SingleFlightScheduleEntity other = (SingleFlightScheduleEntity) object;
-        if ((this.getFlightSchedulePlanId() == null && other.getFlightSchedulePlanId() != null) || (this.getFlightSchedulePlanId() != null && !this.flightSchedulePlanId.equals(other.flightSchedulePlanId))) {
+        if ((this.getFlightSchedulePlanId() == null && other.getFlightSchedulePlanId() != null) || (this.getFlightSchedulePlanId() != null && !this.flightSchedulePlanId.equals(other.getFlightSchedulePlanId()))) {
             return false;
         }
         return true;
@@ -99,11 +99,11 @@ public class RecurringWeeklyScheduleEntity extends FlightSchedulePlanEntity impl
         this.returnFLightSchedulePlan = returnFLightSchedulePlan;
     }
 
-    public List<Fare> getListOfFare() {
+    public List<FareEntity> getListOfFare() {
         return listOfFare;
     }
 
-    public void setListOfFare(List<Fare> listOfFare) {
+    public void setListOfFare(List<FareEntity> listOfFare) {
         this.listOfFare = listOfFare;
     }
 

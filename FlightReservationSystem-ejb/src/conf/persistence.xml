@@ -3,7 +3,25 @@
   <persistence-unit name="FlightReservationSystem-ejbPU" transaction-type="JTA">
     <jta-data-source>jdbc/flightReservationSystem</jta-data-source>
     <class>entity.AircraftTypeEntity</class>
-    <class>entity.UserEntity</class>
+    <class>entity.AircraftConfigurationEntity</class>
+    <class>entity.CabinClassConfigurationEntity</class>
+    <class>entity.CustomerEntity</class>
+    <class>entity.EmployeeEntity</class>
+    <class>entity.FlightReservationEntity</class>
+    <class>entity.IndividualFlightReservationEntity</class>
+    <class>entity.PartnerEntity</class>
+    <class>entity.PassengerEntity</class>
+    <class>entity.AirportEntity</class>
+    <class>entity.FareEntity</class>
+    <class>entity.FlightEntity</class>
+    <class>entity.FlightRouteEntity</class>
+    <class>entity.FlightScheduleEntity</class>
+    <class>entity.FlightSchedulePlanEntity</class>
+    <class>entity.MultipleFlightScheduleEntity</class>
+    <class>entity.RecurringScheduleEntity</class>
+    <class>entity.RecurringWeeklyScheduleEntity</class>
+    <class>entity.SeatEntity</class>
+    <class>entity.SingleFlightScheduleEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>

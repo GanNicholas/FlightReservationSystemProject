@@ -32,7 +32,7 @@ public class FlightEntity implements Serializable {
     private FlightRouteEntity flightRoute;
     @OneToMany
     @JoinColumn(nullable = false)
-    private AircraftConfiguration aircraftConfig;
+    private AircraftConfigurationEntity aircraftConfig;
     private boolean isDeleted;
     @OneToMany(mappedBy = "flightEntity")
     private List<FlightSchedulePlanEntity> listOfFlightSchedulePlan;
@@ -44,7 +44,7 @@ public class FlightEntity implements Serializable {
         returnFlight = null;
     }
 
-    public FlightEntity(String flightNumber, FlightRouteEntity flightRoute, AircraftConfiguration aircraftConfig, boolean isDeleted, List<FlightSchedulePlanEntity> listOfFlightSchedulePlan, FlightEntity returnFlight) {
+    public FlightEntity(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig, boolean isDeleted, List<FlightSchedulePlanEntity> listOfFlightSchedulePlan, FlightEntity returnFlight) {
         this.flightNumber = flightNumber;
         this.flightRoute = flightRoute;
         this.aircraftConfig = aircraftConfig;
@@ -107,11 +107,11 @@ public class FlightEntity implements Serializable {
         this.flightRoute = flightRoute;
     }
 
-    public AircraftConfiguration getAircraftConfig() {
+    public AircraftConfigurationEntity getAircraftConfig() {
         return aircraftConfig;
     }
 
-    public void setAircraftConfig(AircraftConfiguration aircraftConfig) {
+    public void setAircraftConfig(AircraftConfigurationEntity aircraftConfig) {
         this.aircraftConfig = aircraftConfig;
     }
 
