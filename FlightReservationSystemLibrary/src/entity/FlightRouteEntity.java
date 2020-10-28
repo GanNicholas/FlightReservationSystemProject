@@ -35,6 +35,7 @@ public class FlightRouteEntity implements Serializable {
 
     public FlightRouteEntity() {
 
+        
     }
 
     public FlightRouteEntity(AirportEntity originLocation, AirportEntity destinationLocation, FlightRouteEntity returnRoute) {
