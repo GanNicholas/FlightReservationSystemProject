@@ -24,18 +24,21 @@ public class FlightRouteEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long flightRouteId;
+
     @OneToOne(optional = false)
     @JoinColumn(nullable = false)
     private AirportEntity originLocation;
+
     @OneToOne(optional = false)
     @JoinColumn(nullable = false)
     private AirportEntity destinationLocation;
+
     private boolean isDeleted;
+
     private FlightRouteEntity returnRoute;
 
     public FlightRouteEntity() {
 
-        
     }
 
     public FlightRouteEntity(AirportEntity originLocation, AirportEntity destinationLocation, FlightRouteEntity returnRoute) {

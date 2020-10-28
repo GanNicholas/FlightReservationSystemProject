@@ -8,6 +8,7 @@ package entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,6 +17,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -28,15 +31,25 @@ public class FlightEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long flightId;
+
+    @NotEmpty(message = "Flight number cannot be empty!")
+    @Size(min = 1, max = 16, message = "Flight number should not exceed 16 characters!")
+    @Column(nullable = false, length = 8)
     private String flightNumber;
+
     @ManyToOne
+    @JoinColumn(nullable = false)
     private FlightRouteEntity flightRoute;
+
     @OneToOne(optional = false)
     @JoinColumn(nullable = false)
     private AircraftConfigurationEntity aircraftConfig;
+
     private boolean isDeleted;
+
     @OneToMany(mappedBy = "flightEntity")
     private List<FlightSchedulePlanEntity> listOfFlightSchedulePlan;
+
     private FlightEntity returnFlight;
 
     public FlightEntity() {
@@ -53,11 +66,6 @@ public class FlightEntity implements Serializable {
         this.listOfFlightSchedulePlan = listOfFlightSchedulePlan;
         this.returnFlight = returnFlight;
     }
-
-   
-    
-    
-   
 
     @Override
     public int hashCode() {
@@ -83,16 +91,16 @@ public class FlightEntity implements Serializable {
     public String toString() {
         return "entity.FlightEntity[ id=" + flightId + " ]";
     }
-    
-     public Long getFlightId() {
+
+    public Long getFlightId() {
         return flightId;
     }
-    
-    
+
     public void setFlightId(Long flightId) {
         this.flightId = flightId;
     }
-     public String getFlightNumber() {
+
+    public String getFlightNumber() {
         return flightNumber;
     }
 
@@ -139,5 +147,5 @@ public class FlightEntity implements Serializable {
     public void setListOfFlightSchedulePlan(List<FlightSchedulePlanEntity> listOfFlightSchedulePlan) {
         this.listOfFlightSchedulePlan = listOfFlightSchedulePlan;
     }
-    
+
 }

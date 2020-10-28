@@ -6,10 +6,15 @@
 package entity;
 
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -22,21 +27,40 @@ public class AirportEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long airportId;
+
+    @NotEmpty(message = "Airport name cannot be empty!")
+    @Size(min = 1, max = 100, message = "Airport name should not exceed 100 characters!")
+    @Column(nullable = false, length = 100)
     private String airportName;
+
+    @NotNull
+    @Column(nullable = false, length = 3, unique = true)
     private String iataAirPortCode;
+
+    @Size(min = 0, max = 55, message = "Flight number should not exceed 100 characters!")
     private String state;
+
+    @NotEmpty(message = "Country name cannot be empty!")
+    @Size(min = 1, max = 57, message = "Country name should not exceed 57 characters!")
+    @Column(nullable = false, length = 57)
     private String country;
-    private int timeZone;
+
+    @Max(value = 28, message = "Maximum time zone is 28")
+    private Integer timeZone;
+
+    @Size(max = 28, message = "Country name should not exceed 28 characters!")
+    private String city;
 
     public AirportEntity() {
     }
 
-    public AirportEntity(String airportName, String iataAirPortCode, String state, String country, int timeZone) {
+    public AirportEntity(String airportName, String iataAirPortCode, String state, String country, int timeZone, String city) {
         this.airportName = airportName;
         this.iataAirPortCode = iataAirPortCode;
         this.state = state;
         this.country = country;
         this.timeZone = timeZone;
+        this.city = city;
     }
 
     @Override
@@ -88,6 +112,14 @@ public class AirportEntity implements Serializable {
 
     public void setTimeZone(int timeZone) {
         this.timeZone = timeZone;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     @Override

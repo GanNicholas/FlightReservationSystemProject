@@ -5,16 +5,23 @@
  */
 package entity;
 
+import DateValidation.GregorianDateValidate;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 /**
  *
@@ -27,11 +34,21 @@ public class FlightScheduleEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long FlightScheduleId;
+
+    @NotNull
+    @GregorianDateValidate
     private GregorianCalendar departureDateTime;
-    private double flightDuration;
+
+    @Max(value = 48, message = "Maximum flight duration is 48 hours!")
+    @Positive
+    private Double flightDuration;
+
     @ManyToOne(optional = true)
+    @JoinColumn(nullable = false)
     private FlightSchedulePlanEntity flightSchedulePlan;
+
     @OneToMany
+    @JoinColumn(nullable = false)
     private List<List<SeatEntity>> seatingPlan;
 
     public FlightScheduleEntity() {

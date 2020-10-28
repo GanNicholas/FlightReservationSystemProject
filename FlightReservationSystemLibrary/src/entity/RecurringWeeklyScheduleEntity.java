@@ -5,6 +5,7 @@
  */
 package entity;
 
+import DateValidation.GregorianDateValidate;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -13,6 +14,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -22,6 +24,8 @@ import javax.persistence.Id;
 public class RecurringWeeklyScheduleEntity extends FlightSchedulePlanEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    @NotNull
+    @GregorianDateValidate
     private GregorianCalendar endDate;
 
     public RecurringWeeklyScheduleEntity() {

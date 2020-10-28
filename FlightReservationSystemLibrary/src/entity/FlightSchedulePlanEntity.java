@@ -9,15 +9,19 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.paint.Color;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -31,14 +35,27 @@ public abstract class FlightSchedulePlanEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long flightSchedulePlanId;
+
+    @NotEmpty(message = "Flight number cannot be empty!")
+    @Size(min = 1, max = 16, message = "Flight number should not exceed 16 characters!")
+    @Column(nullable = false, length = 8)
     protected String flightNumber;
+
     @OneToMany(mappedBy = "flightSchedulePlan")
+    @JoinColumn(nullable = false)
     protected List<FlightScheduleEntity> listOfFlightSchedule;
+
     protected FlightSchedulePlanEntity returnFlightSchedulePlan;
+
     @OneToMany
+    @JoinColumn(nullable = false)
     protected List<FareEntity> listOfFare;
+    
+
     protected boolean isDeleted;
+
     @ManyToOne
+    @JoinColumn(nullable = false)
     protected FlightEntity flightEntity;
 
     public FlightSchedulePlanEntity() {

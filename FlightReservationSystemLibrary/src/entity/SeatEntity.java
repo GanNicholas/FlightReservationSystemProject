@@ -6,11 +6,14 @@
 package entity;
 
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -23,9 +26,17 @@ public class SeatEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seatId;
+    
+    @NotEmpty(message = "Seat Number cannot be empty!")
+    @Size(min = 1, max = 6, message = "Seat number cannot exceed 6 characters long!")
+    @Column(nullable = false, length = 6)
     private String seatNumber;
+    
     private boolean reserved;
+    
+    @OneToOne
     private PassengerEntity passenger;
+    
     @OneToOne
     private FareEntity fare;
 

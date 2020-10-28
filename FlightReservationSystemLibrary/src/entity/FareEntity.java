@@ -7,10 +7,15 @@ package entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -23,7 +28,13 @@ public class FareEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long FareId;
+    @NotEmpty(message = "Fare basis code cannot be empty!")
+    @Size(min = 3, max = 7, message = "Fare basis code has to be 3 to 7 characters long!")
+    @Column(nullable = false, length = 7)
     private String fareBasisCode;
+    @NotNull
+    @DecimalMin("0.00")
+    @Column(nullable = false, scale = 2)
     private BigDecimal fareAmount;
 
     public FareEntity() {
