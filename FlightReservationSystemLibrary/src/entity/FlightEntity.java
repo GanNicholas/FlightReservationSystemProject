@@ -58,6 +58,17 @@ public class FlightEntity implements Serializable {
         returnFlight = null;
     }
 
+    public FlightEntity(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig) {
+        this.flightNumber = flightNumber;
+        this.flightRoute = flightRoute;
+        this.aircraftConfig = aircraftConfig;
+        this.returnFlight = null;
+        this.listOfFlightSchedulePlan = new ArrayList<FlightSchedulePlanEntity>();
+        this.isDeleted = false;
+    }
+    
+    
+
     public FlightEntity(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig, boolean isDeleted, List<FlightSchedulePlanEntity> listOfFlightSchedulePlan, FlightEntity returnFlight) {
         this.flightNumber = flightNumber;
         this.flightRoute = flightRoute;

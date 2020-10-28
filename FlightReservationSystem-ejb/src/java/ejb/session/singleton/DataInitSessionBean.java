@@ -5,6 +5,7 @@
  */
 package ejb.session.singleton;
 
+import entity.AircraftTypeEntity;
 import entity.AirportEntity;
 import entity.EmployeeEntity;
 import entity.PartnerEntity;
@@ -50,6 +51,7 @@ public class DataInitSessionBean {
             em.persist(partnerEmployee);
             em.persist(partnerManager);
         }
+        em.flush();
 
         AirportEntity airport = em.find(AirportEntity.class, 1L);
         if (airport == null) {
@@ -116,6 +118,17 @@ public class DataInitSessionBean {
             AirportEntity a30 = new AirportEntity("Dubai International Airport", "DXB", "Dubai", "United Arab Emirates", 4, 0, "Dubai");
             em.persist(a30);
         }
+        em.flush();
+        
+        AircraftTypeEntity acType = em.find(AircraftTypeEntity.class, 1L);
+        if(acType == null){
+            AircraftTypeEntity ac1 = new AircraftTypeEntity("Boeing 737 Narrow body short range");
+            em.persist(ac1);
+            AircraftTypeEntity ac2 = new AircraftTypeEntity("Boeing 737 Wide body long range");
+            em.persist(ac2);
+        }   
+        
+        em.flush();
     }
 
 }

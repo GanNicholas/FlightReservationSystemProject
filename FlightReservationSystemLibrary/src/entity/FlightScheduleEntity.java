@@ -10,7 +10,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,7 +18,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
@@ -49,13 +47,20 @@ public class FlightScheduleEntity implements Serializable {
 
     @OneToMany
     @JoinColumn(nullable = false)
-    private List<List<SeatEntity>> seatingPlan;
+    private List<SeatEntity> seatingPlan;
 
     public FlightScheduleEntity() {
-        seatingPlan = new ArrayList<List<SeatEntity>>();
+        seatingPlan = new ArrayList<SeatEntity>();
     }
 
-    public FlightScheduleEntity(GregorianCalendar departureDateTime, double flightDuration, FlightSchedulePlanEntity flightSchedulePlan, List<List<SeatEntity>> seatingPlan) {
+    public FlightScheduleEntity(GregorianCalendar departureDateTime, Double flightDuration, FlightSchedulePlanEntity flightSchedulePlan) {
+        this();
+        this.departureDateTime = departureDateTime;
+        this.flightDuration = flightDuration;
+        this.flightSchedulePlan = flightSchedulePlan;
+    }
+
+    public FlightScheduleEntity(GregorianCalendar departureDateTime, double flightDuration, FlightSchedulePlanEntity flightSchedulePlan, List<SeatEntity> seatingPlan) {
         this.departureDateTime = departureDateTime;
         this.flightDuration = flightDuration;
         this.flightSchedulePlan = flightSchedulePlan;
@@ -86,11 +91,11 @@ public class FlightScheduleEntity implements Serializable {
         this.flightSchedulePlan = flightSchedulePlan;
     }
 
-    public List<List<SeatEntity>> getSeatingPlan() {
+    public List<SeatEntity> getSeatingPlan() {
         return seatingPlan;
     }
 
-    public void setSeatingPlan(List<List<SeatEntity>> seatingPlan) {
+    public void setSeatingPlan(List<SeatEntity> seatingPlan) {
         this.seatingPlan = seatingPlan;
     }
 

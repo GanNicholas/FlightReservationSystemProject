@@ -13,6 +13,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQuery;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import util.enumeration.UserRole;
@@ -22,6 +23,7 @@ import util.enumeration.UserRole;
  * @author nickg
  */
 @Entity
+@NamedQuery(name = "retrieveUsingLogin", query = "SELECT e FROM EmployeeEntity e WHERE e.loginId = :login")
 public class EmployeeEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -49,6 +51,9 @@ public class EmployeeEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    
+    private Boolean loggedIn;
+    
     public EmployeeEntity() {
     }
 
@@ -57,6 +62,7 @@ public class EmployeeEntity implements Serializable {
         this.loginId = loginId;
         this.loginPw = loginPw;
         this.userRole = userRole;
+        this.loggedIn = false;
     }
 
     public Long getEmployeeId() {
@@ -94,7 +100,19 @@ public class EmployeeEntity implements Serializable {
     public UserRole getUserRole() {
         return userRole;
     }
+    
+    public Boolean isEmployeeLoggedIn(){
+        return this.loggedIn;
+    }
 
+    public void login(){
+        this.loggedIn = Boolean.TRUE;
+    }
+    
+    public void logout(){
+        this.loggedIn = Boolean.FALSE;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

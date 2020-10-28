@@ -8,12 +8,16 @@ package entity;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import util.enumeration.CabinClassType;
 
 /**
  *
@@ -39,15 +43,31 @@ public class SeatEntity implements Serializable {
     
     @OneToOne
     private FareEntity fare;
+    
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private CabinClassType cabinType;
 
     public SeatEntity() {
     }
 
-    public SeatEntity(String seatNumber, boolean reserved, PassengerEntity passenger, FareEntity fare) {
+    //initial state when seat is free
+    public SeatEntity(String seatNumber, CabinClassType cabinType) {
+        this.seatNumber = seatNumber;
+        this.cabinType = cabinType;
+        this.reserved = false;
+        this.passenger = null;
+        this.fare = null;
+        
+    }
+
+    //when seat is reserved
+    public SeatEntity(String seatNumber, boolean reserved, PassengerEntity passenger, FareEntity fare, CabinClassType cabinType) {
         this.seatNumber = seatNumber;
         this.reserved = reserved;
         this.passenger = passenger;
         this.fare = fare;
+        this.cabinType = cabinType;
     }
 
     public Long getSeatId() {

@@ -56,6 +56,8 @@ public abstract class CustomerEntity implements Serializable {
     @OneToMany()
     @JoinColumn(nullable = false)
     private List<FlightReservationEntity> listOfFlightReservation;
+    
+    private Boolean login;
 
     public CustomerEntity() {
         listOfFlightReservation = new ArrayList<>();
@@ -66,6 +68,7 @@ public abstract class CustomerEntity implements Serializable {
         this.loginId = loginId;
         this.loginPw = loginPw;
         this.userRole = userRole;
+        this.login = Boolean.FALSE;
     }
 
     public Long getCustomerId() {
@@ -106,6 +109,18 @@ public abstract class CustomerEntity implements Serializable {
 
     public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
+    }
+    
+    public Boolean isLoggedIn(){
+        return this.login;
+    }
+    
+    public void login(){
+        this.login = Boolean.TRUE;
+    }
+    
+    public void logout(){
+        this.login = Boolean.FALSE;
     }
 
     @Override
