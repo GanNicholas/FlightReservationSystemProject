@@ -22,27 +22,14 @@ import javax.persistence.Id;
 public class RecurringWeeklyScheduleEntity extends FlightSchedulePlanEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private Long flightSchedulePlanId;
-    private String flightNumber;
-    private List<FlightScheduleEntity> listOfFlightSchedule;
-    private FlightSchedulePlanEntity returnFLightSchedulePlan;
-    private List<FareEntity> listOfFare;
-    private boolean isDeleted;
     private GregorianCalendar endDate;
 
     public RecurringWeeklyScheduleEntity() {
         super();
-        listOfFlightSchedule = new ArrayList<FlightScheduleEntity>();
-        listOfFare = new ArrayList<FareEntity>();
-
     }
 
-    public RecurringWeeklyScheduleEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity returnFLightSchedulePlan, List<FareEntity> listOfFare, boolean isDeleted, GregorianCalendar endDate) {
-        this.flightNumber = flightNumber;
-        this.listOfFlightSchedule = listOfFlightSchedule;
-        this.returnFLightSchedulePlan = returnFLightSchedulePlan;
-        this.listOfFare = listOfFare;
-        this.isDeleted = isDeleted;
+    public RecurringWeeklyScheduleEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity returnFlightSchedulePlan, List<FareEntity> listOfFare, boolean isDeleted, FlightEntity flightEntity, GregorianCalendar endDate) {
+        super(flightNumber, listOfFlightSchedule, returnFlightSchedulePlan, listOfFare, isDeleted, flightEntity);
         this.endDate = endDate;
     }
 
@@ -56,10 +43,10 @@ public class RecurringWeeklyScheduleEntity extends FlightSchedulePlanEntity impl
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the flightSchedulePlanId fields are not set
-        if (!(object instanceof SingleFlightScheduleEntity)) {
+        if (!(object instanceof RecurringWeeklyScheduleEntity)) {
             return false;
         }
-        SingleFlightScheduleEntity other = (SingleFlightScheduleEntity) object;
+        RecurringWeeklyScheduleEntity other = (RecurringWeeklyScheduleEntity) object;
         if ((this.getFlightSchedulePlanId() == null && other.getFlightSchedulePlanId() != null) || (this.getFlightSchedulePlanId() != null && !this.flightSchedulePlanId.equals(other.getFlightSchedulePlanId()))) {
             return false;
         }
@@ -69,50 +56,6 @@ public class RecurringWeeklyScheduleEntity extends FlightSchedulePlanEntity impl
     @Override
     public String toString() {
         return "entity.FlightSchedulePlan[ id=" + getFlightSchedulePlanId() + " ]";
-    }
-
-    public Long getFlightSchedulePlanId() {
-        return flightSchedulePlanId;
-    }
-
-    public String getFlightNumber() {
-        return flightNumber;
-    }
-
-    public void setFlightNumber(String flightNumber) {
-        this.flightNumber = flightNumber;
-    }
-
-    public List<FlightScheduleEntity> getListOfFlightSchedule() {
-        return listOfFlightSchedule;
-    }
-
-    public void setListOfFlightSchedule(List<FlightScheduleEntity> listOfFlightSchedule) {
-        this.listOfFlightSchedule = listOfFlightSchedule;
-    }
-
-    public FlightSchedulePlanEntity getReturnFLightSchedulePlan() {
-        return returnFLightSchedulePlan;
-    }
-
-    public void setReturnFLightSchedulePlan(FlightSchedulePlanEntity returnFLightSchedulePlan) {
-        this.returnFLightSchedulePlan = returnFLightSchedulePlan;
-    }
-
-    public List<FareEntity> getListOfFare() {
-        return listOfFare;
-    }
-
-    public void setListOfFare(List<FareEntity> listOfFare) {
-        this.listOfFare = listOfFare;
-    }
-
-    public boolean isIsDeleted() {
-        return isDeleted;
-    }
-
-    public void setIsDeleted(boolean isDeleted) {
-        this.isDeleted = isDeleted;
     }
 
     public GregorianCalendar getEndDate() {

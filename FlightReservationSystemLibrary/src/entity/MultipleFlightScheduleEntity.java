@@ -21,40 +21,24 @@ import javax.persistence.Id;
 public class MultipleFlightScheduleEntity extends FlightSchedulePlanEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private Long flightSchedulePlanId;
-    private String flightNumber;
-    private List<FlightScheduleEntity> listOfFlightSchedule;
-    private FlightSchedulePlanEntity returnFlightSchedulePlan;
-    private List<FareEntity> listOfFare;
-    private boolean isDeleted;
 
     public MultipleFlightScheduleEntity() {
         super();
-        listOfFlightSchedule = new ArrayList<FlightScheduleEntity>();
-        listOfFare = new ArrayList<FareEntity>();
     }
 
-    public MultipleFlightScheduleEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity returnFlightSchedulePlan, List<FareEntity> listOfFare, boolean isDeleted) {
-        this.flightNumber = flightNumber;
-        this.listOfFlightSchedule = listOfFlightSchedule;
-        this.returnFlightSchedulePlan = returnFlightSchedulePlan;
-        this.listOfFare = listOfFare;
-        this.isDeleted = isDeleted;
+    public MultipleFlightScheduleEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity returnFlightSchedulePlan, List<FareEntity> listOfFare, boolean isDeleted, FlightEntity flightEntity) {
+        super(flightNumber, listOfFlightSchedule, returnFlightSchedulePlan, listOfFare, isDeleted, flightEntity);
     }
 
-  
-
- 
     @Override
     public String toString() {
-        return "entity.FlightSchedulePlan[ id=" + getFlightSchedulePlanId() + " ]";
+        return "entity.FlightSchedulePlan[ id=" + flightSchedulePlanId + " ]";
     }
-
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (getFlightSchedulePlanId() != null ? getFlightSchedulePlanId().hashCode() : 0);
+        hash += (flightSchedulePlanId != null ? flightSchedulePlanId.hashCode() : 0);
         return hash;
     }
 
@@ -65,56 +49,10 @@ public class MultipleFlightScheduleEntity extends FlightSchedulePlanEntity imple
             return false;
         }
         MultipleFlightScheduleEntity other = (MultipleFlightScheduleEntity) object;
-        if ((this.getFlightSchedulePlanId() == null && other.getFlightSchedulePlanId() != null) || (this.getFlightSchedulePlanId() != null && !this.flightSchedulePlanId.equals(other.flightSchedulePlanId))) {
+        if ((this.flightSchedulePlanId == null && other.flightSchedulePlanId != null) || (this.flightSchedulePlanId != null && !this.flightSchedulePlanId.equals(other.flightSchedulePlanId))) {
             return false;
         }
         return true;
     }
-
-    public Long getFlightSchedulePlanId() {
-        return flightSchedulePlanId;
-    }
-
-    public String getFlightNumber() {
-        return flightNumber;
-    }
-
-    public void setFlightNumber(String flightNumber) {
-        this.flightNumber = flightNumber;
-    }
-
-    public List<FlightScheduleEntity> getListOfFlightSchedule() {
-        return listOfFlightSchedule;
-    }
-
-    public void setListOfFlightSchedule(List<FlightScheduleEntity> listOfFlightSchedule) {
-        this.listOfFlightSchedule = listOfFlightSchedule;
-    }
-
-    public FlightSchedulePlanEntity getReturnFlightSchedulePlan() {
-        return returnFlightSchedulePlan;
-    }
-
-    public void setReturnFlightSchedulePlan(FlightSchedulePlanEntity returnFlightSchedulePlan) {
-        this.returnFlightSchedulePlan = returnFlightSchedulePlan;
-    }
-
-    public List<FareEntity> getListOfFare() {
-        return listOfFare;
-    }
-
-    public void setListOfFare(List<FareEntity> listOfFare) {
-        this.listOfFare = listOfFare;
-    }
-
-    public boolean isIsDeleted() {
-        return isDeleted;
-    }
-
-    public void setIsDeleted(boolean isDeleted) {
-        this.isDeleted = isDeleted;
-    }
-
-    
 
 }

@@ -2,22 +2,22 @@
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
   <persistence-unit name="FlightReservationSystem-ejbPU" transaction-type="JTA">
     <jta-data-source>jdbc/flightReservationSystem</jta-data-source>
-    <class>entity.AircraftTypeEntity</class>
     <class>entity.AircraftConfigurationEntity</class>
+    <class>entity.AircraftTypeEntity</class>
+    <class>entity.AirportEntity</class>
     <class>entity.CabinClassConfigurationEntity</class>
     <class>entity.CustomerEntity</class>
     <class>entity.EmployeeEntity</class>
-    <class>entity.FlightReservationEntity</class>
-    <class>entity.IndividualFlightReservationEntity</class>
-    <class>entity.PartnerEntity</class>
-    <class>entity.PassengerEntity</class>
-    <class>entity.AirportEntity</class>
     <class>entity.FareEntity</class>
     <class>entity.FlightEntity</class>
+    <class>entity.FlightReservationEntity</class>
     <class>entity.FlightRouteEntity</class>
     <class>entity.FlightScheduleEntity</class>
     <class>entity.FlightSchedulePlanEntity</class>
+    <class>entity.IndividualFlightReservationEntity</class>
     <class>entity.MultipleFlightScheduleEntity</class>
+    <class>entity.PartnerEntity</class>
+    <class>entity.PassengerEntity</class>
     <class>entity.RecurringScheduleEntity</class>
     <class>entity.RecurringWeeklyScheduleEntity</class>
     <class>entity.SeatEntity</class>

@@ -28,8 +28,19 @@ public class SeatEntity implements Serializable {
     private PassengerEntity passenger;
     @OneToOne
     private FareEntity fare;
+
+    public SeatEntity() {
+    }
+
+    public SeatEntity(String seatNumber, boolean reserved, PassengerEntity passenger, FareEntity fare) {
+        this.seatNumber = seatNumber;
+        this.reserved = reserved;
+        this.passenger = passenger;
+        this.fare = fare;
+    }
+
     public Long getSeatId() {
-        return seatId;
+        return seatId; 
     }
 
     public void setSeatId(Long seatId) {
@@ -42,8 +53,7 @@ public class SeatEntity implements Serializable {
         hash += (seatId != null ? seatId.hashCode() : 0);
         return hash;
     }
-    
-    
+
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the seatId fields are not set
@@ -93,5 +103,5 @@ public class SeatEntity implements Serializable {
     public void setFare(FareEntity fare) {
         this.fare = fare;
     }
-    
+
 }

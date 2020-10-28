@@ -27,13 +27,16 @@ public class AirportEntity implements Serializable {
     private String state;
     private String country;
     private int timeZone;
-    
-    public Long getAirportId() {
-        return airportId;
+
+    public AirportEntity() {
     }
 
-    public void setAirportId(Long airportId) {
-        this.airportId = airportId;
+    public AirportEntity(String airportName, String iataAirPortCode, String state, String country, int timeZone) {
+        this.airportName = airportName;
+        this.iataAirPortCode = iataAirPortCode;
+        this.state = state;
+        this.country = country;
+        this.timeZone = timeZone;
     }
 
     @Override
@@ -43,7 +46,9 @@ public class AirportEntity implements Serializable {
         return hash;
     }
 
-    
+    public Long getAirportId() {
+        return airportId;
+    }
 
     public String getAirportName() {
         return airportName;
@@ -84,6 +89,7 @@ public class AirportEntity implements Serializable {
     public void setTimeZone(int timeZone) {
         this.timeZone = timeZone;
     }
+
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the airportId fields are not set

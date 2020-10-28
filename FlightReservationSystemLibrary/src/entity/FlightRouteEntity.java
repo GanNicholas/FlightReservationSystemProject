@@ -33,6 +33,16 @@ public class FlightRouteEntity implements Serializable {
     private boolean isDeleted;
     private FlightRouteEntity returnRoute;
 
+    public FlightRouteEntity() {
+
+    }
+
+    public FlightRouteEntity(AirportEntity originLocation, AirportEntity destinationLocation, FlightRouteEntity returnRoute) {
+        this.originLocation = originLocation;
+        this.destinationLocation = destinationLocation;
+        this.returnRoute = returnRoute;
+    }
+
     public Long getFlightRouteId() {
         return flightRouteId;
     }

@@ -8,6 +8,7 @@ package entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.scene.paint.Color;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,33 +30,36 @@ public abstract class FlightSchedulePlanEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long flightSchedulePlanId;
-    private String flightNumber;
+    protected Long flightSchedulePlanId;
+    protected String flightNumber;
+    @OneToMany(mappedBy = "flightSchedulePlan")
+    protected List<FlightScheduleEntity> listOfFlightSchedule;
+    protected FlightSchedulePlanEntity returnFlightSchedulePlan;
     @OneToMany
-    private List<FlightScheduleEntity> listOfFlightSchedule;
-    private FlightSchedulePlanEntity returnFlightSchedulePlan;
-    @OneToMany
-    private List<FareEntity> listOfFare;
-    private boolean isDeleted;
+    protected List<FareEntity> listOfFare;
+    protected boolean isDeleted;
     @ManyToOne
-    private FlightEntity flightEntity;
+    protected FlightEntity flightEntity;
+
     public FlightSchedulePlanEntity() {
+        listOfFlightSchedule = new ArrayList<FlightScheduleEntity>();
         listOfFare = new ArrayList<FareEntity>();
+        returnFlightSchedulePlan = null;
+        flightEntity = null;
     }
 
-    public FlightSchedulePlanEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity flightSchedulePlan, List<FareEntity> listOfFare, boolean isDeleted) {
+    public FlightSchedulePlanEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity flightSchedulePlan, List<FareEntity> listOfFare, boolean isDeleted, FlightEntity flightEntity) {
         this.flightNumber = flightNumber;
         this.listOfFlightSchedule = listOfFlightSchedule;
         this.returnFlightSchedulePlan = flightSchedulePlan;
         this.listOfFare = listOfFare;
         this.isDeleted = isDeleted;
+        this.flightEntity = flightEntity;
     }
-       
-    
+
     public Long getFlightSchedulePlanId() {
         return flightSchedulePlanId;
     }
-
 
     @Override
     public int hashCode() {
@@ -82,44 +86,4 @@ public abstract class FlightSchedulePlanEntity implements Serializable {
         return "entity.FlightSchedulePlan[ id=" + getFlightSchedulePlanId() + " ]";
     }
 
-    public String getFlightNumber() {
-        return flightNumber;
-    }
-
-    public void setFlightNumber(String flightNumber) {
-        this.flightNumber = flightNumber;
-    }
-
-    public List<FlightScheduleEntity> getListOfFlightSchedule() {
-        return listOfFlightSchedule;
-    }
-
-    public void setListOfFlightSchedule(List<FlightScheduleEntity> listOfFlightSchedule) {
-        this.listOfFlightSchedule = listOfFlightSchedule;
-    }
-
-    public FlightSchedulePlanEntity getReturnFlightSchedulePlan() {
-        return returnFlightSchedulePlan;
-    }
-
-    public void setReturnFlightSchedulePlan(FlightSchedulePlanEntity returnFlightSchedulePlan) {
-        this.returnFlightSchedulePlan = returnFlightSchedulePlan;
-    }
-
-    public List<FareEntity> getListOfFare() {
-        return listOfFare;
-    }
-
-    public void setListOfFare(List<FareEntity> listOfFare) {
-        this.listOfFare = listOfFare;
-    }
-
-    public boolean isIsDeleted() {
-        return isDeleted;
-    }
-
-    public void setIsDeleted(boolean isDeleted) {
-        this.isDeleted = isDeleted;
-    }
-    
 }

@@ -33,13 +33,9 @@ public class FareEntity implements Serializable {
         this.fareBasisCode = fareBasisCode;
         this.fareAmount = fareAmount;
     }
-    
+
     public Long getFareId() {
         return FareId;
-    }
-
-    public void setFareId(Long FareId) {
-        this.FareId = FareId;
     }
 
     @Override
@@ -82,5 +78,5 @@ public class FareEntity implements Serializable {
     public void setFareAmount(BigDecimal fareAmount) {
         this.fareAmount = fareAmount;
     }
-    
+
 }
