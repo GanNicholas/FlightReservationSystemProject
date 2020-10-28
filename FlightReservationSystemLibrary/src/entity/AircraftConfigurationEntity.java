@@ -18,7 +18,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -46,14 +48,21 @@ public class AircraftConfigurationEntity implements Serializable {
     @JoinColumn(nullable = false)
     private List<CabinClassConfigurationEntity> cabinClasses;
 
+    @NotEmpty(message = "Aircraft name cannot be empty!")
+    @Size(max = 80, message = "Aircraft name should not exceed 80 characters!")
+    @Column(nullable = false, length = 80)
+    private String aircraftName;
+
     public AircraftConfigurationEntity() {
         this.cabinClasses = new ArrayList<>();
     }
 
-    public AircraftConfigurationEntity(Integer maxSeatingCapacity, AircraftTypeEntity aircraftType) {
+    public AircraftConfigurationEntity(Integer maxSeatingCapacity, AircraftTypeEntity aircraftType, String aircraftName) {
         this();
         this.maxSeatingCapacity = maxSeatingCapacity;
         this.aircraftType = aircraftType;
+        this.aircraftName = aircraftName;
+
     }
 
     public Long getAircraftConfigId() {
@@ -87,6 +96,15 @@ public class AircraftConfigurationEntity implements Serializable {
     public void setCabinClasses(List<CabinClassConfigurationEntity> cabinClasses) {
         this.cabinClasses = cabinClasses;
     }
+
+    public String getAircraftName() {
+        return aircraftName;
+    }
+
+    public void setAircraftName(String aircraftName) {
+        this.aircraftName = aircraftName;
+    }
+    
 
     @Override
     public int hashCode() {

@@ -135,4 +135,12 @@ public class SeatEntity implements Serializable {
         this.fare = fare;
     }
 
+    public CabinClassType getCabinType() {
+        return cabinType;
+    }
+
+    public void setCabinType(CabinClassType cabinType) {
+        this.cabinType = cabinType;
+    }
+
 }

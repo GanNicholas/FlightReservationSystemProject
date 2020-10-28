@@ -61,7 +61,7 @@ public class CabinClassConfigurationEntity implements Serializable {
     private Integer availableSeats;
 
     @Positive
-    @Min(value = 1, message = "Minimum number of reserved seats is 1")
+    @Min(value = 0, message = "Minimum number of reserved seats is 0")
     @Max(value = 1000, message = "Maximum number of reserved seats is 1000")
     @Column(nullable = false)
     private Integer reservedSeats;
@@ -82,9 +82,8 @@ public class CabinClassConfigurationEntity implements Serializable {
     @Max(value = 1000, message = "Maximum number of seats in a column is 1000")
     @Column(nullable = false)
     private Integer numSeatsInAColumn;
-    
+
     @OneToMany
-    @JoinColumn(nullable = false)
     private List<FareEntity> fares;
 
     public CabinClassConfigurationEntity() {
@@ -102,10 +101,6 @@ public class CabinClassConfigurationEntity implements Serializable {
         this.seatingConfig = seatingConfig;
         this.numSeatsInAColumn = numSeatsInAColumn;
     }
-    
-    
-    
-    
 
     public Long getCabinClassConfigId() {
         return cabinClassConfigId;
@@ -113,6 +108,78 @@ public class CabinClassConfigurationEntity implements Serializable {
 
     public void setCabinClassConfigId(Long cabinClassConfigId) {
         this.cabinClassConfigId = cabinClassConfigId;
+    }
+
+    public CabinClassType getCabinclassType() {
+        return cabinclassType;
+    }
+
+    public void setCabinclassType(CabinClassType cabinclassType) {
+        this.cabinclassType = cabinclassType;
+    }
+
+    public Integer getNumAisles() {
+        return numAisles;
+    }
+
+    public void setNumAisles(Integer numAisles) {
+        this.numAisles = numAisles;
+    }
+
+    public Integer getNumRows() {
+        return numRows;
+    }
+
+    public void setNumRows(Integer numRows) {
+        this.numRows = numRows;
+    }
+
+    public Integer getAvailableSeats() {
+        return availableSeats;
+    }
+
+    public void setAvailableSeats(Integer availableSeats) {
+        this.availableSeats = availableSeats;
+    }
+
+    public Integer getReservedSeats() {
+        return reservedSeats;
+    }
+
+    public void setReservedSeats(Integer reservedSeats) {
+        this.reservedSeats = reservedSeats;
+    }
+
+    public Integer getBalancedSeats() {
+        return balancedSeats;
+    }
+
+    public void setBalancedSeats(Integer balancedSeats) {
+        this.balancedSeats = balancedSeats;
+    }
+
+    public String getSeatingConfig() {
+        return seatingConfig;
+    }
+
+    public void setSeatingConfig(String seatingConfig) {
+        this.seatingConfig = seatingConfig;
+    }
+
+    public Integer getNumSeatsInAColumn() {
+        return numSeatsInAColumn;
+    }
+
+    public void setNumSeatsInAColumn(Integer numSeatsInAColumn) {
+        this.numSeatsInAColumn = numSeatsInAColumn;
+    }
+
+    public List<FareEntity> getFares() {
+        return fares;
+    }
+
+    public void setFares(List<FareEntity> fares) {
+        this.fares = fares;
     }
 
     @Override
@@ -137,7 +204,9 @@ public class CabinClassConfigurationEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.CabinClassConfigurationEntity[ id=" + cabinClassConfigId + " ]";
+        return "entity.CabinClassConfigurationEntity[ id=" + cabinClassConfigId + " ] + [ cabinclassType=" + cabinclassType + " ]  + [ numAisles=" + numAisles + " ]"
+                + "+ [ numRows=" + numRows + " ]+ [ availableSeats=" + availableSeats + " ]+ [ reservedSeats=" + reservedSeats + " ]+ [ balancedSeats=" + balancedSeats + " ]+ [ seatingConfig=" + seatingConfig + " ]"
+                + "+ [ numSeatsInAColumn=" + numSeatsInAColumn + " ]";
     }
 
 }

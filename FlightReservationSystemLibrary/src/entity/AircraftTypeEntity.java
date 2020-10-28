@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 /**
@@ -25,6 +26,7 @@ public class AircraftTypeEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long aircraftTypeId;
 
+    @NotEmpty(message = "Airport name cannot be empty!")
     @Size(min = 4, max = 40, message = "Aircraft type should be minimum 4 characters")
     @Column(length = 40, nullable = false)
     private String aircraftTypeName;

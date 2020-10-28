@@ -46,8 +46,8 @@ public class DataInitSessionBean {
 
         PartnerEntity partner = em.find(PartnerEntity.class, 1L);
         if (partner == null) {
-            PartnerEntity partnerEmployee = new PartnerEntity("HrsPartnerEmployee", "password", UserRole.PARTNEREMPLOYEE, "Holiday Reservation System");
-            PartnerEntity partnerManager = new PartnerEntity("HrsPartnerManager", "password", UserRole.PARTNERRESERVATIONMANAGER, "Holiday Reservation System");
+            PartnerEntity partnerEmployee = new PartnerEntity("PartnerEmployee", "password", UserRole.PARTNEREMPLOYEE, "Holiday Reservation System");
+            PartnerEntity partnerManager = new PartnerEntity("PartnerManager", "password", UserRole.PARTNERRESERVATIONMANAGER, "Holiday Reservation System");
             em.persist(partnerEmployee);
             em.persist(partnerManager);
         }

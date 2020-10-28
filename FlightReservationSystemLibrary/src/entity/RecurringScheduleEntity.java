@@ -5,7 +5,7 @@
  */
 package entity;
 
-import DateValidation.GregorianDateValidate;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -14,6 +14,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -26,8 +27,7 @@ import javax.validation.constraints.Positive;
 public class RecurringScheduleEntity extends FlightSchedulePlanEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @NotNull
-    @GregorianDateValidate
+    @Future
     private GregorianCalendar endDate;
     @Positive
     @Min(value = 1, message = "Minimum for recurrent frequency is 1!")
