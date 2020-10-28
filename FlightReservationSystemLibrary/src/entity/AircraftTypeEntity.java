@@ -24,10 +24,17 @@ public class AircraftTypeEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long aircraftTypeId;
-    
+
     @Size(min = 4, max = 40, message = "Aircraft type should be minimum 4 characters")
     @Column(length = 40, nullable = false)
     private String aircraftTypeName;
+
+    public AircraftTypeEntity() {
+    }
+
+    public AircraftTypeEntity(String aircraftTypeName) {
+        this.aircraftTypeName = aircraftTypeName;
+    }
 
     public Long getAircraftTypeId() {
         return aircraftTypeId;
@@ -69,5 +76,5 @@ public class AircraftTypeEntity implements Serializable {
     public String toString() {
         return "entity.AircraftTypeEntity[ id=" + aircraftTypeId + " ]";
     }
-    
+
 }

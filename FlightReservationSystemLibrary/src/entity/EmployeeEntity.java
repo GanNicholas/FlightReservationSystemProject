@@ -13,8 +13,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import util.enumeration.UserRole;
@@ -42,7 +40,7 @@ public class EmployeeEntity implements Serializable {
     private String loginId;
     
     @NotNull
-    @Size(min = 8, max = 16, message = "Login Password has to be minimum 8 characters and maximum 25")
+    @Size(min = 8, max = 16, message = "Login Password has to be minimum 8 characters and maximum 16")
     @Column(nullable = false, length = 16)
     private String loginPw;
     

@@ -6,19 +6,9 @@
 package entity;
 
 import java.io.Serializable;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import util.enumeration.UserRole;
 
@@ -27,78 +17,40 @@ import util.enumeration.UserRole;
  * @author nickg
  */
 @Entity
-public class PartnerEntity implements Serializable {
+public class PartnerEntity extends CustomerEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long partnerId;
 
-    @NotEmpty(message = "First Name cannot be empty!")
+    @NotEmpty(message = "Name cannot be empty!")
     @Size(min = 2, max = 80, message = "Name needs to be between 2 to 80 characters")
     @Column(nullable = false, length = 80)
-    private String name;
+    private String partnerName;
 
-    @NotBlank(message = "Login ID cannot contain spaces or be empty!")
-    @Size(min = 6, max = 16, message = "Login ID has to be minimum 6 characters and maximum 25")
-    @Column(nullable = false, length = 16, unique = true)
-    private String loginId;
+    public PartnerEntity() {
+        super();
+    }
 
-    @NotBlank(message = "Login Password cannot contain spaces or be empty!")
-    @Size(min = 8, max = 16, message = "Login Password has to be minimum 8 characters and maximum 25")
-    @Column(nullable = false, length = 16)
-    private String loginPw;
-    
-    @NotNull
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private UserRole userRole;
+    public PartnerEntity(String loginId, String loginPw, UserRole userRole, String partnerName) {
+        super(loginId, loginPw, userRole);
+        this.partnerName = partnerName;
+    }
 
-    @NotNull
-    @OneToMany
-    @JoinColumn(nullable = false)
-    private List<FlightReservationEntity> listOfFlightReservation;
-    
     public Long getPartnerId() {
-        return partnerId;
+        return this.getCustomerId();
     }
 
-    public void setPartnerId(Long partnerId) {
-        this.partnerId = partnerId;
+    public String getPartnerName() {
+        return partnerName;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getLoginId() {
-        return loginId;
-    }
-
-    public void setLoginId(String loginId) {
-        this.loginId = loginId;
-    }
-
-    public String getLoginPw() {
-        return loginPw;
-    }
-
-    public void setLoginPw(String loginPw) {
-        this.loginPw = loginPw;
-    }
-
-    public UserRole getUserRole() {
-        return userRole;
+    public void setPartnerName(String partnerName) {
+        this.partnerName = partnerName;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (partnerId != null ? partnerId.hashCode() : 0);
+        hash += (this.getCustomerId() != null ? this.getCustomerId().hashCode() : 0);
         return hash;
     }
 
@@ -109,7 +61,7 @@ public class PartnerEntity implements Serializable {
             return false;
         }
         PartnerEntity other = (PartnerEntity) object;
-        if ((this.partnerId == null && other.partnerId != null) || (this.partnerId != null && !this.partnerId.equals(other.partnerId))) {
+        if ((this.getPartnerId() == null && other.getPartnerId() != null) || (this.getPartnerId() != null && !this.getPartnerId().equals(other.getPartnerId()))) {
             return false;
         }
         return true;
@@ -117,6 +69,6 @@ public class PartnerEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.PartnerEntity[ id=" + partnerId + " ]";
+        return "entity.PartnerEntity[ id=" + this.getCustomerId() + " ]";
     }
 }

@@ -25,7 +25,7 @@ public class PassengerEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long passengerId;
-    
+
     @NotEmpty(message = "First Name cannot be empty!")
     @Size(min = 2, max = 80, message = "First name needs to be between 2 to 80 characters")
     @Column(nullable = false, length = 80)
@@ -35,11 +35,20 @@ public class PassengerEntity implements Serializable {
     @Size(min = 2, max = 80, message = "Last name needs to be between 2 to 80 characters")
     @Column(nullable = false, length = 80)
     private String lastName;
-    
+
     @NotEmpty(message = "Passport number cannot be empty!")
     @Size(min = 6, max = 20, message = "Passport number should be between 6 to 20 characters")
     @Column(nullable = false, length = 20, unique = true)
     private String passportNumber;
+
+    public PassengerEntity() {
+    }
+
+    public PassengerEntity(String firstName, String lastName, String passportNumber) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.passportNumber = passportNumber;
+    }
 
     public Long getPassengerId() {
         return passengerId;

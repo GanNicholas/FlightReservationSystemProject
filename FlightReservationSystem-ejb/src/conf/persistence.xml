@@ -22,6 +22,7 @@
     <class>entity.RecurringWeeklyScheduleEntity</class>
     <class>entity.SeatEntity</class>
     <class>entity.SingleFlightScheduleEntity</class>
+    <class>entity.FRSCustomerEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>

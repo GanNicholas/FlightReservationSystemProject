@@ -32,16 +32,22 @@ public class IndividualFlightReservationEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long indivFlightResId;
+    
+    @NotNull
+    @OneToOne(optional = false)
+    @JoinColumn(nullable = false)
     private FlightScheduleEntity flightSchedule;
     
-    @OneToMany()
+    @OneToMany
     @JoinColumn(nullable = false)
-    private List<PassengerEntity> listOfPassenger;
+    private List<PassengerEntity> listOfPassengers;
     
     @OneToOne(optional = false)
     @JoinColumn(nullable = false)
     private PartnerEntity partnerInfo;
     
+    @OneToMany
+    @JoinColumn(nullable = false)
     private List<SeatEntity> listOfSeats;
     
     @NotNull
@@ -54,7 +60,7 @@ public class IndividualFlightReservationEntity implements Serializable {
     private FlightReservationEntity flightReservation;
 
     public IndividualFlightReservationEntity() {
-        this.listOfPassenger = new ArrayList<>();
+        this.listOfPassengers = new ArrayList<>();
         this.listOfSeats = new ArrayList<>();
     }
 
@@ -75,11 +81,11 @@ public class IndividualFlightReservationEntity implements Serializable {
     }
 
     public List<PassengerEntity> getlistOfPassenger() {
-        return listOfPassenger;
+        return listOfPassengers;
     }
 
     public void setlistOfPassenger(List<PassengerEntity> listOfPassenger) {
-        this.listOfPassenger = listOfPassenger;
+        this.listOfPassengers = listOfPassenger;
     }
 
     public PartnerEntity getPartnerInfo() {

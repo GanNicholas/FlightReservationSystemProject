@@ -15,14 +15,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import util.enumeration.UserRole;
 
@@ -31,37 +29,13 @@ import util.enumeration.UserRole;
  * @author nickg
  */
 @Entity
-public class CustomerEntity implements Serializable {
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class CustomerEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long customerId;
-
-    @NotEmpty(message = "First Name cannot be empty!")
-    @Size(min = 2, max = 80, message = "First name needs to be between 2 to 80 characters")
-    @Column(nullable = false, length = 80)
-    private String firstName;
-
-    @NotEmpty(message = "Last Name cannot be empty!")
-    @Size(min = 2, max = 80, message = "Last name needs to be between 2 to 80 characters")
-    @Column(nullable = false, length = 80)
-    private String lastName;
-
-    @NotEmpty(message = "Email cannot be empty!")
-    @Size(min = 15, max = 320, message = "Email address has to be between 15 and 320 characters inclusive @domain.com")
-    @Column(nullable = false, length = 320)
-    private String email;
-
-    @Min(value = 8, message = "Phone number is minimum 8 numbers long, with country prefix")
-    @Max(value = 18, message = "Phone number is 18 numbers long, with country prefix")
-    @Column(nullable = false, length = 8, unique = true)
-    private String phoneNumber;
-
-    @NotEmpty(message = "Address cannot be empty!")
-    @Size(min = 15, max = 85, message = "Address has to be minimum 15 characters")
-    @Column(nullable = false, length = 85)
-    private String address;
+    protected Long customerId;
 
     @NotBlank(message = "Login ID cannot contain spaces or be empty!")
     @Size(min = 6, max = 16, message = "Login ID has to be minimum 6 characters and maximum 25")
@@ -87,13 +61,8 @@ public class CustomerEntity implements Serializable {
         listOfFlightReservation = new ArrayList<>();
     }
 
-    public CustomerEntity(String firstName, String lastName, String email, String phoneNumber, String address, String loginId, String loginPw, UserRole userRole) {
+    public CustomerEntity(String loginId, String loginPw, UserRole userRole) {
         this();
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.address = address;
         this.loginId = loginId;
         this.loginPw = loginPw;
         this.userRole = userRole;
@@ -105,46 +74,6 @@ public class CustomerEntity implements Serializable {
 
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public String getLoginId() {

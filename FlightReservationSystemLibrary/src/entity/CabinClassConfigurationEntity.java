@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,9 +15,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import util.enumeration.CabinClassType;
@@ -33,7 +37,9 @@ public class CabinClassConfigurationEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cabinClassConfigId;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private CabinClassType cabinclassType;
 
     @Positive
@@ -67,7 +73,7 @@ public class CabinClassConfigurationEntity implements Serializable {
     private Integer balancedSeats;
 
     @NotBlank(message = "Seating configuration cannot be empty")
-    @Size(min = 3, max = 4, message = "Seating configuration should be between 3 to 4 characters, inclusive of '-'")
+    @Size(min = 3, max = 5, message = "Seating configuration should be between 3 to 5 characters, inclusive of '-'")
     @Column(nullable = false)
     private String seatingConfig;
 
@@ -77,7 +83,29 @@ public class CabinClassConfigurationEntity implements Serializable {
     @Column(nullable = false)
     private Integer numSeatsInAColumn;
     
+    @OneToMany
+    @JoinColumn(nullable = false)
     private List<FareEntity> fares;
+
+    public CabinClassConfigurationEntity() {
+        this.fares = new ArrayList<>();
+    }
+
+    public CabinClassConfigurationEntity(CabinClassType cabinclassType, Integer numAisles, Integer numRows, Integer availableSeats, Integer reservedSeats, Integer balancedSeats, String seatingConfig, Integer numSeatsInAColumn) {
+        this();
+        this.cabinclassType = cabinclassType;
+        this.numAisles = numAisles;
+        this.numRows = numRows;
+        this.availableSeats = availableSeats;
+        this.reservedSeats = reservedSeats;
+        this.balancedSeats = balancedSeats;
+        this.seatingConfig = seatingConfig;
+        this.numSeatsInAColumn = numSeatsInAColumn;
+    }
+    
+    
+    
+    
 
     public Long getCabinClassConfigId() {
         return cabinClassConfigId;
