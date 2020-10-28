@@ -26,17 +26,19 @@ public class AirportEntity implements Serializable {
     private String iataAirPortCode;
     private String state;
     private String country;
-    private int timeZone;
+    private Integer timeZoneHour;
+    private Integer timeZoneMin;
 
     public AirportEntity() {
     }
 
-    public AirportEntity(String airportName, String iataAirPortCode, String state, String country, int timeZone) {
+    public AirportEntity(String airportName, String iataAirPortCode, String state, String country, Integer timeZoneHour, Integer timezoneMin) {
         this.airportName = airportName;
         this.iataAirPortCode = iataAirPortCode;
         this.state = state;
         this.country = country;
-        this.timeZone = timeZone;
+        this.timeZoneHour = timeZoneHour;
+        this.timeZoneMin = timezoneMin;
     }
 
     @Override
@@ -56,6 +58,22 @@ public class AirportEntity implements Serializable {
 
     public void setAirportName(String airportName) {
         this.airportName = airportName;
+    }
+
+    public Integer getTimeZoneHour() {
+        return timeZoneHour;
+    }
+
+    public void setTimeZoneHour(Integer timeZoneHour) {
+        this.timeZoneHour = timeZoneHour;
+    }
+
+    public Integer getTimeZoneMin() {
+        return timeZoneMin;
+    }
+
+    public void setTimeZoneMin(Integer timeZoneMin) {
+        this.timeZoneMin = timeZoneMin;
     }
 
     public String getIataAirPortCode() {
@@ -82,13 +100,7 @@ public class AirportEntity implements Serializable {
         this.country = country;
     }
 
-    public int getTimeZone() {
-        return timeZone;
-    }
-
-    public void setTimeZone(int timeZone) {
-        this.timeZone = timeZone;
-    }
+   
 
     @Override
     public boolean equals(Object object) {
