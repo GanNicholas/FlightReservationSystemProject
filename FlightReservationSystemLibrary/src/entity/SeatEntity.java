@@ -40,7 +40,7 @@ public class SeatEntity implements Serializable {
     }
 
     public Long getSeatId() {
-        return seatId;
+        return seatId; 
     }
 
     public void setSeatId(Long seatId) {
