@@ -35,7 +35,7 @@ public class AirportEntity implements Serializable {
 
     @NotNull
     @Column(nullable = false, length = 3, unique = true)
-    private String iataAirPortCode;
+    private String iataAirportCode;
 
     @Size(min = 0, max = 55, message = "Flight number should not exceed 100 characters!")
     private String state;
@@ -45,21 +45,26 @@ public class AirportEntity implements Serializable {
     @Column(nullable = false, length = 57)
     private String country;
 
-    @Max(value = 28, message = "Maximum time zone is 28")
-    private Integer timeZone;
-
-    @Size(max = 28, message = "Country name should not exceed 28 characters!")
+    @Size(max = 87, message = "City should not exceed 87 characters!")
+    @Column(nullable = false, length = 87)
     private String city;
+
+    @Max(value = 28, message = "Maximum time zone in hour  is 28!")
+    private Integer timeZoneHour;
+
+    @Max(value = 59, message = "Maximum time zone in minute is 59!")
+    private Integer timeZoneMin;
 
     public AirportEntity() {
     }
 
-    public AirportEntity(String airportName, String iataAirPortCode, String state, String country, int timeZone, String city) {
+    public AirportEntity(String airportName, String iataAirportCode, String state, String country, Integer timeZoneHour, Integer timezoneMin, String city) {
         this.airportName = airportName;
-        this.iataAirPortCode = iataAirPortCode;
+        this.iataAirportCode = iataAirportCode;
         this.state = state;
         this.country = country;
-        this.timeZone = timeZone;
+        this.timeZoneHour = timeZoneHour;
+        this.timeZoneMin = timezoneMin;
         this.city = city;
     }
 
@@ -82,12 +87,28 @@ public class AirportEntity implements Serializable {
         this.airportName = airportName;
     }
 
-    public String getIataAirPortCode() {
-        return iataAirPortCode;
+    public Integer getTimeZoneHour() {
+        return timeZoneHour;
     }
 
-    public void setIataAirPortCode(String iataAirPortCode) {
-        this.iataAirPortCode = iataAirPortCode;
+    public void setTimeZoneHour(Integer timeZoneHour) {
+        this.timeZoneHour = timeZoneHour;
+    }
+
+    public Integer getTimeZoneMin() {
+        return timeZoneMin;
+    }
+
+    public void setTimeZoneMin(Integer timeZoneMin) {
+        this.timeZoneMin = timeZoneMin;
+    }
+
+    public String getIataAirportCode() {
+        return iataAirportCode;
+    }
+
+    public void setIataAirportCode(String iataAirportCode) {
+        this.iataAirportCode = iataAirportCode;
     }
 
     public String getState() {
@@ -104,22 +125,6 @@ public class AirportEntity implements Serializable {
 
     public void setCountry(String country) {
         this.country = country;
-    }
-
-    public int getTimeZone() {
-        return timeZone;
-    }
-
-    public void setTimeZone(int timeZone) {
-        this.timeZone = timeZone;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
     }
 
     @Override
