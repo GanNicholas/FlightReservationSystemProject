@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -30,7 +31,7 @@ public class FlightEntity implements Serializable {
     private String flightNumber;
     @ManyToOne
     private FlightRouteEntity flightRoute;
-    @OneToMany
+    @OneToOne(optional = false)
     @JoinColumn(nullable = false)
     private AircraftConfigurationEntity aircraftConfig;
     private boolean isDeleted;
@@ -130,4 +131,13 @@ public class FlightEntity implements Serializable {
     public void setReturnFlight(FlightEntity returnFlight) {
         this.returnFlight = returnFlight;
     }
+
+    public List<FlightSchedulePlanEntity> getListOfFlightSchedulePlan() {
+        return listOfFlightSchedulePlan;
+    }
+
+    public void setListOfFlightSchedulePlan(List<FlightSchedulePlanEntity> listOfFlightSchedulePlan) {
+        this.listOfFlightSchedulePlan = listOfFlightSchedulePlan;
+    }
+    
 }
