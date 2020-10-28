@@ -26,7 +26,7 @@ public class FareEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long FareId;
     @NotEmpty(message = "Fare basis code cannot be empty!")
     @Size(min = 3, max = 7, message = "Fare basis code has to be 3 to 7 characters long!")

@@ -5,7 +5,11 @@
  */
 package ejb.session.stateless;
 
+import entity.AircraftConfigurationEntity;
+import entity.FlightEntity;
+import entity.FlightRouteEntity;
 import javax.ejb.Remote;
+import util.exception.FlightExistsException;
 
 /**
  *
@@ -13,5 +17,9 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface FlightSessionBeanRemote {
-    
+
+    public FlightEntity createFlightWithoutReturnFlight(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig) throws FlightExistsException;
+
+    public FlightEntity createFlightWithReturnFlight(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig, FlightEntity returnFlight) throws FlightExistsException;
+
 }

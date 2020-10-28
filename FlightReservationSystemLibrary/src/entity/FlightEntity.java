@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotEmpty;
@@ -25,16 +26,17 @@ import javax.validation.constraints.Size;
  * @author sohqi
  */
 @Entity
+@NamedQuery(name = "retrieveFlightUsingFlightNumber", query = "SELECT e FROM FlightEntity e WHERE e.flightNumber = :flightNum")
 public class FlightEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long flightId;
 
     @NotEmpty(message = "Flight number cannot be empty!")
     @Size(min = 1, max = 16, message = "Flight number should not exceed 16 characters!")
-    @Column(nullable = false, length = 8)
+    @Column(nullable = false, length = 16, unique = true)
     private String flightNumber;
 
     @ManyToOne
