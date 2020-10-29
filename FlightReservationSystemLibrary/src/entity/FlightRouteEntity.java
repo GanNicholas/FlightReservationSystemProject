@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 
 /**
@@ -18,6 +19,7 @@ import javax.persistence.OneToOne;
  * @author sohqi
  */
 @Entity
+@NamedQuery(name = "findFlightRoute", query = "SELECT a FROM FlightRouteEntity a WHERE a.originLocation =:origin AND a.destinationLocation =:destination")
 public class FlightRouteEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;

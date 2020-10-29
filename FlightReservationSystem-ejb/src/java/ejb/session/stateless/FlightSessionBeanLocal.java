@@ -8,8 +8,11 @@ package ejb.session.stateless;
 import entity.AircraftConfigurationEntity;
 import entity.FlightEntity;
 import entity.FlightRouteEntity;
+import java.util.List;
 import javax.ejb.Local;
+import util.exception.FlightDoesNotExistException;
 import util.exception.FlightExistsException;
+import util.exception.FlightRecordIsEmptyException;
 
 /**
  *
@@ -21,5 +24,12 @@ public interface FlightSessionBeanLocal {
     public FlightEntity createFlightWithoutReturnFlight(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig) throws FlightExistsException;
 
     public FlightEntity createFlightWithReturnFlight(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig, FlightEntity returnFlight) throws FlightExistsException;
-    
+
+    public List<FlightEntity> viewAllFlights() throws FlightRecordIsEmptyException;
+
+    public FlightEntity viewFlightDetails(String flightNumber) throws FlightDoesNotExistException;
+
+    public void updateFlight(FlightEntity flight) throws FlightDoesNotExistException;
+
+    public boolean deleteFlight(String flightNumber) throws FlightDoesNotExistException;
 }

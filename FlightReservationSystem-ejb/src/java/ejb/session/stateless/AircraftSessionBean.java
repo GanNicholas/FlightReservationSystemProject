@@ -85,7 +85,7 @@ public class AircraftSessionBean implements AircraftSessionBeanRemote, AircraftS
                     s.setSeatNumber((seatNumber) + "" + cabinCol.charAt(col));
                     System.out.println("Seat : " + s.getSeatNumber());
                     s.setReserved(false);
-                    s.setCabinType(cabin.getCabinclassType());
+                    //s.(cabin.getCabinclassType());
                     em.persist(s);
                     em.flush();
                 }

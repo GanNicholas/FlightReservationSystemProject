@@ -33,12 +33,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         try {
             EmployeeEntity employee = (EmployeeEntity) em.createNamedQuery("retrieveUsingLogin").setParameter("login", userId).getSingleResult();
             if (employee.getLoginPw().equals(userPw)) {
-                if (employee.isEmployeeLoggedIn() == Boolean.TRUE) {
-                    throw new CurrentlyLoggedInException("Employee currently logged in!");
-                } else {
-                    employee.login();
-                    return true;
-                }
+                return true;
             } else {
                 throw new WrongPasswordException("Wrong password has been entered!");
             }
@@ -51,12 +46,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     public boolean employeeLogOut(String userId) throws EmployeeDoesNotExistException, CurrentlyLoggedOutException {
         try {
             EmployeeEntity employee = (EmployeeEntity) em.createNamedQuery("retrieveUsingLogin").setParameter("login", userId).getSingleResult();
-            if (employee.isEmployeeLoggedIn() == Boolean.FALSE) {
-                throw new CurrentlyLoggedOutException("Employee currently logged out!");
-            } else {
-                employee.logout();
-                return true;
-            }
+            return true;
         } catch (NoResultException ex) {
             throw new EmployeeDoesNotExistException("Employee does not exist!");
         }

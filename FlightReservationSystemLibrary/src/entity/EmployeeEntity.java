@@ -52,8 +52,6 @@ public class EmployeeEntity implements Serializable {
     private UserRole userRole;
 
     
-    private Boolean loggedIn;
-    
     public EmployeeEntity() {
     }
 
@@ -62,7 +60,6 @@ public class EmployeeEntity implements Serializable {
         this.loginId = loginId;
         this.loginPw = loginPw;
         this.userRole = userRole;
-        this.loggedIn = false;
     }
 
     public Long getEmployeeId() {
@@ -101,17 +98,6 @@ public class EmployeeEntity implements Serializable {
         return userRole;
     }
     
-    public Boolean isEmployeeLoggedIn(){
-        return this.loggedIn;
-    }
-
-    public void login(){
-        this.loggedIn = Boolean.TRUE;
-    }
-    
-    public void logout(){
-        this.loggedIn = Boolean.FALSE;
-    }
     
     @Override
     public int hashCode() {

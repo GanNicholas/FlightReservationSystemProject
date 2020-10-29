@@ -19,7 +19,9 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
@@ -29,6 +31,7 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@NamedQuery(name = "queryFSPwithFlightNumber", query = "SELECT c FROM FlightSchedulePlanEntity c WHERE c.flightNumber = :flightNum")
 public abstract class FlightSchedulePlanEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -39,30 +42,39 @@ public abstract class FlightSchedulePlanEntity implements Serializable {
     @NotEmpty(message = "Flight number cannot be empty!")
     @Size(min = 1, max = 16, message = "Flight number should not exceed 16 characters!")
     @Column(nullable = false, length = 8)
-    protected String flightNumber;
+    private String flightNumber;
 
     @OneToMany(mappedBy = "flightSchedulePlan")
     @JoinColumn(nullable = false)
-    protected List<FlightScheduleEntity> listOfFlightSchedule;
+    private List<FlightScheduleEntity> listOfFlightSchedule;
 
-    protected FlightSchedulePlanEntity returnFlightSchedulePlan;
+    @OneToOne
+    private FlightSchedulePlanEntity returnFlightSchedulePlan;
 
     @OneToMany
     @JoinColumn(nullable = false)
-    protected List<FareEntity> listOfFare;
-    
+    private List<FareEntity> listOfFare;
 
-    protected boolean isDeleted;
+    private boolean isDeleted;
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    protected FlightEntity flightEntity;
+    private FlightEntity flightEntity;
 
     public FlightSchedulePlanEntity() {
-        listOfFlightSchedule = new ArrayList<FlightScheduleEntity>();
-        listOfFare = new ArrayList<FareEntity>();
-        returnFlightSchedulePlan = null;
-        flightEntity = null;
+        this.listOfFlightSchedule = new ArrayList<FlightScheduleEntity>();
+        this.listOfFare = new ArrayList<FareEntity>();
+        this.returnFlightSchedulePlan = null;
+        this.flightEntity = null;
+    }
+
+    public FlightSchedulePlanEntity(String flightNumber, boolean isDeleted, FlightEntity flightEntity) {
+        this.flightNumber = flightNumber;
+        this.isDeleted = isDeleted;
+        this.flightEntity = flightEntity;
+        this.listOfFlightSchedule = new ArrayList<FlightScheduleEntity>();
+        this.listOfFare = new ArrayList<FareEntity>();
+        this.returnFlightSchedulePlan = null;
     }
 
     public FlightSchedulePlanEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity flightSchedulePlan, List<FareEntity> listOfFare, boolean isDeleted, FlightEntity flightEntity) {
@@ -76,6 +88,54 @@ public abstract class FlightSchedulePlanEntity implements Serializable {
 
     public Long getFlightSchedulePlanId() {
         return flightSchedulePlanId;
+    }
+
+    public String getFlightNumber() {
+        return flightNumber;
+    }
+
+    public void setFlightNumber(String flightNumber) {
+        this.flightNumber = flightNumber;
+    }
+
+    public List<FlightScheduleEntity> getListOfFlightSchedule() {
+        return listOfFlightSchedule;
+    }
+
+    public void setListOfFlightSchedule(List<FlightScheduleEntity> listOfFlightSchedule) {
+        this.listOfFlightSchedule = listOfFlightSchedule;
+    }
+
+    public FlightSchedulePlanEntity getReturnFlightSchedulePlan() {
+        return returnFlightSchedulePlan;
+    }
+
+    public void setReturnFlightSchedulePlan(FlightSchedulePlanEntity returnFlightSchedulePlan) {
+        this.returnFlightSchedulePlan = returnFlightSchedulePlan;
+    }
+
+    public List<FareEntity> getListOfFare() {
+        return listOfFare;
+    }
+
+    public void setListOfFare(List<FareEntity> listOfFare) {
+        this.listOfFare = listOfFare;
+    }
+
+    public boolean isIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public FlightEntity getFlightEntity() {
+        return flightEntity;
+    }
+
+    public void setFlightEntity(FlightEntity flightEntity) {
+        this.flightEntity = flightEntity;
     }
 
     @Override

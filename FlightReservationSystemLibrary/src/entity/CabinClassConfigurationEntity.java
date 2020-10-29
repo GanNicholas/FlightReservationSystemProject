@@ -22,6 +22,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import util.enumeration.CabinClassType;
 
@@ -54,20 +55,18 @@ public class CabinClassConfigurationEntity implements Serializable {
     @Column(nullable = false)
     private Integer numRows;
 
-    // @Positive
-    //@Min(value = 0, message = "Minimum number of available seats is 0")
+    @PositiveOrZero
+    @Min(value = 0, message = "Minimum number of available seats is 0")
     @Max(value = 1000, message = "Maximum number of available seats is 1000")
     @Column(nullable = false)
     private Integer availableSeats;
 
-    //@Positive
-    //@Min(value = 0, message = "Minimum number of reserved seats is 0")
+    @PositiveOrZero
+    @Min(value = 0, message = "Minimum number of reserved seats is 0")
     @Max(value = 1000, message = "Maximum number of reserved seats is 1000")
     @Column(nullable = false)
     private Integer reservedSeats;
 
-    // @Positive
-    //@Min(value = 0, message = "Minimum number of balanced seats is 0")
     @Max(value = 1000, message = "Maximum number of balanced seats is 1000")
     @Column(nullable = false)
     private Integer balancedSeats;
@@ -77,11 +76,9 @@ public class CabinClassConfigurationEntity implements Serializable {
     @Column(nullable = false)
     private String seatingConfig;
 
-    @OneToMany
-    private List<FareEntity> fares;
+    
 
     public CabinClassConfigurationEntity() {
-        this.fares = new ArrayList<>();
     }
 
     public CabinClassConfigurationEntity(CabinClassType cabinclassType, Integer numAisles, Integer numRows, Integer availableSeats, Integer reservedSeats, Integer balancedSeats, String seatingConfig) {
@@ -159,13 +156,7 @@ public class CabinClassConfigurationEntity implements Serializable {
         this.seatingConfig = seatingConfig;
     }
 
-    public List<FareEntity> getFares() {
-        return fares;
-    }
 
-    public void setFares(List<FareEntity> fares) {
-        this.fares = fares;
-    }
 
     @Override
     public int hashCode() {

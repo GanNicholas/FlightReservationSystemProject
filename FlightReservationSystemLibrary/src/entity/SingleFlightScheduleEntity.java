@@ -26,6 +26,10 @@ public class SingleFlightScheduleEntity extends FlightSchedulePlanEntity impleme
         super();
 
     }
+    
+    public SingleFlightScheduleEntity (String flightNumber, boolean isDeleted, FlightEntity flightEntity){
+        super(flightNumber, isDeleted, flightEntity);
+    }
 
     public SingleFlightScheduleEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity returnFlightSchedulePlan, List<FareEntity> listOfFare, boolean isDeleted, FlightEntity flightEntity) {
         super(flightNumber, listOfFlightSchedule, returnFlightSchedulePlan, listOfFare, isDeleted, flightEntity);
