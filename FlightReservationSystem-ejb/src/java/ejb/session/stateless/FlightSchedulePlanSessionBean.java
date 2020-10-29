@@ -32,7 +32,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
     private EntityManager em;
 
     //for single/multiple flight schedule plan
-    public String createSingleFlightSchedulePlan(String flightNumber, Integer numSchedule, GregorianCalendar departureDateTime, Integer flightDuration, boolean createReturnFlightSchedule, List<FareEntity> listOfFares) throws FlightDoesNotExistException {
+    /* public String createSingleFlightSchedulePlan(String flightNumber, Integer numSchedule, GregorianCalendar departureDateTime, Integer flightDuration, boolean createReturnFlightSchedule, List<FareEntity> listOfFares) throws FlightDoesNotExistException {
         FlightEntity flight;
         try {
             flight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", flightNumber);
@@ -75,5 +75,5 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
         } else {
 
         }
-    }
+    }*/
 }

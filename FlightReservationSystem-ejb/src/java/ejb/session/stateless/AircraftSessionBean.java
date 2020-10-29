@@ -13,12 +13,14 @@ import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.AircraftConfigurationNotExistException;
 import util.exception.CabinClassExceedMaxCapacity;
 
 /**
@@ -78,7 +80,7 @@ public class AircraftSessionBean implements AircraftSessionBeanRemote, AircraftS
                 numPplPerRow += Integer.parseInt(getSeatingPerRow[i]);
 
             }
-            System.out.println("num ppl in row: " + numPplPerRow);
+            // System.out.println("num ppl in row: " + numPplPerRow);
             for (int noOfRow = 0; noOfRow < cabin.getNumRows(); noOfRow++) {
                 for (int col = 0; col < numPplPerRow; col++) {
                     s = new SeatEntity();
@@ -88,6 +90,7 @@ public class AircraftSessionBean implements AircraftSessionBeanRemote, AircraftS
                     //s.(cabin.getCabinclassType());
                     em.persist(s);
                     em.flush();
+                    aircraftConfigurationEntity.getSeatingPlan().add(s);
                 }
                 seatNumber++;
             }
@@ -99,9 +102,23 @@ public class AircraftSessionBean implements AircraftSessionBeanRemote, AircraftS
     // "Insert Code > Add Business Method")
 
     public List<AircraftConfigurationEntity> viewAircraftConfiguration() {
-        Query query = em.createQuery("SELECT a FROM AircraftConfigurationEntity AS a ORDER BY a.aircraftType asc, a.aircraftName asc");
+        Query query = em.createQuery("SELECT a FROM AircraftConfigurationEntity AS a ORDER BY a.aircraftType.aircraftTypeName asc, a.aircraftName asc");
         List<AircraftConfigurationEntity> aircraftConfiguration = query.getResultList();
 
         return aircraftConfiguration;
     }
+
+    public AircraftConfigurationEntity viewDetailAircraftConfiguration(Long index) throws AircraftConfigurationNotExistException {
+        AircraftConfigurationEntity aircraft = null;
+        try {
+
+            Query query = em.createQuery("SELECT a FROM AircraftConfigurationEntity a WHERE a.aircraftConfigId=:aircraftId").setParameter("aircraftId", index);
+            aircraft = (AircraftConfigurationEntity) query.getSingleResult();
+            aircraft.getCabinClasses().size();
+        } catch (NoResultException ex) {
+            throw new AircraftConfigurationNotExistException("No such record");
+        }
+        return aircraft;
+    }
+
 }

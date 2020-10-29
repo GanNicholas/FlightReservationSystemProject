@@ -10,6 +10,7 @@ import entity.AircraftTypeEntity;
 import entity.CabinClassConfigurationEntity;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.AircraftConfigurationNotExistException;
 import util.exception.CabinClassExceedMaxCapacity;
 
 /**
@@ -19,7 +20,9 @@ import util.exception.CabinClassExceedMaxCapacity;
 @Remote
 public interface AircraftSessionBeanRemote {
 
-     public Long createAircraftConfiguration(AircraftConfigurationEntity aircraftConfigurationEntity, AircraftTypeEntity aircarAircraftTypeEntity, List<CabinClassConfigurationEntity> listOfCabinClassConfig);
+    public Long createAircraftConfiguration(AircraftConfigurationEntity aircraftConfigurationEntity, AircraftTypeEntity aircarAircraftTypeEntity, List<CabinClassConfigurationEntity> listOfCabinClassConfig);
 
     public List<AircraftConfigurationEntity> viewAircraftConfiguration();
+
+    public AircraftConfigurationEntity viewDetailAircraftConfiguration(Long index) throws AircraftConfigurationNotExistException;
 }

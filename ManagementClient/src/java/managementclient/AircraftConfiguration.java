@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import util.enumeration.CabinClassType;
+import util.exception.AircraftConfigurationNotExistException;
 import util.exception.CabinClassExceedMaxCapacity;
 
 /**
@@ -34,12 +35,15 @@ public class AircraftConfiguration {
 
             System.out.println("1. Create aircraft configurations.");
             System.out.println("2. View all aircraft configurations.");
+            System.out.println("3. View detail of an aircraft configurations.");
             System.out.println("0. Exit");
             int choice = sc.nextInt();
             if (choice == 1) {
                 createAircraftConfiguration();
             } else if (choice == 2) {
                 viewAircraftConfiguration();
+            } else if (choice == 3) {
+                viewDetailOfAircraftConfiguration();
             } else if (choice == 0) {
                 break;
             }
@@ -119,22 +123,25 @@ public class AircraftConfiguration {
                     addRecordToDatabase = false;
 
                 }
-                for (int i = 0; i < maxPplPerRow.length; i++) {
-                    row += Integer.parseInt(maxPplPerRow[i]);
+                if (addRecordToDatabase) {
+                    for (int i = 0; i < maxPplPerRow.length; i++) {
+                        row += Integer.parseInt(maxPplPerRow[i]);
+                    }
+
+                    int totalPplPerClass = row * numRows;
+                    totalSeat += totalPplPerClass;
+
+                    cabin.setAvailableSeats(totalSeat);
+                    cabin.setBalancedSeats(totalSeat);
+                    cabin.setReservedSeats(0);
+                    //validating total seat from user input must be lesser than max seat capacity from aircraft configuration
+                    if (totalSeat > maxSeatingCapacity) {
+                        System.out.println("Please check your capacity. Seating configuration and row for all the cabin classes should not exceed the maximum capacity of aircraft configuration.");
+                        addRecordToDatabase = false;
+                        break;
+                    }
                 }
 
-                int totalPplPerClass = row * numRows;
-                totalSeat += totalPplPerClass;
-
-                cabin.setAvailableSeats(totalSeat);
-                cabin.setBalancedSeats(totalSeat);
-                cabin.setReservedSeats(0);
-                //validating total seat from user input must be lesser than max seat capacity from aircraft configuration
-                if (totalSeat > maxSeatingCapacity) {
-                    System.out.println("Please check your capacity. Seating configuration and row for all the cabin classes should not exceed the maximum capacity of aircraft configuration.");
-                    addRecordToDatabase = false;
-                    break;
-                }
                 if (addRecordToDatabase) {
                     listOfCabin.add(cabin);
                 }
@@ -176,11 +183,64 @@ public class AircraftConfiguration {
         System.out.println("**View all aircraft configurations.**");
         List<AircraftConfigurationEntity> aircrafttConfigList = aircraftSessionBeanRemote.viewAircraftConfiguration();
         for (AircraftConfigurationEntity aircraftConfig : aircrafttConfigList) {
-            System.out.println("Aircraft configuration id:" + aircraftConfig.getAircraftConfigId());
-            System.out.println("Aircraft configuration:" + aircraftConfig.getAircraftName());
-            System.out.println("Aircraft configuration:" + aircraftConfig.getAircraftType().getAircraftTypeName());
-            System.out.println("Aircraft configuration:" + aircraftConfig.getMaxSeatingCapacity());
+            System.out.println("Aircraft Configuration Id:" + aircraftConfig.getAircraftConfigId());
+            System.out.println("Aircraft Configuration Name:" + aircraftConfig.getAircraftName());
+            System.out.println("Aircraft Type Name:" + aircraftConfig.getAircraftType().getAircraftTypeName());
+            System.out.println("Aircraft Configuration Maximum Seating Capacity:" + aircraftConfig.getMaxSeatingCapacity());
+            System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
+        }
+    }
+
+    public void viewDetailOfAircraftConfiguration() {
+        Scanner sc = new Scanner(System.in);
+        boolean notExitingViewDetailOfAirConfig = true;
+        while (notExitingViewDetailOfAirConfig) {
+            System.out.println("**View detail of an aircraft configurations.**");
+            System.out.println("Please enter the number to view the detail of the aircraft configuration or '0' to exit.");
+
+            List<AircraftConfigurationEntity> aircrafttConfigList = aircraftSessionBeanRemote.viewAircraftConfiguration();
+            for (AircraftConfigurationEntity aircraftConfig : aircrafttConfigList) {
+                System.out.println("Aircraft Configuration Id:" + aircraftConfig.getAircraftConfigId());
+                System.out.println("Aircraft Configuration Name:" + aircraftConfig.getAircraftName());
+                System.out.println("Aircraft Type Name:" + aircraftConfig.getAircraftType().getAircraftTypeName());
+                System.out.println("Aircraft Configuration Maximum Seating Capacity:" + aircraftConfig.getMaxSeatingCapacity());
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
+            }
+            Long selectedId = sc.nextLong();
+            Long zero = 0L;
+            if (selectedId.equals(zero)) {
+                notExitingViewDetailOfAirConfig = false;
+                break;
+            }
+            try {
+                AircraftConfigurationEntity aircraftConfigDetail = aircraftSessionBeanRemote.viewDetailAircraftConfiguration(selectedId);
+
+                //aircraftConfigDetail.getCabinClasses().size();
+                System.out.println("***Aircraft Configuration and Aircraft Type***");
+                System.out.println("Aircraft Configuration Id:" + aircraftConfigDetail.getAircraftConfigId());
+                System.out.println("Aircraft Configuration Name:" + aircraftConfigDetail.getAircraftName());
+                System.out.println("Aircraft Type Name:" + aircraftConfigDetail.getAircraftType().getAircraftTypeName());
+                System.out.println("Aircraft Configuration Maximum Seating Capacity:" + aircraftConfigDetail.getMaxSeatingCapacity());
+
+                System.out.println("***Cabin Class Configuration and Aircraft Type***");
+
+                for (int i = 0; i < aircraftConfigDetail.getCabinClasses().size(); i++) {
+                    List<CabinClassConfigurationEntity> listOfCabinClass = aircraftConfigDetail.getCabinClasses();
+                    System.out.println("Cabin Class Configuration Id:" + listOfCabinClass.get(i).getCabinClassConfigId());
+                    System.out.println("Cabin Class Class Type:" + listOfCabinClass.get(i).getCabinclassType());
+                    System.out.println("Cabin Class Number of Aisle(s):" + listOfCabinClass.get(i).getNumAisles());
+                    System.out.println("Cabin Class Number of Row(s):" + listOfCabinClass.get(i).getNumRows());
+                    System.out.println("Cabin Class Available Seat(s):" + listOfCabinClass.get(i).getAvailableSeats());
+                    System.out.println("Cabin Class Reserved Seat(s):" + listOfCabinClass.get(i).getReservedSeats());
+                    System.out.println("Cabin Class Balance Seat(s):" + listOfCabinClass.get(i).getBalancedSeats());
+                    System.out.println("Cabin Class Seating Configuration:" + listOfCabinClass.get(i).getSeatingConfig());
+                    System.out.println("****************************************************************************************");
+                }
+            } catch (AircraftConfigurationNotExistException ex) {
+                System.out.println("The number you have entered does not exist in the database");
+            }
 
         }
+
     }
 }
