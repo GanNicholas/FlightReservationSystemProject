@@ -6,6 +6,7 @@
 package managementclient;
 
 import ejb.session.stateless.AircraftSessionBeanRemote;
+import ejb.session.stateless.FlightRouteSessionBeanRemote;
 import javax.ejb.EJB;
 
 /**
@@ -13,6 +14,9 @@ import javax.ejb.EJB;
  * @author nickg
  */
 public class Main {
+
+    @EJB
+    private static FlightRouteSessionBeanRemote flightRouteSessionBean;
 
     @EJB
     private static AircraftSessionBeanRemote aircraftSessionBean;
@@ -24,7 +28,7 @@ public class Main {
     public static void main(String[] args) {
         // TODO code application logic here
         
-        AircraftConfiguration aircraft = new AircraftConfiguration(aircraftSessionBean);
+        AircraftConfiguration aircraft = new AircraftConfiguration(aircraftSessionBean,flightRouteSessionBean);
         aircraft.AircraftConfigurationApp();
     }
     

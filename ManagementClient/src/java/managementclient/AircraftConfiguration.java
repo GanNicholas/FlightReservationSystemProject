@@ -6,15 +6,19 @@
 package managementclient;
 
 import ejb.session.stateless.AircraftSessionBeanRemote;
+import ejb.session.stateless.FlightRouteSessionBeanRemote;
 import entity.AircraftConfigurationEntity;
 import entity.AircraftTypeEntity;
+import entity.AirportEntity;
 import entity.CabinClassConfigurationEntity;
+import entity.FlightRouteEntity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import util.enumeration.CabinClassType;
 import util.exception.AircraftConfigurationNotExistException;
 import util.exception.CabinClassExceedMaxCapacity;
+import util.exception.FlightRouteODPairExistException;
 
 /**
  *
@@ -23,9 +27,11 @@ import util.exception.CabinClassExceedMaxCapacity;
 public class AircraftConfiguration {
 
     AircraftSessionBeanRemote aircraftSessionBeanRemote = null;
+    FlightRouteSessionBeanRemote flightRouteSessionBean = null;
 
-    public AircraftConfiguration(AircraftSessionBeanRemote aircraftSessionBeanRemote) {
+    public AircraftConfiguration(AircraftSessionBeanRemote aircraftSessionBeanRemote, FlightRouteSessionBeanRemote flightRouteSessionBean) {
         this.aircraftSessionBeanRemote = aircraftSessionBeanRemote;
+        this.flightRouteSessionBean = flightRouteSessionBean;
     }
 
     public void AircraftConfigurationApp() {
@@ -36,6 +42,7 @@ public class AircraftConfiguration {
             System.out.println("1. Create aircraft configurations.");
             System.out.println("2. View all aircraft configurations.");
             System.out.println("3. View detail of an aircraft configurations.");
+            System.out.println("4. Create flight route.");
             System.out.println("0. Exit");
             int choice = sc.nextInt();
             if (choice == 1) {
@@ -240,6 +247,126 @@ public class AircraftConfiguration {
                 System.out.println("The number you have entered does not exist in the database");
             }
 
+        }
+
+    }
+
+    public void createFlightRoute() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("**Create flight route.**");
+
+        System.out.println("Please enter the original location of the airport.");
+        String originalLocation = sc.nextLine();
+        System.out.println("Please enter the original location of IATA airport code.");
+        String oIATAAirport = sc.nextLine();
+        System.out.println("Please enter the original location of the airport city.");
+        String oCity = sc.nextLine();
+        System.out.println("Please enter the original location of the airport state.");
+        String oState = sc.nextLine();
+        System.out.println("Please enter the original location of the airport country.");
+        String oCountry = sc.nextLine();
+        System.out.println("Please enter the original location of time zone(hour).");
+        int oTimezoneHr = sc.nextInt();
+        System.out.println("Please enter the original location of time zone(minute).");
+        int oTimezoneMin = sc.nextInt();
+        sc.nextLine();
+        System.out.println("Please enter the Destination location of the airport.");
+        String destinationLocation = sc.nextLine();
+        System.out.println("Please enter the Destination location of IATA airport code.");
+        String dIATAAirport = sc.nextLine();
+        System.out.println("Please enter the Destination location of the airport city.");
+        String dCity = sc.nextLine();
+        System.out.println("Please enter the Destination location of the airport state.");
+        String dState = sc.nextLine();
+        System.out.println("Please enter the Destination location of the airport country.");
+        String dCountry = sc.nextLine();
+        System.out.println("Please enter the Destination location of time zone(hour).");
+        int dTimezoneHr = sc.nextInt();
+        System.out.println("Please enter the original location of time zone(minute).");
+        int dTimezoneMin = sc.nextInt();
+        sc.nextLine();
+        System.out.println("Is there a return route? Yes/No");
+        String returnRoute = sc.nextLine();
+        while (!returnRoute.equalsIgnoreCase("Yes") && !returnRoute.equalsIgnoreCase("No")) {
+            System.out.println("Invalid return route.");
+            System.out.println("Is there a return route? Yes/No");
+            returnRoute = sc.nextLine();
+        }
+
+        FlightRouteEntity fr = new FlightRouteEntity();
+
+        AirportEntity airportOriginal = new AirportEntity();
+        airportOriginal.setAirportName(originalLocation);
+        airportOriginal.setIataAirportCode(oIATAAirport);
+        airportOriginal.setCity(oCity);
+        airportOriginal.setState(oState);
+        airportOriginal.setCountry(oCountry);
+        airportOriginal.setTimeZoneHour(oTimezoneHr);
+        airportOriginal.setTimeZoneMin(oTimezoneMin);
+
+        AirportEntity airportDestination = new AirportEntity();
+        airportDestination.setAirportName(destinationLocation);
+        airportDestination.setIataAirportCode(dIATAAirport);
+        airportDestination.setCity(dCity);
+        airportDestination.setState(dState);
+        airportDestination.setCountry(dCountry);
+        airportDestination.setTimeZoneHour(dTimezoneHr);
+        airportDestination.setTimeZoneMin(dTimezoneMin);
+
+        fr.setDestinationLocation(airportDestination);
+        fr.setOriginLocation(airportOriginal);
+        fr.setIsDeleted(false);
+
+        FlightRouteEntity returnRouteEntity = null;
+        if (returnRoute.equalsIgnoreCase("Yes")) {
+            returnRouteEntity = new FlightRouteEntity();
+            returnRouteEntity.setOriginLocation(airportDestination);
+            returnRouteEntity.setDestinationLocation(airportOriginal);
+            returnRouteEntity.setIsDeleted(false);
+            returnRouteEntity.setReturnRoute(fr);
+        }
+        fr.setReturnRoute(returnRouteEntity);
+        try {
+            Long id = flightRouteSessionBean.createFlightRoute(fr);
+            System.out.println("You have successfully create a flight route with the id of" + id);
+        } catch (FlightRouteODPairExistException ex) {
+            System.out.println("Flight route origin-destination already exist in the database");
+        }
+
+    }
+
+    public void viewFlightRoute() {
+        List<FlightRouteEntity> listOfFlightRoute = flightRouteSessionBean.viewListOfFlightRoute();
+        for (int i = 0; i < listOfFlightRoute.size(); i++) {
+            FlightRouteEntity fr = listOfFlightRoute.get(i);
+            System.out.println("***Flight Route***");
+            System.out.println(String.format("Origin Location(IATA airport Code: %s (%s)", fr.getOriginLocation().getAirportName(), fr.getOriginLocation().getIataAirportCode()));
+            System.out.println("City: " + fr.getOriginLocation().getCity());
+            System.out.println("State: " + fr.getOriginLocation().getCity());
+            System.out.println("Country: " + fr.getOriginLocation().getCity());
+            System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getOriginLocation().getTimeZoneHour(), fr.getOriginLocation().getTimeZoneMin()));
+
+            System.out.println(String.format("Destination Location(IATA airport Code: %s (%s)", fr.getDestinationLocation().getAirportName(), fr.getDestinationLocation().getIataAirportCode()));
+            System.out.println("City: " + fr.getDestinationLocation().getCity());
+            System.out.println("State: " + fr.getDestinationLocation().getCity());
+            System.out.println("Country: " + fr.getDestinationLocation().getCity());
+            System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getDestinationLocation().getTimeZoneHour(), fr.getDestinationLocation().getTimeZoneMin()));
+
+            if (fr.getReturnRoute() != null) {
+                System.out.println("*** Return Flight Route***");
+                System.out.println(String.format("Origin Location(IATA airport Code: %s (%s)", fr.getReturnRoute().getOriginLocation().getAirportName(), fr.getReturnRoute().getOriginLocation().getIataAirportCode()));
+                System.out.println("City: " + fr.getReturnRoute().getOriginLocation().getCity());
+                System.out.println("State: " + fr.getReturnRoute().getOriginLocation().getCity());
+                System.out.println("Country: " + fr.getReturnRoute().getOriginLocation().getCity());
+                System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getReturnRoute().getOriginLocation().getTimeZoneHour(), fr.getReturnRoute().getOriginLocation().getTimeZoneMin()));
+
+                System.out.println(String.format("Destination Location(IATA airport Code: %s (%s)", fr.getReturnRoute().getDestinationLocation().getAirportName(), fr.getReturnRoute().getDestinationLocation().getIataAirportCode()));
+                System.out.println("City: " + fr.getReturnRoute().getDestinationLocation().getCity());
+                System.out.println("State: " + fr.getReturnRoute().getDestinationLocation().getCity());
+                System.out.println("Country: " + fr.getReturnRoute().getDestinationLocation().getCity());
+                System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getReturnRoute().getDestinationLocation().getTimeZoneHour(), fr.getReturnRoute().getDestinationLocation().getTimeZoneMin()));
+            }
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------");
         }
 
     }
