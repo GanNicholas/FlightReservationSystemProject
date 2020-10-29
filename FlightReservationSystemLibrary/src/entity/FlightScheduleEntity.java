@@ -73,7 +73,7 @@ public class FlightScheduleEntity implements Serializable {
         return FlightScheduleId;
     }
 
-    public double getFlightDuration() {
+    public Integer getFlightDuration() {
         return flightDuration;
     }
 
@@ -95,6 +95,14 @@ public class FlightScheduleEntity implements Serializable {
 
     public void setSeatingPlan(List<SeatEntity> seatingPlan) {
         this.seatingPlan = seatingPlan;
+    }
+
+    public GregorianCalendar getDepartureDateTime() {
+        return departureDateTime;
+    }
+
+    public void setDepartureDateTime(GregorianCalendar departureDateTime) {
+        this.departureDateTime = departureDateTime;
     }
 
     @Override
