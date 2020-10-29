@@ -32,29 +32,29 @@ public class IndividualFlightReservationEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long indivFlightResId;
-    
+
     @NotNull
     @OneToOne(optional = false)
     @JoinColumn(nullable = false)
     private FlightScheduleEntity flightSchedule;
-    
+
     @OneToMany
     @JoinColumn(nullable = false)
     private List<PassengerEntity> listOfPassengers;
-    
+
     @OneToOne(optional = false)
     @JoinColumn(nullable = false)
     private PartnerEntity partnerInfo;
-    
+
     @OneToMany
-    @JoinColumn(nullable = false)
+    //@JoinColumn(nullable = false)
     private List<SeatEntity> listOfSeats;
-    
+
     @NotNull
     @DecimalMin("0.00")
-    @Column(nullable = false, scale = 2 )
+    @Column(nullable = false, scale = 2)
     private BigDecimal amount;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private FlightReservationEntity flightReservation;

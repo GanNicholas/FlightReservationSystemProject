@@ -42,10 +42,10 @@ public class FlightReservationEntity implements Serializable {
     @Column(nullable = false, length = 3, unique = true)
     private String destinationIATACode;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     @OneToMany(mappedBy = "flightReservation")
     private List<IndividualFlightReservationEntity> listOfIndividualFlightRes;
-    
+
     @NotNull
     @DecimalMin("0.00")
     @Column(nullable = false, scale = 2)

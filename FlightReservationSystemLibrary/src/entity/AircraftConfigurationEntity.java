@@ -45,7 +45,6 @@ public class AircraftConfigurationEntity implements Serializable {
     private AircraftTypeEntity aircraftType;
 
     @OneToMany
-    @JoinColumn(nullable = false)
     private List<CabinClassConfigurationEntity> cabinClasses;
 
     @NotEmpty(message = "Aircraft name cannot be empty!")

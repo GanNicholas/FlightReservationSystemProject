@@ -10,10 +10,15 @@ import entity.AircraftTypeEntity;
 import entity.CabinClassConfigurationEntity;
 import entity.SeatEntity;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.exception.CabinClassExceedMaxCapacity;
 
 /**
@@ -33,6 +38,7 @@ public class AircraftSessionBean implements AircraftSessionBeanRemote, AircraftS
         aircraftConfigurationEntity.setAircraftType(aircarAircraftTypeEntity);
         em.persist(aircraftConfigurationEntity);
         em.flush();
+
         //check all the cabin class configuration greater than the aircraftconfiguration max seating capacity
         for (CabinClassConfigurationEntity cabin : listOfCabinClassConfig) {
             String[] getSeatingPerRow = cabin.getSeatingConfig().split("-");
@@ -44,43 +50,56 @@ public class AircraftSessionBean implements AircraftSessionBeanRemote, AircraftS
             cabin.setAvailableSeats(maxPerCabinType);
             cabin.setBalancedSeats(maxPerCabinType);
             cabin.setReservedSeats(0);
-            
-            em.persist(cabin);
-            
-        }
+            ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+            Validator validator = validatorFactory.getValidator();
+            Set<ConstraintViolation<CabinClassConfigurationEntity>> errors = validator.validate(cabin);
+            if (errors.size() != 0) {
+                for (ConstraintViolation error : errors) {
+                    System.out.println("******************Came error*******************************");
+                    System.err.println("******* Error with initialisation: " + error.getPropertyPath() + "; " + error.getInvalidValue() + "; " + error.getMessage());
+                }
+            } else {
+                em.persist(cabin);
 
+            }
+        }
         // aircraftConfigurationEntity.setCabinClasses(listOfCabinClassConfig);
-        //aircraftConfigurationEntity.setCabinClasses(listOfCabinClassConfig);
+        aircraftConfigurationEntity.setCabinClasses(listOfCabinClassConfig);
         //generate seat into the database
         SeatEntity s = null;
         String cabinCol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-        /*for (CabinClassConfigurationEntity cabin : aircraftConfigurationEntity.getCabinClasses()) {
+        int seatNumber = 1;
+        System.out.println("aircraftConfigurationEntity.getCabinClasses()" + aircraftConfigurationEntity.getCabinClasses().size());
+        for (CabinClassConfigurationEntity cabin : aircraftConfigurationEntity.getCabinClasses()) {
 
             String[] getSeatingPerRow = cabin.getSeatingConfig().split("-");
             int numPplPerRow = 0;
             for (int i = 0; i < getSeatingPerRow.length; i++) {
                 numPplPerRow += Integer.parseInt(getSeatingPerRow[i]);
+
             }
+            System.out.println("num ppl in row: " + numPplPerRow);
             for (int noOfRow = 0; noOfRow < cabin.getNumRows(); noOfRow++) {
                 for (int col = 0; col < numPplPerRow; col++) {
                     s = new SeatEntity();
-                    s.setSeatNumber((noOfRow + 1) + "" + cabinCol.charAt(col));
+                    s.setSeatNumber((seatNumber) + "" + cabinCol.charAt(col));
+                    System.out.println("Seat : " + s.getSeatNumber());
                     s.setReserved(false);
                     s.setCabinType(cabin.getCabinclassType());
                     em.persist(s);
                     em.flush();
                 }
+                seatNumber++;
             }
 
-        }*/
+        }
         return aircraftConfigurationEntity.getAircraftConfigId();
     }
-
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
+
     public List<AircraftConfigurationEntity> viewAircraftConfiguration() {
-        Query query = em.createQuery("SELECT a from AircraftConfigurationEntity a order by a.aircraftType asc, a.aircraftName asc");
+        Query query = em.createQuery("SELECT a FROM AircraftConfigurationEntity AS a ORDER BY a.aircraftType asc, a.aircraftName asc");
         List<AircraftConfigurationEntity> aircraftConfiguration = query.getResultList();
 
         return aircraftConfiguration;
