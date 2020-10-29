@@ -52,9 +52,13 @@ public class AircraftConfigurationEntity implements Serializable {
     @Size(max = 80, message = "Aircraft name should not exceed 80 characters!")
     @Column(nullable = false, length = 80)
     private String aircraftName;
+    
+    @OneToMany
+    private List<SeatEntity> seatingPlan;
 
     public AircraftConfigurationEntity() {
         this.cabinClasses = new ArrayList<>();
+        this.seatingPlan = new ArrayList<>();
     }
 
     public AircraftConfigurationEntity(Integer maxSeatingCapacity, AircraftTypeEntity aircraftType, String aircraftName) {
@@ -103,6 +107,14 @@ public class AircraftConfigurationEntity implements Serializable {
 
     public void setAircraftName(String aircraftName) {
         this.aircraftName = aircraftName;
+    }
+
+    public List<SeatEntity> getSeatingPlan() {
+        return seatingPlan;
+    }
+
+    public void setSeatingPlan(List<SeatEntity> seatingPlan) {
+        this.seatingPlan = seatingPlan;
     }
     
 

@@ -44,17 +44,13 @@ public class SeatEntity implements Serializable {
     @OneToOne
     private FareEntity fare;
     
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private CabinClassType cabinType;
 
     public SeatEntity() {
     }
 
     //initial state when seat is free
-    public SeatEntity(String seatNumber, CabinClassType cabinType) {
+    public SeatEntity(String seatNumber) {
         this.seatNumber = seatNumber;
-        this.cabinType = cabinType;
         this.reserved = false;
         this.passenger = null;
         this.fare = null;
@@ -62,12 +58,11 @@ public class SeatEntity implements Serializable {
     }
 
     //when seat is reserved
-    public SeatEntity(String seatNumber, boolean reserved, PassengerEntity passenger, FareEntity fare, CabinClassType cabinType) {
+    public SeatEntity(String seatNumber, boolean reserved, PassengerEntity passenger, FareEntity fare) {
         this.seatNumber = seatNumber;
         this.reserved = reserved;
         this.passenger = passenger;
         this.fare = fare;
-        this.cabinType = cabinType;
     }
 
     public Long getSeatId() {
@@ -135,12 +130,5 @@ public class SeatEntity implements Serializable {
         this.fare = fare;
     }
 
-    public CabinClassType getCabinType() {
-        return cabinType;
-    }
-
-    public void setCabinType(CabinClassType cabinType) {
-        this.cabinType = cabinType;
-    }
 
 }

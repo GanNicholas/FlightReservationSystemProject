@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,6 +18,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import util.enumeration.CabinClassType;
 
 /**
  *
@@ -28,21 +31,28 @@ public class FareEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long FareId;
+    
     @NotEmpty(message = "Fare basis code cannot be empty!")
     @Size(min = 3, max = 7, message = "Fare basis code has to be 3 to 7 characters long!")
     @Column(nullable = false, length = 7)
     private String fareBasisCode;
+    
     @NotNull
     @DecimalMin("0.00")
     @Column(nullable = false, scale = 2)
     private BigDecimal fareAmount;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private CabinClassType cabinType;
+    
     public FareEntity() {
     }
 
-    public FareEntity(String fareBasisCode, BigDecimal fareAmount) {
+    public FareEntity(String fareBasisCode, BigDecimal fareAmount, CabinClassType cabinType) {
         this.fareBasisCode = fareBasisCode;
         this.fareAmount = fareAmount;
+        this.cabinType = cabinType;
     }
 
     public Long getFareId() {
@@ -88,6 +98,14 @@ public class FareEntity implements Serializable {
 
     public void setFareAmount(BigDecimal fareAmount) {
         this.fareAmount = fareAmount;
+    }
+
+    public CabinClassType getCabinType() {
+        return cabinType;
+    }
+
+    public void setCabinType(CabinClassType cabinType) {
+        this.cabinType = cabinType;
     }
 
 }

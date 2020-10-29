@@ -22,6 +22,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import util.enumeration.CabinClassType;
 
@@ -54,20 +55,20 @@ public class CabinClassConfigurationEntity implements Serializable {
     @Column(nullable = false)
     private Integer numRows;
 
-    @Positive
-    @Min(value = 1, message = "Minimum number of available seats is 1")
+    @PositiveOrZero
+    @Min(value = 0, message = "Minimum number of available seats is 0")
     @Max(value = 1000, message = "Maximum number of available seats is 1000")
     @Column(nullable = false)
     private Integer availableSeats;
 
-    @Positive
+    @PositiveOrZero
     @Min(value = 0, message = "Minimum number of reserved seats is 0")
     @Max(value = 1000, message = "Maximum number of reserved seats is 1000")
     @Column(nullable = false)
     private Integer reservedSeats;
 
-    @Positive
-    @Min(value = 1, message = "Minimum number of balanced seats is 1")
+    @PositiveOrZero
+    @Min(value = 0, message = "Minimum number of balanced seats is 0")
     @Max(value = 1000, message = "Maximum number of balanced seats is 1000")
     @Column(nullable = false)
     private Integer balancedSeats;
@@ -77,20 +78,18 @@ public class CabinClassConfigurationEntity implements Serializable {
     @Column(nullable = false)
     private String seatingConfig;
 
-    @Positive
-    @Min(value = 1, message = "Minimum number of seats in a column is 1")
-    @Max(value = 1000, message = "Maximum number of seats in a column is 1000")
-    @Column(nullable = false)
-    private Integer numSeatsInAColumn;
+//    @Positive
+//    @Min(value = 1, message = "Minimum number of seats in a column is 1")
+//    @Max(value = 1000, message = "Maximum number of seats in a column is 1000")
+//    @Column(nullable = false)
+//    private Integer numSeatsInAColumn;
 
-    @OneToMany
-    private List<FareEntity> fares;
+   
 
     public CabinClassConfigurationEntity() {
-        this.fares = new ArrayList<>();
     }
 
-    public CabinClassConfigurationEntity(CabinClassType cabinclassType, Integer numAisles, Integer numRows, Integer availableSeats, Integer reservedSeats, Integer balancedSeats, String seatingConfig, Integer numSeatsInAColumn) {
+    public CabinClassConfigurationEntity(CabinClassType cabinclassType, Integer numAisles, Integer numRows, Integer availableSeats, Integer reservedSeats, Integer balancedSeats, String seatingConfig) {
         this();
         this.cabinclassType = cabinclassType;
         this.numAisles = numAisles;
@@ -99,7 +98,6 @@ public class CabinClassConfigurationEntity implements Serializable {
         this.reservedSeats = reservedSeats;
         this.balancedSeats = balancedSeats;
         this.seatingConfig = seatingConfig;
-        this.numSeatsInAColumn = numSeatsInAColumn;
     }
 
     public Long getCabinClassConfigId() {
@@ -166,21 +164,7 @@ public class CabinClassConfigurationEntity implements Serializable {
         this.seatingConfig = seatingConfig;
     }
 
-    public Integer getNumSeatsInAColumn() {
-        return numSeatsInAColumn;
-    }
 
-    public void setNumSeatsInAColumn(Integer numSeatsInAColumn) {
-        this.numSeatsInAColumn = numSeatsInAColumn;
-    }
-
-    public List<FareEntity> getFares() {
-        return fares;
-    }
-
-    public void setFares(List<FareEntity> fares) {
-        this.fares = fares;
-    }
 
     @Override
     public int hashCode() {
@@ -205,8 +189,7 @@ public class CabinClassConfigurationEntity implements Serializable {
     @Override
     public String toString() {
         return "entity.CabinClassConfigurationEntity[ id=" + cabinClassConfigId + " ] + [ cabinclassType=" + cabinclassType + " ]  + [ numAisles=" + numAisles + " ]"
-                + "+ [ numRows=" + numRows + " ]+ [ availableSeats=" + availableSeats + " ]+ [ reservedSeats=" + reservedSeats + " ]+ [ balancedSeats=" + balancedSeats + " ]+ [ seatingConfig=" + seatingConfig + " ]"
-                + "+ [ numSeatsInAColumn=" + numSeatsInAColumn + " ]";
+                + "+ [ numRows=" + numRows + " ]+ [ availableSeats=" + availableSeats + " ]+ [ reservedSeats=" + reservedSeats + " ]+ [ balancedSeats=" + balancedSeats + " ]+ [ seatingConfig=" + seatingConfig + " ]";
     }
 
 }
