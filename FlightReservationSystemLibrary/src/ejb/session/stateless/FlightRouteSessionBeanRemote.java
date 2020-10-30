@@ -8,6 +8,8 @@ package ejb.session.stateless;
 import entity.FlightRouteEntity;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.FlightRouteDoesNotExistException;
+import util.exception.FlightRouteExistInOtherClassException;
 import util.exception.FlightRouteODPairExistException;
 
 /**
@@ -22,4 +24,6 @@ public interface FlightRouteSessionBeanRemote {
     public boolean checkFlightRouteOD(FlightRouteEntity frEntity) throws FlightRouteODPairExistException;
 
     public List<FlightRouteEntity> viewListOfFlightRoute();
+
+    public boolean DeleteFlightRoute(Long id) throws FlightRouteDoesNotExistException, FlightRouteExistInOtherClassException;
 }
