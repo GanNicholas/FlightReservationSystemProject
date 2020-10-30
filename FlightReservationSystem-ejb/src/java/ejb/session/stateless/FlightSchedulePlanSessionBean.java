@@ -49,7 +49,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
     public String createNonRecurrentFlightSchedulePlan(String flightNumber, List<GregorianCalendar> listOfDepartureDateTime, Integer flightDuration, boolean createReturnFlightSchedule, List<FareEntity> listOfFares, Integer layover) throws FlightDoesNotExistException, FlightScheduleExistException {
         FlightEntity flight;
         try {
-            flight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", flightNumber);
+            flight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
         } catch (NoResultException ex) {
             throw new FlightDoesNotExistException("Flight with flight number does not exist!");
         }
@@ -316,6 +316,10 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             for (FlightScheduleEntity fs : returnFsp.getListOfFlightSchedule()) {
                 fs.getSeatingPlan().size();
             }
+
+            fsp.getFlightEntity();
+            fsp.getFlightEntity().getFlightRoute().getOriginLocation();
+            fsp.getFlightEntity().getFlightRoute().getDestinationLocation();
 
             return fsp;
         } catch (NoResultException ex) {

@@ -5,9 +5,12 @@
  */
 package ejb.session.singleton;
 
+import entity.AircraftConfigurationEntity;
 import entity.AircraftTypeEntity;
 import entity.AirportEntity;
 import entity.EmployeeEntity;
+import entity.FlightEntity;
+import entity.FlightRouteEntity;
 import entity.PartnerEntity;
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -127,6 +130,16 @@ public class DataInitSessionBean {
             AircraftTypeEntity ac2 = new AircraftTypeEntity("Boeing 737 Wide body long range");
             em.persist(ac2);
         }   
+        
+        FlightEntity flight = em.find(FlightEntity.class, 1L);
+        if(flight == null){
+            FlightRouteEntity fr = em.find(FlightRouteEntity.class, 1L);
+            AircraftConfigurationEntity ac1 = em.find(AircraftConfigurationEntity.class, 1L);
+            FlightEntity f1 = new FlightEntity("ML1234", fr, ac1);
+            em.persist(f1);
+        }
+        
+        
         
         em.flush();
     }
