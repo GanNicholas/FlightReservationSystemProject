@@ -57,7 +57,7 @@ public class AircraftSessionBean implements AircraftSessionBeanRemote, AircraftS
             Set<ConstraintViolation<CabinClassConfigurationEntity>> errors = validator.validate(cabin);
             if (errors.size() != 0) {
                 for (ConstraintViolation error : errors) {
-                    System.out.println("******************Came error*******************************");
+                    //System.out.println("******************Came error*******************************");
                     System.err.println("******* Error with initialisation: " + error.getPropertyPath() + "; " + error.getInvalidValue() + "; " + error.getMessage());
                 }
             } else {

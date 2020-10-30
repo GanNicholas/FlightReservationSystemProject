@@ -35,7 +35,6 @@ import util.exception.FlightRouteODPairExistException;
 public class AircraftConfiguration {
 
     private AircraftSessionBeanRemote aircraftSessionBeanRemote = null;
-    private FlightRouteSessionBeanRemote flightRouteSessionBean = null;
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
@@ -45,10 +44,9 @@ public class AircraftConfiguration {
         validator = validatorFactory.getValidator();
     }
 
-    public AircraftConfiguration(AircraftSessionBeanRemote aircraftSessionBeanRemote, FlightRouteSessionBeanRemote flightRouteSessionBean) {
+    public AircraftConfiguration(AircraftSessionBeanRemote aircraftSessionBeanRemote) {
         this();
         this.aircraftSessionBeanRemote = aircraftSessionBeanRemote;
-        this.flightRouteSessionBean = flightRouteSessionBean;
     }
 
     public void AircraftConfigurationApp() {
@@ -70,12 +68,6 @@ public class AircraftConfiguration {
                 viewAircraftConfiguration();
             } else if (choice == 3) {
                 viewDetailOfAircraftConfiguration();
-            } else if (choice == 4) {
-                createFlightRoute();
-            } else if (choice == 5) {
-                viewFlightRoute();
-            } else if (choice == 6) {
-                DeleteFlightRoute();
             } else if (choice == 0) {
                 break;
             }
@@ -251,13 +243,16 @@ public class AircraftConfiguration {
     public void viewAircraftConfiguration() {
         System.out.println("**View all aircraft configurations.**");
         List<AircraftConfigurationEntity> aircrafttConfigList = aircraftSessionBeanRemote.viewAircraftConfiguration();
+        System.out.printf("%35s%30s%22s%51s", "Aircraft Configuration Id", "Aircraft Configuration Name", "Aircraft Type Name", "Aircraft Configuration Maximum Seating Capacity");
+
         for (AircraftConfigurationEntity aircraftConfig : aircrafttConfigList) {
-            System.out.println("Aircraft Configuration Id:" + aircraftConfig.getAircraftConfigId());
-            System.out.println("Aircraft Configuration Name:" + aircraftConfig.getAircraftName());
-            System.out.println("Aircraft Type Name:" + aircraftConfig.getAircraftType().getAircraftTypeName());
-            System.out.println("Aircraft Configuration Maximum Seating Capacity:" + aircraftConfig.getMaxSeatingCapacity());
-            System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
+            System.out.println("");
+            System.out.printf("%20s%30s%33s%40s", aircraftConfig.getAircraftConfigId(), aircraftConfig.getAircraftName(), aircraftConfig.getAircraftType().getAircraftTypeName(), aircraftConfig.getMaxSeatingCapacity());
+            // System.out.println("Aircraft Configuration Name:" + aircraftConfig.getAircraftName());
+            //System.out.println("Aircraft Type Name:" + aircraftConfig.getAircraftType().getAircraftTypeName());
+            //System.out.println("Aircraft Configuration Maximum Seating Capacity:" + aircraftConfig.getMaxSeatingCapacity());
         }
+        System.out.println();
     }
 
     public void viewDetailOfAircraftConfiguration() {
@@ -268,13 +263,19 @@ public class AircraftConfiguration {
             System.out.println("Please enter the number to view the detail of the aircraft configuration or '0' to exit.");
 
             List<AircraftConfigurationEntity> aircrafttConfigList = aircraftSessionBeanRemote.viewAircraftConfiguration();
+            System.out.printf("%35s%30s%22s%51s", "Aircraft Configuration Id", "Aircraft Configuration Name", "Aircraft Type Name", "Aircraft Configuration Maximum Seating Capacity");
+
             for (AircraftConfigurationEntity aircraftConfig : aircrafttConfigList) {
-                System.out.println("Aircraft Configuration Id:" + aircraftConfig.getAircraftConfigId());
+                System.out.println();
+                System.out.printf("%20s%30s%33s%40s", aircraftConfig.getAircraftConfigId(), aircraftConfig.getAircraftName(), aircraftConfig.getAircraftType().getAircraftTypeName(), aircraftConfig.getMaxSeatingCapacity());
+
+                /* System.out.println("Aircraft Configuration Id:" + aircraftConfig.getAircraftConfigId());
                 System.out.println("Aircraft Configuration Name:" + aircraftConfig.getAircraftName());
                 System.out.println("Aircraft Type Name:" + aircraftConfig.getAircraftType().getAircraftTypeName());
                 System.out.println("Aircraft Configuration Maximum Seating Capacity:" + aircraftConfig.getMaxSeatingCapacity());
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");*/
             }
+            System.out.println();
             Long selectedId = sc.nextLong();
             Long zero = 0L;
             if (selectedId.equals(zero)) {
@@ -283,14 +284,16 @@ public class AircraftConfiguration {
             }
             try {
                 AircraftConfigurationEntity aircraftConfigDetail = aircraftSessionBeanRemote.viewDetailAircraftConfiguration(selectedId);
+                System.out.printf("%35s%30s%22s%51s", "Aircraft Configuration Id", "Aircraft Configuration Name", "Aircraft Type Name", "Aircraft Configuration Maximum Seating Capacity");
+                System.out.println();
+                System.out.printf("%20s%30s%33s%40s", aircraftConfigDetail.getAircraftConfigId(), aircraftConfigDetail.getAircraftName(), aircraftConfigDetail.getAircraftType().getAircraftTypeName(), aircraftConfigDetail.getMaxSeatingCapacity());
 
                 //aircraftConfigDetail.getCabinClasses().size();
-                System.out.println("***Aircraft Configuration and Aircraft Type***");
+                /* System.out.println("***Aircraft Configuration and Aircraft Type***");
                 System.out.println("Aircraft Configuration Id:" + aircraftConfigDetail.getAircraftConfigId());
                 System.out.println("Aircraft Type Name:" + aircraftConfigDetail.getAircraftType().getAircraftTypeName());
                 System.out.println("Aircraft Configuration Name:" + aircraftConfigDetail.getAircraftName());
-                System.out.println("Aircraft Configuration Maximum Seating Capacity:" + aircraftConfigDetail.getMaxSeatingCapacity());
-
+                System.out.println("Aircraft Configuration Maximum Seating Capacity:" + aircraftConfigDetail.getMaxSeatingCapacity());*/
                 System.out.println("***Cabin Class Configuration and Aircraft Type***");
 
                 for (int i = 0; i < aircraftConfigDetail.getCabinClasses().size(); i++) {
@@ -313,111 +316,4 @@ public class AircraftConfiguration {
 
     }
 
-    public void createFlightRoute() {
-        List<AirportEntity> listOfAirport = flightRouteSessionBean.getListOfAirportEntity();
-        System.out.println("***Airport List***");
-        System.out.printf("%5s%3s%3s", "Country", ":", "IATA Code:");
-        System.out.println();
-        for (AirportEntity airportEntity : listOfAirport) {
-
-            System.out.printf("%5s%3s%3s", airportEntity.getCountry(), ":", airportEntity.getIataAirportCode());
-            // .out.printf("Country: %s%10 || Airport IATA code: %s", airportEntity.getCountry(), airportEntity.getIataAirportCode());
-            System.out.println();
-        }
-        Scanner sc = new Scanner(System.in);
-
-        System.out.println("**Create flight route.**");
-
-        System.out.println("Please enter the origin location of IATA airport code.");
-        String oIATAAirport = sc.nextLine().toUpperCase();
-        while (oIATAAirport.length() != 3) {
-            System.out.println("Invalid origin location IATA code. It should only have 3 characters");
-            System.out.println("Please enter the origin location of IATA airport code.");
-            oIATAAirport = sc.nextLine().toUpperCase().trim();
-        }
-
-        System.out.println("Please enter the Destination location of IATA airport code.");
-        String dIATAAirport = sc.nextLine().toUpperCase().trim();
-        while (dIATAAirport.length() != 3) {
-            System.out.println("Invalid destination location IATA code. It should only have 3 characters");
-            System.out.println("Please enter the destination location of IATA airport code.");
-            dIATAAirport = sc.nextLine().toUpperCase().trim();
-        }
-
-        System.out.println("Is there a return route? Yes/No");
-        String returnRoute = sc.nextLine().toUpperCase();
-        while (!returnRoute.equalsIgnoreCase("Yes") && !returnRoute.equalsIgnoreCase("No")) {
-            System.out.println("Invalid return route.");
-            System.out.println("Is there a return route? Yes/No");
-            returnRoute = sc.nextLine().trim();
-        }
-
-        try {
-            Long id = flightRouteSessionBean.createFlightRoute(oIATAAirport, dIATAAirport, returnRoute);
-            System.out.println("You have successfully created flight route");
-        } catch (FlightRouteODPairExistException ex) {
-            System.out.println("Flight route origin-destination already exist in the database");
-        } catch (AirportODPairNotFoundException ex) {
-            System.out.println("Invalid input for O-D. Please try again.");
-        }
-
-    }
-
-    public void viewFlightRoute() {
-        List<FlightRouteEntity> listOfFlightRoute = flightRouteSessionBean.viewListOfFlightRoute();
-        for (int i = 0; i < listOfFlightRoute.size(); i++) {
-            FlightRouteEntity fr = listOfFlightRoute.get(i);
-            System.out.println("***Flight Route***");
-            System.out.println(String.format("Origin Location(IATA airport Code): %s (%s)", fr.getOriginLocation().getAirportName(), fr.getOriginLocation().getIataAirportCode()));
-            System.out.println("Country: " + fr.getOriginLocation().getCountry());
-            System.out.println("State: " + fr.getOriginLocation().getState());
-            System.out.println("City: " + fr.getOriginLocation().getCity());
-            System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getOriginLocation().getTimeZoneHour(), fr.getOriginLocation().getTimeZoneMin()));
-
-            System.out.println(String.format("Destination Location(IATA airport Code): %s (%s)", fr.getDestinationLocation().getAirportName(), fr.getDestinationLocation().getIataAirportCode()));
-            System.out.println("Country: " + fr.getDestinationLocation().getCountry());
-            System.out.println("State: " + fr.getDestinationLocation().getState());
-            System.out.println("City: " + fr.getDestinationLocation().getCity());
-            System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getDestinationLocation().getTimeZoneHour(), fr.getDestinationLocation().getTimeZoneMin()));
-
-            if (fr.getReturnRoute() != null) {
-                System.out.println("*** Return Flight Route***");
-                System.out.println(String.format("Origin Location(IATA airport Code): %s (%s)", fr.getReturnRoute().getOriginLocation().getAirportName(), fr.getReturnRoute().getOriginLocation().getIataAirportCode()));
-                System.out.println("Country: " + fr.getReturnRoute().getOriginLocation().getCountry());
-                System.out.println("State: " + fr.getReturnRoute().getOriginLocation().getState());
-                System.out.println("City: " + fr.getReturnRoute().getOriginLocation().getCity());
-                System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getReturnRoute().getOriginLocation().getTimeZoneHour(), fr.getReturnRoute().getOriginLocation().getTimeZoneMin()));
-
-                System.out.println(String.format("Destination Location(IATA airport Code): %s (%s)", fr.getReturnRoute().getDestinationLocation().getAirportName(), fr.getReturnRoute().getDestinationLocation().getIataAirportCode()));
-                System.out.println("Country: " + fr.getReturnRoute().getDestinationLocation().getCountry());
-                System.out.println("State: " + fr.getReturnRoute().getDestinationLocation().getState());
-                System.out.println("City: " + fr.getReturnRoute().getDestinationLocation().getCity());
-                System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getReturnRoute().getDestinationLocation().getTimeZoneHour(), fr.getReturnRoute().getDestinationLocation().getTimeZoneMin()));
-            }
-            System.out.println("--------------------------------------------------------------------------------------------------------------------------");
-        }
-
-    }
-
-    public void DeleteFlightRoute() {
-        Scanner sc = new Scanner(System.in);
-        List<FlightRouteEntity> listOfFlightRoute = flightRouteSessionBean.viewListOfFlightRoute();
-        System.out.println("***List of flight route***");
-        for (int i = 0; i < listOfFlightRoute.size(); i++) {
-            System.out.println(String.format("%d. %s-%s", listOfFlightRoute.get(i).getFlightRouteId(), listOfFlightRoute.get(i).getOriginLocation().getIataAirportCode(), listOfFlightRoute.get(i).getDestinationLocation().getIataAirportCode()));
-        }
-        System.out.println("Please enter the id you wish to delete");
-        Long id = sc.nextLong();
-        try {
-            boolean isDelete = flightRouteSessionBean.DeleteFlightRoute(id);
-            if (isDelete) {
-                System.out.println("You have successfully deleted");
-            }
-        } catch (FlightRouteDoesNotExistException ex) {
-            System.out.println("The id you have entered does not exist in the database.");
-        } catch (FlightRouteExistInOtherClassException ex) {
-            System.out.println("The id you have entered is currently used by other flight record(s).");
-        }
-
-    }
 }

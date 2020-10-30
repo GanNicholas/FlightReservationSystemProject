@@ -37,15 +37,23 @@ public class Main {
         System.out.println("Welcome");
         System.out.println("1. Flight Schedule Plan");
         System.out.println("2. Aircraft configuration");
+        System.out.println("3. Flight route");
+        System.out.println("0. Exit");
         Scanner sc = new Scanner(System.in);
         String input = sc.nextLine();
-        if (input.equals("1")) {
-            FlightSchedulePlan fsp = new FlightSchedulePlan(flightSchedulePlanSessionBean, flightSessionBean);
-            fsp.runFSP();
-        } else if (input.equals("2")) {
-
-            AircraftConfiguration aircraft = new AircraftConfiguration(aircraftSessionBean, flightRouteSessionBean);
-            aircraft.AircraftConfigurationApp();
+        while (true) {
+            if (input.equals("1")) {
+                FlightSchedulePlan fsp = new FlightSchedulePlan(flightSchedulePlanSessionBean, flightSessionBean);
+                fsp.runFSP();
+            } else if (input.equals("2")) {
+                AircraftConfiguration aircraft = new AircraftConfiguration(aircraftSessionBean);
+                aircraft.AircraftConfigurationApp();
+            } else if (input.equals("3")) {
+                FlightRoute fr = new FlightRoute(flightRouteSessionBean);
+                fr.FlightRouteApp();
+            }else if(input.equals("0")){
+                break;
+            }
         }
 
     }
