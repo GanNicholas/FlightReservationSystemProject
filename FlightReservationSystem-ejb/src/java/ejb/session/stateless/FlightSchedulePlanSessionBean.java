@@ -28,6 +28,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import util.exception.FlightDoesNotExistException;
 import util.exception.FlightScheduleExistException;
+import util.exception.FlightSchedulePlanDoesNotExistException;
 import util.exception.FlightSchedulePlanIsEmptyException;
 
 /**
@@ -59,7 +60,10 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
         } else {
             fsp = new MultipleFlightScheduleEntity(flightNumber, false, flight);
         }
-        fsp.setListOfFare(listOfFares);
+
+        for (FareEntity fare : listOfFares) {
+            fsp.getListOfFare().add(fare);
+        }
 
         for (int i = 0; i < listOfDepartureDateTime.size(); i++) {
             GregorianCalendar departureDateTime = listOfDepartureDateTime.get(i);
@@ -100,7 +104,9 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
                 returnFSP = new MultipleFlightScheduleEntity(flightNumber, false, flight);
             }
 
-            returnFSP.setListOfFare(listOfFares);
+            for (FareEntity fare : listOfFares) {
+                returnFSP.getListOfFare().add(fare);
+            }
 
             // GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight
             for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
@@ -112,7 +118,10 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
                     returnFSP.getListOfFlightSchedule().add(fe1);
                     //get seatingplan - need get seating plan from aircraft config, add to flight schedule
                     List<SeatEntity> returnSeatingPlan = returnFlight.getAircraftConfig().getSeatingPlan();
-                    fe1.setSeatingPlan(returnSeatingPlan);
+                    for (SeatEntity seat : returnSeatingPlan) {
+                        fe1.getSeatingPlan().add(seat);
+                    }
+
                 } catch (FlightScheduleExistException ex) {
                     throw new FlightScheduleExistException(ex.getMessage());
                 }
@@ -150,7 +159,10 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
         } else { //MUST CHECK RECURRENCY 7 OR LESSER
             fsp = new RecurringWeeklyScheduleEntity(flightNumber, false, flight, endDate);
         }
-        fsp.setListOfFare(listOfFares);
+
+        for (FareEntity fare : listOfFares) {
+            fsp.getListOfFare().add(fare);
+        }
 
         int dateCompare = departureDateTime.compareTo(endDate);
 
@@ -194,7 +206,9 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             } else { //MUST CHECK RECURRENCY 7 OR LESSER
                 returnFSP = new RecurringWeeklyScheduleEntity(flightNumber, false, flight, endDate);
             }
-            returnFSP.setListOfFare(listOfFares);
+            for (FareEntity fare : listOfFares) {
+                returnFSP.getListOfFare().add(fare);
+            }
 
             // GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight
             for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
@@ -206,7 +220,10 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
                     returnFSP.getListOfFlightSchedule().add(fe1);
                     //get seatingplan - need get seating plan from aircraft config, add to flight schedule
                     List<SeatEntity> returnSeatingPlan = returnFlight.getAircraftConfig().getSeatingPlan();
-                    fe1.setSeatingPlan(returnSeatingPlan);
+
+                    for (SeatEntity seat : returnSeatingPlan) {
+                        fe1.getSeatingPlan().add(seat);
+                    }
                 } catch (FlightScheduleExistException ex) {
                     throw new FlightScheduleExistException(ex.getMessage());
                 }
@@ -231,6 +248,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
         }
     }
 
+    @Override
     public List<FlightSchedulePlanEntity> viewAllFlightSchedulePlan() throws FlightSchedulePlanIsEmptyException {
         List<FlightSchedulePlanEntity> listOfFsp = em.createQuery("SELECT c FROM FlightSchedulePlanEntity c WHERE c.isDeleted = FALSE ORDER BY c.flightNumber ASC").getResultList();
         if (listOfFsp.isEmpty()) {
@@ -261,7 +279,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
 
     private void sortFlightSchedule(FlightSchedulePlanEntity fsp) {
         List<FlightScheduleEntity> listOfFlightSchedule = fsp.getListOfFlightSchedule();
-        
+
 //        Collections.sort(listOfFlightSchedule, new Comparator<FlightScheduleEntity>(){
 //        @Override
 //        public int compare(GregorianCalendar d1, GregorianCalendar d2){
@@ -280,6 +298,28 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
                 }
 
             }
+        }
+
+    }
+
+    @Override
+    public FlightSchedulePlanEntity viewFlightSchedulePlan(String flightNumber) throws FlightSchedulePlanDoesNotExistException {
+        try {
+            FlightSchedulePlanEntity fsp = (FlightSchedulePlanEntity) em.createNamedQuery("queryFSPwithFlightNumber").setParameter("flightNum", flightNumber);
+            fsp.getListOfFlightSchedule().size();
+            for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
+                fs.getSeatingPlan().size();
+            }
+
+            FlightSchedulePlanEntity returnFsp = fsp.getReturnFlightSchedulePlan();
+            returnFsp.getListOfFlightSchedule().size();
+            for (FlightScheduleEntity fs : returnFsp.getListOfFlightSchedule()) {
+                fs.getSeatingPlan().size();
+            }
+
+            return fsp;
+        } catch (NoResultException ex) {
+            throw new FlightSchedulePlanDoesNotExistException("Flight schedule plan does not exist!");
         }
 
     }

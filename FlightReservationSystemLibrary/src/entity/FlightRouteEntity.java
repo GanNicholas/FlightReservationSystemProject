@@ -30,15 +30,14 @@ public class FlightRouteEntity implements Serializable {
     private Long flightRouteId;
 
     @OneToOne
-    @JoinColumn(nullable = false)
     private AirportEntity originLocation;
 
     @OneToOne
-    @JoinColumn(nullable = false)
     private AirportEntity destinationLocation;
 
     private boolean isDeleted;
 
+    @OneToOne(mappedBy = "returnRoute")
     private FlightRouteEntity returnRoute;
 
     public FlightRouteEntity() {

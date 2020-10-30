@@ -35,11 +35,9 @@ public class IndividualFlightReservationEntity implements Serializable {
 
     @NotNull
     @OneToOne(optional = false)
-    @JoinColumn(nullable = false)
     private FlightScheduleEntity flightSchedule;
 
     @OneToMany
-    @JoinColumn(nullable = false)
     private List<PassengerEntity> listOfPassengers;
 
     @OneToOne(optional = false)

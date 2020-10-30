@@ -41,11 +41,9 @@ public class FlightEntity implements Serializable {
     private String flightNumber;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
     private FlightRouteEntity flightRoute;
 
     @OneToOne(optional = false)
-    @JoinColumn(nullable = false)
     private AircraftConfigurationEntity aircraftConfig;
 
     private boolean isDeleted;

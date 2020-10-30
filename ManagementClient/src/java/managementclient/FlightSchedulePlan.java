@@ -53,7 +53,7 @@ public class FlightSchedulePlan {
             if (choice == 1) {
                 createfsp(sc, flightSchedulePlanSessionBean);
             } else if (choice == 2) {
-                
+                viewAllFsp(sc,flightSchedulePlanSessionBean );
             } else if (choice == 3) {
             } else if (choice == 4) {
 
@@ -239,7 +239,7 @@ public class FlightSchedulePlan {
                     }
                     if (reenter) {
                         break;
-                    }
+                    } 
                 }
             }
             if (reenter == false) {
@@ -309,6 +309,11 @@ public class FlightSchedulePlan {
         //NEED VALIDATE CALENDAR INPUT 
         GregorianCalendar newCalendar = new GregorianCalendar(informationInteger.get(2), informationInteger.get(1), informationInteger.get(0), informationInteger.get(3), informationInteger.get(4));
         return newCalendar;
+    }
+    
+    
+    public void viewAllFsp(Scanner sc, FlightSchedulePlanSessionBeanRemote flightSchedulePlanSessionBeanRemote){
+        
     }
 
 }
