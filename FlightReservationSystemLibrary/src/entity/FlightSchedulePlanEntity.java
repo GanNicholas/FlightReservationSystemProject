@@ -52,7 +52,6 @@ public abstract class FlightSchedulePlanEntity implements Serializable {
     private FlightSchedulePlanEntity returnFlightSchedulePlan;
 
     @OneToMany
-    @JoinColumn(nullable = false)
     private List<FareEntity> listOfFare;
 
     private boolean isDeleted;

@@ -53,8 +53,7 @@ public abstract class CustomerEntity implements Serializable {
     private UserRole userRole;
 
     @NotNull
-    @OneToMany()
-    @JoinColumn(nullable = false)
+    @OneToMany(mappedBy = "customer")
     private List<FlightReservationEntity> listOfFlightReservation;
     
 

@@ -92,11 +92,11 @@ public class FlightSessionBean implements FlightSessionBeanRemote, FlightSession
         for (int i = 0; i < listOfFlightEntity.size(); i++) {
             if (listOfFlightEntity.get(i).getReturnFlight() != null && !listOfAllFlights.contains(listOfFlightEntity.get(i).getReturnFlight())) {
 
-                listOfAllFlights.add(counter, listOfAllFlights.get(i));
-                listOfAllFlights.add(counter + 1, listOfAllFlights.get(i).getReturnFlight());
+                listOfAllFlights.add(counter, listOfFlightEntity.get(i));
+                listOfAllFlights.add(counter + 1, listOfFlightEntity.get(i).getReturnFlight());
                 counter += 2;
             } else if (!listOfAllFlights.contains(listOfFlightEntity.get(i))) {
-                listOfAllFlights.add(counter, listOfAllFlights.get(i));
+                listOfAllFlights.add(counter, listOfFlightEntity.get(i));
                 counter++;
             }
         }

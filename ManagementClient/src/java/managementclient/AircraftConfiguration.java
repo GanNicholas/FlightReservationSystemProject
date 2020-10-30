@@ -315,10 +315,14 @@ public class AircraftConfiguration {
 
     public void createFlightRoute() {
         List<AirportEntity> listOfAirport = flightRouteSessionBean.getListOfAirportEntity();
-        System.out.println("Airport List:");
+        System.out.println("***Airport List***");
+        System.out.printf("%5s%3s%3s", "Country", ":", "IATA Code:");
+        System.out.println();
         for (AirportEntity airportEntity : listOfAirport) {
 
-            System.out.printf(String.format("Country: %s || Airport IATA code: %s", airportEntity.getCountry(), airportEntity.getIataAirportCode()));
+            System.out.printf("%5s%3s%3s", airportEntity.getCountry(), ":", airportEntity.getIataAirportCode());
+            // .out.printf("Country: %s%10 || Airport IATA code: %s", airportEntity.getCountry(), airportEntity.getIataAirportCode());
+            System.out.println();
         }
         Scanner sc = new Scanner(System.in);
 

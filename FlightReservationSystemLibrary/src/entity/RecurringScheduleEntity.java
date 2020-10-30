@@ -7,16 +7,11 @@ package entity;
 
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 /**
@@ -36,6 +31,12 @@ public class RecurringScheduleEntity extends FlightSchedulePlanEntity implements
     public RecurringScheduleEntity() {
         super();
         endDate = null;
+    }
+    
+    public RecurringScheduleEntity(String flightNumber, boolean isDeleted, FlightEntity flightEntity, GregorianCalendar endDate, Integer recurrentFreq) {
+        super(flightNumber, isDeleted, flightEntity);
+        this.endDate = endDate;
+        this.recurrentFreq = recurrentFreq;
     }
 
     public RecurringScheduleEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity returnFlightSchedulePlan, List<FareEntity> listOfFare, boolean isDeleted, int recurrentFreq, GregorianCalendar endDate, FlightEntity flightEntity) {

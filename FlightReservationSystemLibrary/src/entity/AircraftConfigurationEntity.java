@@ -42,7 +42,6 @@ public class AircraftConfigurationEntity implements Serializable {
     private Integer maxSeatingCapacity;
 
     @OneToOne(optional = false)
-    @JoinColumn(nullable = false)
     private AircraftTypeEntity aircraftType;
 
     @OneToMany

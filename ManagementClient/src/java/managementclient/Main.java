@@ -7,6 +7,9 @@ package managementclient;
 
 import ejb.session.stateless.AircraftSessionBeanRemote;
 import ejb.session.stateless.FlightRouteSessionBeanRemote;
+import ejb.session.stateless.FlightSchedulePlanSessionBeanRemote;
+import ejb.session.stateless.FlightSessionBeanRemote;
+import java.util.Scanner;
 import javax.ejb.EJB;
 
 /**
@@ -14,6 +17,12 @@ import javax.ejb.EJB;
  * @author nickg
  */
 public class Main {
+
+    @EJB
+    private static FlightSessionBeanRemote flightSessionBean;
+
+    @EJB
+    private static FlightSchedulePlanSessionBeanRemote flightSchedulePlanSessionBean;
 
     @EJB
     private static FlightRouteSessionBeanRemote flightRouteSessionBean;
@@ -24,12 +33,21 @@ public class Main {
     /**
      * @param args the command line arguments
      */
-    
     public static void main(String[] args) {
-        // TODO code application logic here
-        
-        AircraftConfiguration aircraft = new AircraftConfiguration(aircraftSessionBean,flightRouteSessionBean);
-        aircraft.AircraftConfigurationApp();
+        System.out.println("Welcome");
+        System.out.println("1. Flight Schedule Plan");
+        System.out.println("2. Aircraft configuration");
+        Scanner sc = new Scanner(System.in);
+        String input = sc.nextLine();
+        if (input.equals("1")) {
+            FlightSchedulePlan fsp = new FlightSchedulePlan(flightSchedulePlanSessionBean, flightSessionBean);
+            fsp.runFSP();
+        } else if (input.equals("2")) {
+
+            AircraftConfiguration aircraft = new AircraftConfiguration(aircraftSessionBean, flightRouteSessionBean);
+            aircraft.AircraftConfigurationApp();
+        }
+
     }
-    
+
 }
