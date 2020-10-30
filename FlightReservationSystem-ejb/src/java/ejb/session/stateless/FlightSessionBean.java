@@ -109,10 +109,12 @@ public class FlightSessionBean implements FlightSessionBeanRemote, FlightSession
         try {
             FlightEntity flight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
             flight.getAircraftConfig().getCabinClasses().size();
-            flight.getReturnFlight().getAircraftConfig().getCabinClasses().size();
-
             flight.getFlightRoute();
-            flight.getReturnFlight().getFlightRoute();
+
+            if (flight.getReturnFlight() != null) {
+                flight.getReturnFlight().getAircraftConfig().getCabinClasses().size();
+                flight.getReturnFlight().getFlightRoute();
+            }
 
             return flight;
 
