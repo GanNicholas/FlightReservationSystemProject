@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
+import javax.persistence.Persistence;
 
 /**
  *
@@ -27,11 +29,11 @@ public class FlightRouteEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long flightRouteId;
 
-    @OneToOne(optional = false)
+    @OneToOne
     @JoinColumn(nullable = false)
     private AirportEntity originLocation;
 
-    @OneToOne(optional = false)
+    @OneToOne
     @JoinColumn(nullable = false)
     private AirportEntity destinationLocation;
 
