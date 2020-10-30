@@ -100,6 +100,12 @@ public class FlightScheduleEntity implements Serializable {
     public GregorianCalendar getDepartureDateTime() {
         return departureDateTime;
     }
+    
+    public GregorianCalendar getArrivalDateTime(){
+        GregorianCalendar arrivalDateTime = (GregorianCalendar) departureDateTime.clone();
+        arrivalDateTime.add(GregorianCalendar.MINUTE, flightDuration);
+        return arrivalDateTime;
+    }
 
     public void setDepartureDateTime(GregorianCalendar departureDateTime) {
         this.departureDateTime = departureDateTime;

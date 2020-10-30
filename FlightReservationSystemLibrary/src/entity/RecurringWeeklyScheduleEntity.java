@@ -30,6 +30,11 @@ public class RecurringWeeklyScheduleEntity extends FlightSchedulePlanEntity impl
     public RecurringWeeklyScheduleEntity() {
         super();
     }
+    
+    public RecurringWeeklyScheduleEntity(String flightNumber, boolean isDeleted, FlightEntity flightEntity, GregorianCalendar endDate) {
+        super(flightNumber, isDeleted, flightEntity);
+        this.endDate = endDate;
+    }
 
     public RecurringWeeklyScheduleEntity(String flightNumber, List<FlightScheduleEntity> listOfFlightSchedule, FlightSchedulePlanEntity returnFlightSchedulePlan, List<FareEntity> listOfFare, boolean isDeleted, FlightEntity flightEntity, GregorianCalendar endDate) {
         super(flightNumber, listOfFlightSchedule, returnFlightSchedulePlan, listOfFare, isDeleted, flightEntity);

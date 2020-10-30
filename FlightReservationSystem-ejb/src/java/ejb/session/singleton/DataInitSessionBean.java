@@ -79,7 +79,7 @@ public class DataInitSessionBean {
             em.persist(a10);
             AirportEntity a11 = new AirportEntity("Osaka International Airport", "ITM", "Osaka", "Japan", 9, 0, "Itami");
             em.persist(a11);
-            AirportEntity a12 = new AirportEntity("Tokyo International Airport", "HND", "Tokyo", "Japan", 9, 0, "Ōta");
+            AirportEntity a12 = new AirportEntity("Tokyo International Airport", "HND", "Tokyo", "Japan", 9, 0, "Ota");
             em.persist(a12);
             AirportEntity a13 = new AirportEntity("Beijing Capital International Airport", "PEK", "Beijing", "China", 8, 0, "Shunyi District");
             em.persist(a13);
