@@ -5,9 +5,11 @@
  */
 package ejb.session.stateless;
 
+import entity.AirportEntity;
 import entity.FlightRouteEntity;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.AirportODPairNotFoundException;
 import util.exception.FlightRouteDoesNotExistException;
 import util.exception.FlightRouteExistInOtherClassException;
 import util.exception.FlightRouteODPairExistException;
@@ -19,11 +21,13 @@ import util.exception.FlightRouteODPairExistException;
 @Remote
 public interface FlightRouteSessionBeanRemote {
 
-    public Long createFlightRoute(FlightRouteEntity frEntity) throws FlightRouteODPairExistException;
+    public Long createFlightRoute(String oIATA, String dIATA, String returnFlight) throws FlightRouteODPairExistException, AirportODPairNotFoundException;
 
-    public boolean checkFlightRouteOD(FlightRouteEntity frEntity) throws FlightRouteODPairExistException;
+    public boolean checkFlightRouteOD(String oIATA, String dIATA) throws FlightRouteODPairExistException;
 
     public List<FlightRouteEntity> viewListOfFlightRoute();
 
     public boolean DeleteFlightRoute(Long id) throws FlightRouteDoesNotExistException, FlightRouteExistInOtherClassException;
+
+    public List<AirportEntity> getListOfAirportEntity();
 }

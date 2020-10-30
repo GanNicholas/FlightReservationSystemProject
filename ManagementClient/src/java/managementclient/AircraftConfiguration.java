@@ -22,6 +22,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.enumeration.CabinClassType;
 import util.exception.AircraftConfigurationNotExistException;
+import util.exception.AirportODPairNotFoundException;
 import util.exception.CabinClassExceedMaxCapacity;
 import util.exception.FlightRouteDoesNotExistException;
 import util.exception.FlightRouteExistInOtherClassException;
@@ -313,135 +314,47 @@ public class AircraftConfiguration {
     }
 
     public void createFlightRoute() {
+        List<AirportEntity> listOfAirport = flightRouteSessionBean.getListOfAirportEntity();
+        System.out.println("Airport List:");
+        for (AirportEntity airportEntity : listOfAirport) {
+
+            System.out.printf(String.format("Country: %s || Airport IATA code: %s", airportEntity.getCountry(), airportEntity.getIataAirportCode()));
+        }
         Scanner sc = new Scanner(System.in);
 
         System.out.println("**Create flight route.**");
 
-        System.out.println("Please enter the original location of the airport.");
-        String originalLocation = sc.nextLine();
-        System.out.println("Please enter the original location of IATA airport code.");
-        String oIATAAirport = sc.nextLine();
-        System.out.println("Please enter the original location of the airport city.");
-        String oCity = sc.nextLine();
-        System.out.println("Please enter the original location of the airport state.");
-        String oState = sc.nextLine();
-        System.out.println("Please enter the original location of the airport country.");
-        String oCountry = sc.nextLine();
-        System.out.println("Please enter the original location of time zone(hour).");
-        int oTimezoneHr = sc.nextInt();
-        System.out.println("Please enter the original location of time zone(minute).");
-        int oTimezoneMin = sc.nextInt();
-        sc.nextLine();
-        System.out.println("Please enter the Destination location of the airport.");
-        String destinationLocation = sc.nextLine();
+        System.out.println("Please enter the origin location of IATA airport code.");
+        String oIATAAirport = sc.nextLine().toUpperCase();
+        while (oIATAAirport.length() != 3) {
+            System.out.println("Invalid origin location IATA code. It should only have 3 characters");
+            System.out.println("Please enter the origin location of IATA airport code.");
+            oIATAAirport = sc.nextLine().toUpperCase().trim();
+        }
+
         System.out.println("Please enter the Destination location of IATA airport code.");
-        String dIATAAirport = sc.nextLine();
-        System.out.println("Please enter the Destination location of the airport city.");
-        String dCity = sc.nextLine();
-        System.out.println("Please enter the Destination location of the airport state.");
-        String dState = sc.nextLine();
-        System.out.println("Please enter the Destination location of the airport country.");
-        String dCountry = sc.nextLine();
-        System.out.println("Please enter the Destination location of time zone(hour).");
-        int dTimezoneHr = sc.nextInt();
-        System.out.println("Please enter the original location of time zone(minute).");
-        int dTimezoneMin = sc.nextInt();
-        sc.nextLine();
+        String dIATAAirport = sc.nextLine().toUpperCase().trim();
+        while (dIATAAirport.length() != 3) {
+            System.out.println("Invalid destination location IATA code. It should only have 3 characters");
+            System.out.println("Please enter the destination location of IATA airport code.");
+            dIATAAirport = sc.nextLine().toUpperCase().trim();
+        }
+
         System.out.println("Is there a return route? Yes/No");
-        String returnRoute = sc.nextLine();
+        String returnRoute = sc.nextLine().toUpperCase();
         while (!returnRoute.equalsIgnoreCase("Yes") && !returnRoute.equalsIgnoreCase("No")) {
             System.out.println("Invalid return route.");
             System.out.println("Is there a return route? Yes/No");
-            returnRoute = sc.nextLine();
+            returnRoute = sc.nextLine().trim();
         }
 
-        FlightRouteEntity fr = new FlightRouteEntity();
-
-        AirportEntity airportOriginal = new AirportEntity();
-        airportOriginal.setAirportName(originalLocation);
-        airportOriginal.setIataAirportCode(oIATAAirport);
-        airportOriginal.setCity(oCity);
-        airportOriginal.setState(oState);
-        airportOriginal.setCountry(oCountry);
-        airportOriginal.setTimeZoneHour(oTimezoneHr);
-        airportOriginal.setTimeZoneMin(oTimezoneMin);
-
-        AirportEntity airportDestination = new AirportEntity();
-        airportDestination.setAirportName(destinationLocation);
-        airportDestination.setIataAirportCode(dIATAAirport);
-        airportDestination.setCity(dCity);
-        airportDestination.setState(dState);
-        airportDestination.setCountry(dCountry);
-        airportDestination.setTimeZoneHour(dTimezoneHr);
-        airportDestination.setTimeZoneMin(dTimezoneMin);
-
-        fr.setDestinationLocation(airportDestination);
-        fr.setOriginLocation(airportOriginal);
-        fr.setIsDeleted(false);
-
-        FlightRouteEntity returnRouteEntity = null;
-        if (returnRoute.equalsIgnoreCase("Yes")) {
-            returnRouteEntity = new FlightRouteEntity();
-            returnRouteEntity.setOriginLocation(airportDestination);
-            returnRouteEntity.setDestinationLocation(airportOriginal);
-            returnRouteEntity.setIsDeleted(false);
-            returnRouteEntity.setReturnRoute(null);
-        }
-        boolean isValidationPassed = true;
-        fr.setReturnRoute(returnRouteEntity);
         try {
-            Set<ConstraintViolation<FlightRouteEntity>> constraintViolationsFr = validator.validate(fr);
-            if (!constraintViolationsFr.isEmpty()) {
-                isValidationPassed = false;
-                System.out.println("\nInput data validation error!:");
-
-                for (ConstraintViolation constraintViolation : constraintViolationsFr) {
-                    System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
-                }
-
-                //System.out.println("\nPlease try again......\n");
-            }
-            /* Set<ConstraintViolation<FlightRouteEntity>> constraintViolationsRR = validator.validate(returnRouteEntity);
-            if (!constraintViolationsRR.isEmpty()) {
-                isValidationPassed = false;
-                System.out.println("\nInput data validation error!:");
-
-                for (ConstraintViolation constraintViolation : constraintViolationsRR) {
-                    System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
-                }
-
-                //  System.out.println("\nPlease try again......\n");
-            }*/
-            Set<ConstraintViolation<AirportEntity>> constraintViolationsAO = validator.validate(airportOriginal);
-            if (!constraintViolationsAO.isEmpty()) {
-                isValidationPassed = false;
-                System.out.println("\nInput data validation error!:");
-
-                for (ConstraintViolation constraintViolation : constraintViolationsAO) {
-                    System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
-                }
-
-                //System.out.println("\nPlease try again......\n");
-            }
-            Set<ConstraintViolation<AirportEntity>> constraintViolationsAD = validator.validate(airportDestination);
-            if (!constraintViolationsAD.isEmpty()) {
-                isValidationPassed = false;
-                System.out.println("\nInput data validation error!:");
-
-                for (ConstraintViolation constraintViolation : constraintViolationsAD) {
-                    System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
-                }
-
-                //System.out.println("\nPlease try again......\n");
-            }
-            if (isValidationPassed) {
-                Long id = flightRouteSessionBean.createFlightRoute(fr);
-                System.out.println("You have successfully create a flight route with the id of" + id);
-            } else {
-                System.out.println("\nPlease try again......\n");
-            }
+            Long id = flightRouteSessionBean.createFlightRoute(oIATAAirport, dIATAAirport, returnRoute);
+            System.out.println("You have successfully created flight route");
         } catch (FlightRouteODPairExistException ex) {
             System.out.println("Flight route origin-destination already exist in the database");
+        } catch (AirportODPairNotFoundException ex) {
+            System.out.println("Invalid input for O-D. Please try again.");
         }
 
     }
@@ -451,30 +364,30 @@ public class AircraftConfiguration {
         for (int i = 0; i < listOfFlightRoute.size(); i++) {
             FlightRouteEntity fr = listOfFlightRoute.get(i);
             System.out.println("***Flight Route***");
-            System.out.println(String.format("Origin Location(IATA airport Code: %s (%s)", fr.getOriginLocation().getAirportName(), fr.getOriginLocation().getIataAirportCode()));
-            System.out.println("City: " + fr.getOriginLocation().getCountry());
+            System.out.println(String.format("Origin Location(IATA airport Code): %s (%s)", fr.getOriginLocation().getAirportName(), fr.getOriginLocation().getIataAirportCode()));
+            System.out.println("Country: " + fr.getOriginLocation().getCountry());
             System.out.println("State: " + fr.getOriginLocation().getState());
-            System.out.println("Country: " + fr.getOriginLocation().getCity());
+            System.out.println("City: " + fr.getOriginLocation().getCity());
             System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getOriginLocation().getTimeZoneHour(), fr.getOriginLocation().getTimeZoneMin()));
 
-            System.out.println(String.format("Destination Location(IATA airport Code: %s (%s)", fr.getDestinationLocation().getAirportName(), fr.getDestinationLocation().getIataAirportCode()));
-            System.out.println("City: " + fr.getDestinationLocation().getCountry());
+            System.out.println(String.format("Destination Location(IATA airport Code): %s (%s)", fr.getDestinationLocation().getAirportName(), fr.getDestinationLocation().getIataAirportCode()));
+            System.out.println("Country: " + fr.getDestinationLocation().getCountry());
             System.out.println("State: " + fr.getDestinationLocation().getState());
-            System.out.println("Country: " + fr.getDestinationLocation().getCity());
+            System.out.println("City: " + fr.getDestinationLocation().getCity());
             System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getDestinationLocation().getTimeZoneHour(), fr.getDestinationLocation().getTimeZoneMin()));
 
             if (fr.getReturnRoute() != null) {
                 System.out.println("*** Return Flight Route***");
-                System.out.println(String.format("Origin Location(IATA airport Code: %s (%s)", fr.getReturnRoute().getOriginLocation().getAirportName(), fr.getReturnRoute().getOriginLocation().getIataAirportCode()));
-                System.out.println("City: " + fr.getReturnRoute().getOriginLocation().getCountry());
+                System.out.println(String.format("Origin Location(IATA airport Code): %s (%s)", fr.getReturnRoute().getOriginLocation().getAirportName(), fr.getReturnRoute().getOriginLocation().getIataAirportCode()));
+                System.out.println("Country: " + fr.getReturnRoute().getOriginLocation().getCountry());
                 System.out.println("State: " + fr.getReturnRoute().getOriginLocation().getState());
-                System.out.println("Country: " + fr.getReturnRoute().getOriginLocation().getCity());
+                System.out.println("City: " + fr.getReturnRoute().getOriginLocation().getCity());
                 System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getReturnRoute().getOriginLocation().getTimeZoneHour(), fr.getReturnRoute().getOriginLocation().getTimeZoneMin()));
 
-                System.out.println(String.format("Destination Location(IATA airport Code: %s (%s)", fr.getReturnRoute().getDestinationLocation().getAirportName(), fr.getReturnRoute().getDestinationLocation().getIataAirportCode()));
-                System.out.println("City: " + fr.getReturnRoute().getDestinationLocation().getCountry());
+                System.out.println(String.format("Destination Location(IATA airport Code): %s (%s)", fr.getReturnRoute().getDestinationLocation().getAirportName(), fr.getReturnRoute().getDestinationLocation().getIataAirportCode()));
+                System.out.println("Country: " + fr.getReturnRoute().getDestinationLocation().getCountry());
                 System.out.println("State: " + fr.getReturnRoute().getDestinationLocation().getState());
-                System.out.println("Country: " + fr.getReturnRoute().getDestinationLocation().getCity());
+                System.out.println("City: " + fr.getReturnRoute().getDestinationLocation().getCity());
                 System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getReturnRoute().getDestinationLocation().getTimeZoneHour(), fr.getReturnRoute().getDestinationLocation().getTimeZoneMin()));
             }
             System.out.println("--------------------------------------------------------------------------------------------------------------------------");
