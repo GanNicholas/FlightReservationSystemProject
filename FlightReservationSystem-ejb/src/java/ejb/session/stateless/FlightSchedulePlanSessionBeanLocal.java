@@ -28,5 +28,6 @@ public interface FlightSchedulePlanSessionBeanLocal {
 
     public List<FlightSchedulePlanEntity> viewAllFlightSchedulePlan() throws FlightSchedulePlanIsEmptyException;
 
-    public FlightSchedulePlanEntity viewFlightSchedulePlan(String flightNumber) throws FlightSchedulePlanDoesNotExistException;
+    public FlightSchedulePlanEntity viewFlightSchedulePlan(String flightNumber, Long fspId) throws FlightSchedulePlanDoesNotExistException;
+
 }

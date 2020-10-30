@@ -14,8 +14,11 @@ import entity.FlightScheduleEntity;
 import entity.FlightSchedulePlanEntity;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Scanner;
@@ -31,6 +34,7 @@ import util.exception.FlightDoesNotExistException;
 import util.exception.FlightScheduleExistException;
 import util.exception.FlightSchedulePlanDoesNotExistException;
 import util.exception.FlightSchedulePlanIsEmptyException;
+import util.exception.IncorrectFormatException;
 
 /**
  *
@@ -58,6 +62,7 @@ public class FlightSchedulePlan {
             System.out.println("4. Update flight schedule plan.");
             System.out.println("5. Delete flight schedule plan");
             System.out.println("0. Exit");
+            System.out.print("Please enter your choice: ");
             int choice = sc.nextInt();
             sc.nextLine();
             if (choice == 1) {
@@ -84,6 +89,7 @@ public class FlightSchedulePlan {
             System.out.println("----Create a new Flight Schedule Plan----");
             System.out.println("1. Create single/Multiple Flight Schedules");
             System.out.println("2. Create Recurrent Flight Schedules");
+            System.out.println("3. Back");
             System.out.print("Please enter your choice: ");
             String choiceStr = sc.nextLine().trim();
             int choice = Integer.parseInt(choiceStr);
@@ -93,6 +99,8 @@ public class FlightSchedulePlan {
                 counter = 0;
             } else if (choice == 2) {
                 recurrentFlightSchedule(sc);
+            } else if (choice == 3) {
+                break;
             } else {
                 System.out.println("Please enter a valid entry!");
                 counter++;
@@ -127,12 +135,16 @@ public class FlightSchedulePlan {
             for (int i = 0; i < numSchedule; i++) {
                 System.out.print("Please enter departure date and time (Please enter in this format: dd/mm/yyyy/hh/mm) ");
                 String dateTime = sc.nextLine().trim();
-                GregorianCalendar departDateTime = createDateTime(dateTime);
-                System.out.println(departDateTime.get(GregorianCalendar.DAY_OF_MONTH) + "/" + departDateTime.get(GregorianCalendar.MONTH) + "/"
-                        + departDateTime.get(GregorianCalendar.YEAR) + " " + departDateTime.get(GregorianCalendar.HOUR_OF_DAY) + ":"
-                        + departDateTime.get(GregorianCalendar.MINUTE));
+                try {
+                    GregorianCalendar departDateTime = createDateTime(dateTime);
+                    Date date = departDateTime.getTime();
+                    System.out.println(format.format(date));
 
-                listOfDepartDateTime.add(departDateTime);
+                    listOfDepartDateTime.add(departDateTime);
+                } catch (IncorrectFormatException ex) {
+                    System.out.println(ex.getMessage());
+                }
+
             }
 
             System.out.print("Please enter flight duration (in minutes)");
@@ -206,16 +218,25 @@ public class FlightSchedulePlan {
             String numFrequencyString = sc.nextLine().trim();
             int numFrequency = Integer.parseInt(numFrequencyString);
 
-            // run a for loop to take in a list of date and time
             System.out.print("Please enter departure date and time (Please enter in this format (dd/mm/yyyy/hh/mm) : ");
             String dateTime = sc.nextLine().trim();
-            GregorianCalendar departDateTime = createDateTime(dateTime);
-
+            GregorianCalendar departDateTime = null;
+            try {
+                departDateTime = createDateTime(dateTime);
+            } catch (IncorrectFormatException ex) {
+                System.out.println(ex.getMessage());
+                reenter = true;
+            }
             //POTENTIAL ERROR
-            System.out.println("Please enter end date (dd/mm/yyyy/hh/mm) : ");
+            System.out.print("Please enter end date (dd/mm/yyyy/hh/mm) : ");
             String endDateTimeStr = sc.nextLine().trim();
-            GregorianCalendar endDateTime = createDateTime(endDateTimeStr);
-
+            GregorianCalendar endDateTime = null;
+            try {
+                endDateTime = createDateTime(endDateTimeStr);
+            } catch (IncorrectFormatException ex) {
+                System.out.println(ex.getMessage());
+                reenter = true;
+            }
             System.out.print("Please enter flight duration (in minutes) : ");
             String duration = sc.nextLine().trim();
             Integer flightDuration = Integer.parseInt(duration);
@@ -323,17 +344,19 @@ public class FlightSchedulePlan {
 
     }
 
-    public GregorianCalendar createDateTime(String dateTime) {
+    public GregorianCalendar createDateTime(String dateTime) throws IncorrectFormatException {
         String[] information = dateTime.split("/");
         List<Integer> informationInteger = new ArrayList<>();
         for (String info : information) {
             informationInteger.add(Integer.parseInt(info));
         }
-        
-        System.out.println(informationInteger.toString());
+
+        if (informationInteger.size() != 5) {
+            throw new IncorrectFormatException("Wrong date format!");
+        }
 
         //NEED VALIDATE CALENDAR INPUT 
-        GregorianCalendar newCalendar = new GregorianCalendar(informationInteger.get(2), (informationInteger.get(1)), informationInteger.get(0), informationInteger.get(3), informationInteger.get(4));
+        GregorianCalendar newCalendar = new GregorianCalendar(informationInteger.get(2), (informationInteger.get(1) - 1), informationInteger.get(0), informationInteger.get(3), informationInteger.get(4));
         return newCalendar;
     }
 
@@ -350,8 +373,9 @@ public class FlightSchedulePlan {
                 for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
                     System.out.println("-----------------------------");
                     System.out.println("Flight Schedule  " + fs.getFlightScheduleId());
-                    String departureDate = format.format(fs.getDepartureDateTime());
-                    System.out.println("Departure Date:  " + departureDate);
+                    GregorianCalendar departDateTime = fs.getDepartureDateTime();
+                    Date date = departDateTime.getTime();
+                    System.out.println("Departure Date: " + format.format(date));
                     System.out.println("Flight Duration: " + fs.getFlightDuration());
                     System.out.println("-----------END---------------");
                     System.out.println();
@@ -366,10 +390,23 @@ public class FlightSchedulePlan {
 
     public void viewSpecificFsp(Scanner sc) {
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        System.out.println("Please enter the flight number: ");
+        System.out.print("Please enter the flight number: ");
         String flightNumber = sc.nextLine().trim();
         try {
-            FlightSchedulePlanEntity fsp = flightSchedulePlanSessionBean.viewFlightSchedulePlan(flightNumber);
+            List<FlightSchedulePlanEntity> listOfFsp = flightSchedulePlanSessionBean.viewAllFlightSchedulePlan();
+
+            for (FlightSchedulePlanEntity fsp : listOfFsp) {
+                System.out.println("------------Flight Schedule Plan------------");
+                System.out.println("FSP ID: " + fsp.getFlightSchedulePlanId());
+                System.out.println("Flight depart from: " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getAirportName());
+                System.out.println("Flight arrive at  : " + fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName());
+            }
+
+            System.out.print("Please enter ID of FSP you wish to view: ");
+            String choiceStr = sc.nextLine().trim();
+            Long id = Long.parseLong(choiceStr);
+
+            FlightSchedulePlanEntity fsp = flightSchedulePlanSessionBean.viewFlightSchedulePlan(flightNumber, id);
             System.out.println("============FLIGHT SCHEDULE=============");
             System.out.println("Flight number:   " + flightNumber);
             System.out.println("Flight depart from: " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getAirportName());
@@ -379,7 +416,7 @@ public class FlightSchedulePlan {
             for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
                 System.out.println("-----------------------------");
                 System.out.println("Flight Schedule  " + fs.getFlightScheduleId());
-                String departureDate = format.format(fs.getDepartureDateTime());
+                String departureDate = format.format(fs.getDepartureDateTime().getTime());
                 System.out.println("Departure Date:  " + departureDate);
                 System.out.println("Flight Duration: " + fs.getFlightDuration());
                 System.out.println("-----------END---------------");
@@ -389,9 +426,14 @@ public class FlightSchedulePlan {
             System.out.println("-----Fares for Flight Schedule Plan-----");
             for (FareEntity fare : fsp.getListOfFare()) {
                 System.out.printf("%25s%20s%20s", "Fare basis code", "Fare amount", "Fare cabin type");
+                System.out.println();
                 System.out.printf("%10s%8.2f%8s", fare.getFareBasisCode(), fare.getFareAmount(), fare.getCabinType());
+                System.out.println();
             }
-        } catch (FlightSchedulePlanDoesNotExistException ex) {
+            System.out.println();
+            System.out.println();
+            System.out.println();
+        } catch (FlightSchedulePlanDoesNotExistException | FlightSchedulePlanIsEmptyException ex) {
             System.out.println(ex.getMessage());
         }
     }

@@ -34,18 +34,23 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        System.out.println("Welcome");
-        System.out.println("1. Flight Schedule Plan");
-        System.out.println("2. Aircraft configuration");
-        Scanner sc = new Scanner(System.in);
-        String input = sc.nextLine();
-        if (input.equals("1")) {
-            FlightSchedulePlan fsp = new FlightSchedulePlan(flightSchedulePlanSessionBean, flightSessionBean);
-            fsp.runFSP();
-        } else if (input.equals("2")) {
-
-            AircraftConfiguration aircraft = new AircraftConfiguration(aircraftSessionBean, flightRouteSessionBean);
-            aircraft.AircraftConfigurationApp();
+        while (true) {
+            System.out.println("-----Welcome to Flight Reservation System-----");
+            System.out.println("1. Flight Schedule Plan");
+            System.out.println("2. Aircraft configuration");
+            System.out.println("3. Exit");
+            Scanner sc = new Scanner(System.in);
+            String input = sc.nextLine();
+            if (input.equals("1")) {
+                FlightSchedulePlan fsp = new FlightSchedulePlan(flightSchedulePlanSessionBean, flightSessionBean);
+                fsp.runFSP();
+            } else if (input.equals("2")) {
+                AircraftConfiguration aircraft = new AircraftConfiguration(aircraftSessionBean, flightRouteSessionBean);
+                aircraft.AircraftConfigurationApp();
+            } else if (input.equals("3")) {
+                System.out.println("Goodbye!");
+                break;
+            }
         }
 
     }
