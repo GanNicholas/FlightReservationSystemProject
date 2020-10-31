@@ -66,7 +66,7 @@ public class DataInitSessionBean {
             //check if minutes is displayd how
             AirportEntity a3 = new AirportEntity("Darwin International Airport", "DRW", "Northern Territory", "Australia", 9, 30, "Eaton");
             em.persist(a3);
-            AirportEntity a4 = new AirportEntity("Perth Airport", "PER", "Western Australia", "Australia", 8, 0 , "Perth");
+            AirportEntity a4 = new AirportEntity("Perth Airport", "PER", "Western Australia", "Australia", 8, 0, "Perth");
             em.persist(a4);
             AirportEntity a5 = new AirportEntity("Kuala Lumpur International Airport", "KUL", "Selangor", "Malaysia", 8, 0, "Sepang");
             em.persist(a5);
@@ -122,25 +122,16 @@ public class DataInitSessionBean {
             em.persist(a30);
         }
         em.flush();
-        
+
         AircraftTypeEntity acType = em.find(AircraftTypeEntity.class, 1L);
-        if(acType == null){
+        if (acType == null) {
             AircraftTypeEntity ac1 = new AircraftTypeEntity("Boeing 737 Narrow body short range");
             em.persist(ac1);
             AircraftTypeEntity ac2 = new AircraftTypeEntity("Boeing 737 Wide body long range");
             em.persist(ac2);
-        }   
-        
-        FlightEntity flight = em.find(FlightEntity.class, 1L);
-        if(flight == null){
-            FlightRouteEntity fr = em.find(FlightRouteEntity.class, 1L);
-            AircraftConfigurationEntity ac1 = em.find(AircraftConfigurationEntity.class, 1L);
-            FlightEntity f1 = new FlightEntity("ML1234", fr, ac1);
-            em.persist(f1);
         }
-        
-        
-        
+
+
         em.flush();
     }
 

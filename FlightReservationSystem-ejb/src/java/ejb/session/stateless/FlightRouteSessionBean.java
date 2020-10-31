@@ -31,6 +31,7 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
     @PersistenceContext(unitName = "FlightReservationSystem-ejbPU")
     private EntityManager em;
     
+    @Override
     public Long createFlightRoute(String oIATA, String dIATA, String returnFlight) throws FlightRouteODPairExistException, AirportODPairNotFoundException {
         FlightRouteEntity flightRoute = new FlightRouteEntity();
         try {
@@ -68,6 +69,7 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
         return flightRoute.getFlightRouteId();
     }
     
+    @Override
     public boolean checkFlightRouteOD(String oIATA, String dIATA) throws FlightRouteODPairExistException {
         try {
             
@@ -80,6 +82,7 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
         
     }
     
+    @Override
     public List<FlightRouteEntity> viewListOfFlightRoute() {
         
         Query query = em.createQuery("SELECT f FROM FlightRouteEntity f");
@@ -100,6 +103,7 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
         
     }
     
+    @Override
     public boolean DeleteFlightRoute(Long id) throws FlightRouteDoesNotExistException, FlightRouteExistInOtherClassException {
         
         try {
@@ -117,11 +121,25 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
         
     }
     
+    @Override
     public List<AirportEntity> getListOfAirportEntity() {
         
         Query query = em.createQuery("SELECT a FROM AirportEntity a ");
         List<AirportEntity> listOfAirport = query.getResultList();
         return listOfAirport;
+    }
+    
+    @Override
+    public FlightRouteEntity getFlightRoute(Long id) throws FlightRouteDoesNotExistException{
+        FlightRouteEntity fr = em.find(FlightRouteEntity.class, id);
+        if(fr == null){
+            throw new FlightRouteDoesNotExistException("Flight route does not exist!");
+        } else {
+            fr.getDestinationLocation();
+            fr.getOriginLocation();
+            fr.getReturnRoute();
+            return fr;
+        }
     }
     
 }

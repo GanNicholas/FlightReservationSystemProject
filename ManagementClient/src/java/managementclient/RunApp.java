@@ -102,7 +102,7 @@ public class RunApp {
             } else if (choice == 2) {
                 try {
                     if (employeeSessionBean.getEmployeeRole(userId).equals(UserRole.SCHEDULEMANAGER)) {
-                        FlightSchedulePlan fsp = new FlightSchedulePlan(flightSchedulePlanSessionBean, flightSessionBean);
+                        FlightSchedulePlan fsp = new FlightSchedulePlan(flightSchedulePlanSessionBean, flightSessionBean, aircraftSessionBean, flightRouteSessionBean);
                         fsp.runFSP();
                     } else {
                         System.out.println("Sorry, you do not have the access right. Please try again!");

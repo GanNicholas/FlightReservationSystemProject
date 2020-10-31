@@ -13,7 +13,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -51,8 +50,12 @@ public class FlightEntity implements Serializable {
     @OneToMany(mappedBy = "flightEntity")
     private List<FlightSchedulePlanEntity> listOfFlightSchedulePlan;
 
+    @OneToOne
     private FlightEntity returnFlight;
 
+    private boolean isMainRoute;
+    
+    
     public FlightEntity() {
         listOfFlightSchedulePlan = new ArrayList<FlightSchedulePlanEntity>();
         aircraftConfig = null;
@@ -66,17 +69,19 @@ public class FlightEntity implements Serializable {
         this.returnFlight = null;
         this.listOfFlightSchedulePlan = new ArrayList<FlightSchedulePlanEntity>();
         this.isDeleted = false;
+        this.isMainRoute = true;
     }
     
     
 
-    public FlightEntity(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig, boolean isDeleted, List<FlightSchedulePlanEntity> listOfFlightSchedulePlan, FlightEntity returnFlight) {
+    public FlightEntity(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig, boolean isDeleted, List<FlightSchedulePlanEntity> listOfFlightSchedulePlan, FlightEntity returnFlight, boolean isMainRoute) {
         this.flightNumber = flightNumber;
         this.flightRoute = flightRoute;
         this.aircraftConfig = aircraftConfig;
         this.isDeleted = isDeleted;
         this.listOfFlightSchedulePlan = listOfFlightSchedulePlan;
         this.returnFlight = returnFlight;
+        this.isMainRoute = isMainRoute;
     }
 
     @Override
@@ -158,6 +163,14 @@ public class FlightEntity implements Serializable {
 
     public void setListOfFlightSchedulePlan(List<FlightSchedulePlanEntity> listOfFlightSchedulePlan) {
         this.listOfFlightSchedulePlan = listOfFlightSchedulePlan;
+    }
+
+    public boolean isIsMainRoute() {
+        return isMainRoute;
+    }
+
+    public void setIsMainRoute(boolean isMainRoute) {
+        this.isMainRoute = isMainRoute;
     }
 
 }

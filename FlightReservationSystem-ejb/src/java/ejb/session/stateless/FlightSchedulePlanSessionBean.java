@@ -17,8 +17,6 @@ import entity.RecurringWeeklyScheduleEntity;
 import entity.SeatEntity;
 import entity.SingleFlightScheduleEntity;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
 import javax.ejb.EJB;
@@ -177,6 +175,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
                 throw new FlightScheduleExistException(ex.getMessage());
             }
 
+            //check this issue!
             departureDateTime.add(GregorianCalendar.DAY_OF_MONTH, recurrency);
             dateCompare = departureDateTime.compareTo(endDate);
         }

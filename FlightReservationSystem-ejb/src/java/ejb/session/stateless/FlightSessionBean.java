@@ -16,9 +16,11 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import util.exception.AircraftConfigurationNotExistException;
 import util.exception.FlightDoesNotExistException;
 import util.exception.FlightExistsException;
 import util.exception.FlightRecordIsEmptyException;
+import util.exception.FlightRouteDoesNotExistException;
 
 /**
  *
@@ -31,7 +33,7 @@ public class FlightSessionBean implements FlightSessionBeanRemote, FlightSession
     private EntityManager em;
 
     @Override
-    public FlightEntity createFlightWithoutReturnFlight(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig) throws FlightExistsException {
+    public FlightEntity createFlightWithoutReturnFlight(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig) throws FlightExistsException, FlightRouteDoesNotExistException, AircraftConfigurationNotExistException {
         try {
             FlightEntity flight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
             if (flight != null) {
@@ -41,48 +43,75 @@ public class FlightSessionBean implements FlightSessionBeanRemote, FlightSession
 
         }
 
-        FlightEntity newFlight = new FlightEntity(flightNumber, flightRoute, aircraftConfig);
+        FlightRouteEntity fr = em.find(FlightRouteEntity.class, flightRoute.getFlightRouteId());
+        AircraftConfigurationEntity acc = em.find(AircraftConfigurationEntity.class, aircraftConfig.getAircraftConfigId());
+
+        if (fr == null) {
+            throw new FlightRouteDoesNotExistException("Flight route does not exist!");
+        }
+
+        if (acc == null) {
+            throw new AircraftConfigurationNotExistException("Aircraft Config does not exist!");
+        }
+
+        FlightEntity newFlight = new FlightEntity(flightNumber, fr, acc);
         em.persist(newFlight);
         em.flush();
 
-        //linking two flights that are actually O-D and D-O, so link them to be return flights
-        AirportEntity origin = flightRoute.getOriginLocation();
-        AirportEntity destination = flightRoute.getDestinationLocation();
-        try {
-            FlightRouteEntity returnRoute = (FlightRouteEntity) em.createNamedQuery("findFlightRoute").setParameter("origin", destination).setParameter("destination", origin).getSingleResult();
-            FlightEntity returnFlight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightRoute").setParameter("flightRoute", returnRoute).getSingleResult();
-            newFlight.setReturnFlight(returnFlight);
-            returnFlight.setReturnFlight(newFlight);
-        } catch (NoResultException ex) {
-
-        }
-
+//        //linking two flights that are actually O-D and D-O, so link them to be return flights
+//        AirportEntity origin = flightRoute.getOriginLocation();
+//        AirportEntity destination = flightRoute.getDestinationLocation();
+//        try {
+//            FlightRouteEntity returnRoute = (FlightRouteEntity) em.createNamedQuery("findFlightRoute").setParameter("origin", destination).setParameter("destination", origin).getSingleResult();
+//            FlightEntity returnFlight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightRoute").setParameter("flightRoute", returnRoute).getSingleResult();
+//            newFlight.setReturnFlight(returnFlight);
+//            returnFlight.setReturnFlight(newFlight);
+//        } catch (NoResultException ex) {
+//
+//        }
         return newFlight;
     }
 
     @Override
-    public FlightEntity createFlightWithReturnFlight(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig, FlightEntity returnFlight) throws FlightExistsException {
+    public FlightEntity createFlightWithReturnFlight(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig, String mainFlightNumber) throws FlightExistsException, FlightRouteDoesNotExistException, AircraftConfigurationNotExistException, FlightDoesNotExistException {
+        FlightEntity mainFlight = null;
         try {
             FlightEntity flight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
-            if (flight != null) {
-                throw new FlightExistsException("Flight with same flight number exists!");
-            }
+            throw new FlightExistsException("Flight with same flight number exists!");
         } catch (NoResultException ex) {
 
         }
 
-        FlightEntity newFlight = new FlightEntity(flightNumber, flightRoute, aircraftConfig);
+        FlightRouteEntity fr = em.find(FlightRouteEntity.class, flightRoute.getFlightRouteId());
+        AircraftConfigurationEntity acc = em.find(AircraftConfigurationEntity.class, aircraftConfig.getAircraftConfigId());
+
+        if (fr == null) {
+            throw new FlightRouteDoesNotExistException("Flight route does not exist!");
+        }
+
+        if (acc == null) {
+            throw new AircraftConfigurationNotExistException("Aircraft Config does not exist!");
+        }
+
+        try {
+            mainFlight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", mainFlightNumber).getSingleResult();
+        } catch (NoResultException ex) {
+            throw new FlightDoesNotExistException("Flight does not exist!");
+        }
+
+        FlightEntity newFlight = new FlightEntity(flightNumber, fr, acc);
         em.persist(newFlight);
         em.flush();
-        newFlight.setReturnFlight(returnFlight);
-        returnFlight.setReturnFlight(newFlight);
+        mainFlight.setReturnFlight(newFlight);
+        newFlight.setReturnFlight(mainFlight);
+        newFlight.setIsMainRoute(false);
 
         return newFlight;
     }
 
     @Override
     public List<FlightEntity> viewAllFlights() throws FlightRecordIsEmptyException {
-        List<FlightEntity> listOfFlightEntity = em.createQuery("SELECT c FROM FlightEntity c WHERE c.isDeleted = FALSE ORDER BY c.flightNumber ASC").getResultList();
+        List<FlightEntity> listOfFlightEntity = em.createQuery("SELECT c FROM FlightEntity c WHERE c.isDeleted = FALSE AND c.isMainRoute = TRUE ORDER BY c.flightNumber ASC").getResultList();
         if (listOfFlightEntity.isEmpty()) {
             throw new FlightRecordIsEmptyException("No flight record exists!");
         }
@@ -128,7 +157,7 @@ public class FlightSessionBean implements FlightSessionBeanRemote, FlightSession
     public void updateFlight(FlightEntity flight) throws FlightDoesNotExistException {
         String flightNumber = flight.getFlightNumber();
         try {
-            FlightEntity oldFlight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", flightNumber);
+            FlightEntity oldFlight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
         } catch (NoResultException ex) {
             throw new FlightDoesNotExistException("Flight does not exist!");
         }
@@ -160,7 +189,8 @@ public class FlightSessionBean implements FlightSessionBeanRemote, FlightSession
         try {
             FlightEntity flight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
             List<FlightSchedulePlanEntity> listOfFlightSchedulePlan = em.createNamedQuery("queryFSPwithFlightNumber").setParameter("flightNum", flightNumber).getResultList();
-            if (flight.getListOfFlightSchedulePlan().isEmpty() && listOfFlightSchedulePlan.isEmpty()) {
+            
+            if (listOfFlightSchedulePlan.isEmpty()) {
                 flight.setReturnFlight(null);
                 flight.setFlightRoute(null);
                 flight.setAircraftConfig(null);
