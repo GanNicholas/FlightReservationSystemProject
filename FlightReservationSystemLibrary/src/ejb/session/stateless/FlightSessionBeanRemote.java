@@ -13,6 +13,8 @@ import javax.ejb.Remote;
 import util.exception.AircraftConfigurationNotExistException;
 import util.exception.FlightDoesNotExistException;
 import util.exception.FlightExistsException;
+import util.exception.FlightHasFlightSchedulePlanException;
+import util.exception.FlightIsDeletedException;
 import util.exception.FlightRecordIsEmptyException;
 import util.exception.FlightRouteDoesNotExistException;
 
@@ -31,9 +33,11 @@ public interface FlightSessionBeanRemote {
 
     public FlightEntity viewFlightDetails(String flightNumber) throws FlightDoesNotExistException;
 
-    public void updateFlight(FlightEntity flight) throws FlightDoesNotExistException;
+    public void updateFlight(FlightEntity flight) throws FlightDoesNotExistException, FlightHasFlightSchedulePlanException;
 
     public boolean deleteFlight(String flightNumber) throws FlightDoesNotExistException;
 
     public List<FlightEntity> listOfFlightRecords(String tripType, String departureAirport, String destinationAirport, String departureDate, String returnDate, String passenger);
+
+    public FlightEntity viewActiveFlight(String flightNumber) throws FlightIsDeletedException;
 }

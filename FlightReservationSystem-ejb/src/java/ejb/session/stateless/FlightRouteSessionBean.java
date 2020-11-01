@@ -19,6 +19,7 @@ import util.exception.AirportODPairNotFoundException;
 import util.exception.FlightDoesNotExistException;
 import util.exception.FlightRouteDoesNotExistException;
 import util.exception.FlightRouteExistInOtherClassException;
+import util.exception.FlightRouteIsNotMainRouteException;
 import util.exception.FlightRouteODPairExistException;
 
 /**
@@ -155,6 +156,24 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
             fr.getOriginLocation();
             fr.getReturnRoute();
             return fr;
+        }
+    }
+
+    @Override
+    public FlightRouteEntity getMainFlightRoute(Long id) throws FlightRouteDoesNotExistException, FlightRouteIsNotMainRouteException {
+        FlightRouteEntity fr = em.find(FlightRouteEntity.class, id);
+        if (fr == null) {
+            throw new FlightRouteDoesNotExistException("Flight route does not exist!");
+        } else {
+
+            if (fr.isIsDeleted() || !fr.isMainRoute()) {
+                throw new FlightRouteIsNotMainRouteException("Flight route chosen is not the main route!");
+            } else {
+                fr.getDestinationLocation();
+                fr.getOriginLocation();
+                fr.getReturnRoute();
+                return fr;
+            }
         }
     }
 

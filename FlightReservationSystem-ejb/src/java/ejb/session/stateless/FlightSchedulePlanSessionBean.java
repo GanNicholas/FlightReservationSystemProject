@@ -47,20 +47,22 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
     public String createNonRecurrentFlightSchedulePlan(String flightNumber, List<GregorianCalendar> listOfDepartureDateTime, Integer flightDuration, boolean createReturnFlightSchedule, List<FareEntity> listOfFares, Integer layover) throws FlightDoesNotExistException, FlightScheduleExistException {
         FlightEntity flight;
         try {
-            flight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
+            flight = (FlightEntity) em.createNamedQuery("retrieveActiveFlightUsingFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
         } catch (NoResultException ex) {
             throw new FlightDoesNotExistException("Flight with flight number does not exist!");
         }
-
+        
         FlightSchedulePlanEntity fsp;
         if (listOfDepartureDateTime.size() == 1) {
             fsp = new SingleFlightScheduleEntity(flightNumber, false, flight);
         } else {
             fsp = new MultipleFlightScheduleEntity(flightNumber, false, flight);
         }
+        
+//        em.persist(fsp);
 
         for (FareEntity fare : listOfFares) {
-            em.persist(fare);
+//            em.persist(fare);
             fsp.getListOfFare().add(fare);
         }
 
@@ -68,6 +70,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             GregorianCalendar departureDateTime = listOfDepartureDateTime.get(i);
             try {
                 FlightScheduleEntity fe1 = flightScheduleSessionBean.createFlightSchedule(departureDateTime, flightDuration, fsp, flight);
+//                em.persist(fe1);
                 //link flight schedule to FSP
                 fsp.getListOfFlightSchedule().add(fe1);
             } catch (FlightScheduleExistException ex) {
@@ -90,7 +93,8 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             AirportEntity destination = flight.getFlightRoute().getOriginLocation();
             try {
                 FlightRouteEntity returnFlightRoute = (FlightRouteEntity) em.createNamedQuery("findFlightRoute").setParameter("origin", origin).setParameter("destination", destination).getSingleResult();
-                returnFlight = (FlightEntity) em.createQuery("retrieveFlightUsingFlightRoute").setParameter("flightRoute", returnFlightRoute);
+                Long airportId = returnFlightRoute.getOriginLocation().getAirportId();
+                returnFlight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightRouteId").setParameter("airportId", airportId).getSingleResult();
             } catch (NoResultException ex) {
                 throw new FlightDoesNotExistException("Flight does not exist!");
             }
@@ -98,28 +102,31 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             //create return FSP
             FlightSchedulePlanEntity returnFSP;
             if (listOfDepartureDateTime.size() == 1) {
-                returnFSP = new SingleFlightScheduleEntity(flightNumber, false, flight);
+                returnFSP = new SingleFlightScheduleEntity(returnFlight.getFlightNumber(), false, returnFlight);
             } else {
-                returnFSP = new MultipleFlightScheduleEntity(flightNumber, false, flight);
+                returnFSP = new MultipleFlightScheduleEntity(returnFlight.getFlightNumber(), false, returnFlight);
             }
 
             for (FareEntity fare : listOfFares) {
                 returnFSP.getListOfFare().add(fare);
             }
+            
+//            em.persist(returnFSP);
 
             // GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight
             for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
-                GregorianCalendar returnFlightDeparture = fs.getArrivalDateTime();
+                GregorianCalendar returnFlightDeparture = (GregorianCalendar) fs.getArrivalDateTime().clone();
                 returnFlightDeparture.add(GregorianCalendar.MINUTE, layover);
                 try {
                     FlightScheduleEntity fe1 = flightScheduleSessionBean.createFlightSchedule(returnFlightDeparture, flightDuration, returnFSP, returnFlight);
                     //link flight schedule to FSP
                     returnFSP.getListOfFlightSchedule().add(fe1);
                     //get seatingplan - need get seating plan from aircraft config, add to flight schedule
-                    List<SeatEntity> returnSeatingPlan = returnFlight.getAircraftConfig().getSeatingPlan();
-                    for (SeatEntity seat : returnSeatingPlan) {
-                        fe1.getSeatingPlan().add(seat);
-                    }
+//                    List<SeatEntity> returnSeatingPlan = returnFlight.getAircraftConfig().getSeatingPlan();
+//                    returnSeatingPlan.size();
+//                    for (SeatEntity seat : returnSeatingPlan) {
+//                        fe1.getSeatingPlan().add(seat);
+//                    }
 
                 } catch (FlightScheduleExistException ex) {
                     throw new FlightScheduleExistException(ex.getMessage());
@@ -131,13 +138,15 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
                 em.persist(fs);
             }
 
+            fsp.setReturnFlightSchedulePlan(returnFSP);
+            
             em.persist(returnFSP);
             em.flush();
 
         }
 
         if (createReturnFlightSchedule && returnFlight != null) {
-            return "Flight Schedule Plan created for " + flight.getFlightNumber() + " \n Return Flight Schedule Plan created for " + returnFlight.getFlightNumber();
+            return "Flight Schedule Plan created for " + flight.getFlightNumber() + " \nReturn Flight Schedule Plan created for " + returnFlight.getFlightNumber();
         } else {
             return "Flight Schedule Plan created for " + flight.getFlightNumber();
         }
@@ -153,20 +162,20 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
         }
 
         FlightSchedulePlanEntity fsp;
-        if (recurrency <= 7) {
+        if (recurrency < 7) {
             fsp = new RecurringScheduleEntity(flightNumber, false, flight, endDate, recurrency);
         } else { //MUST CHECK RECURRENCY 7 OR LESSER
             fsp = new RecurringWeeklyScheduleEntity(flightNumber, false, flight, endDate);
         }
 
+        
         for (FareEntity fare : listOfFares) {
-            em.persist(fare);
             fsp.getListOfFare().add(fare);
         }
 
-        int dateCompare = departureDateTime.compareTo(endDate);
+        boolean departBeforeEndDate = departureDateTime.before(endDate);
 
-        while (dateCompare == -1) {
+        while (departBeforeEndDate) {
             try {
                 FlightScheduleEntity fe1 = flightScheduleSessionBean.createFlightSchedule(departureDateTime, flightDuration, fsp, flight);
                 //link flight schedule to FSP
@@ -176,8 +185,9 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             }
 
             //check this issue!
+            departureDateTime = (GregorianCalendar) departureDateTime.clone();
             departureDateTime.add(GregorianCalendar.DAY_OF_MONTH, recurrency);
-            dateCompare = departureDateTime.compareTo(endDate);
+            departBeforeEndDate = departureDateTime.before(endDate);
         }
 
         for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
@@ -195,36 +205,40 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             AirportEntity destination = flight.getFlightRoute().getOriginLocation();
             try {
                 FlightRouteEntity returnFlightRoute = (FlightRouteEntity) em.createNamedQuery("findFlightRoute").setParameter("origin", origin).setParameter("destination", destination).getSingleResult();
-                returnFlight = (FlightEntity) em.createQuery("retrieveFlightUsingFlightRoute").setParameter("flightRoute", returnFlightRoute);
+                Long airportId = returnFlightRoute.getOriginLocation().getAirportId();
+                returnFlight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightRouteId").setParameter("airportId", airportId).getSingleResult();
             } catch (NoResultException ex) {
                 throw new FlightDoesNotExistException("Flight does not exist!");
             }
 
             //create return FSP
             FlightSchedulePlanEntity returnFSP;
-            if (recurrency <= 7) {
-                returnFSP = new RecurringScheduleEntity(flightNumber, false, flight, endDate, recurrency);
+            if (recurrency < 7) {
+                returnFSP = new RecurringScheduleEntity(returnFlight.getFlightNumber(), false, returnFlight, endDate, recurrency);
             } else { //MUST CHECK RECURRENCY 7 OR LESSER
-                returnFSP = new RecurringWeeklyScheduleEntity(flightNumber, false, flight, endDate);
+                returnFSP = new RecurringWeeklyScheduleEntity(returnFlight.getFlightNumber(), false, returnFlight, endDate);
             }
+            
+//            em.persist(returnFSP);
+            
             for (FareEntity fare : listOfFares) {
                 returnFSP.getListOfFare().add(fare);
             }
 
             // GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight
             for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
-                GregorianCalendar returnFlightDeparture = fs.getArrivalDateTime();
+                GregorianCalendar returnFlightDeparture = (GregorianCalendar) fs.getArrivalDateTime().clone();
                 returnFlightDeparture.add(GregorianCalendar.MINUTE, layover);
                 try {
                     FlightScheduleEntity fe1 = flightScheduleSessionBean.createFlightSchedule(returnFlightDeparture, flightDuration, returnFSP, returnFlight);
                     //link flight schedule to FSP
                     returnFSP.getListOfFlightSchedule().add(fe1);
                     //get seatingplan - need get seating plan from aircraft config, add to flight schedule
-                    List<SeatEntity> returnSeatingPlan = returnFlight.getAircraftConfig().getSeatingPlan();
-
-                    for (SeatEntity seat : returnSeatingPlan) {
-                        fe1.getSeatingPlan().add(seat);
-                    }
+//                    List<SeatEntity> returnSeatingPlan = returnFlight.getAircraftConfig().getSeatingPlan();
+//
+//                    for (SeatEntity seat : returnSeatingPlan) {
+//                        fe1.getSeatingPlan().add(seat);
+//                    }
                 } catch (FlightScheduleExistException ex) {
                     throw new FlightScheduleExistException(ex.getMessage());
                 }
@@ -235,15 +249,15 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
                 em.persist(fs);
             }
 
-            returnFSP.setListOfFare(listOfFares);
-
+            fsp.setReturnFlightSchedulePlan(returnFSP);
+            
             em.persist(returnFSP);
             em.flush();
 
         }
 
         if (createReturnFlightSchedule && returnFlight != null) {
-            return "Flight Schedule Plan created for " + flight.getFlightNumber() + " \n Return Flight Schedule Plan created for " + returnFlight.getFlightNumber();
+            return "Flight Schedule Plan created for " + flight.getFlightNumber() + " \nReturn Flight Schedule Plan created for " + returnFlight.getFlightNumber();
         } else {
             return "Flight Schedule Plan created for " + flight.getFlightNumber();
         }
@@ -313,7 +327,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
 
         fsp.getListOfFlightSchedule().size();
         fsp.getListOfFare().size();
-        
+
         for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
             fs.getSeatingPlan().size();
         }

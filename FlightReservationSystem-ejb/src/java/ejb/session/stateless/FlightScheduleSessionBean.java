@@ -13,6 +13,8 @@ import entity.SeatEntity;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import javax.annotation.Resource;
+import javax.ejb.EJBContext;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -27,6 +29,9 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
 
     @PersistenceContext(unitName = "FlightReservationSystem-ejbPU")
     private EntityManager em;
+
+    @Resource
+    EJBContext eJBContext;
 
     @Override
     public FlightScheduleEntity createFlightSchedule(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight) throws FlightScheduleExistException {
@@ -59,25 +64,36 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
 
     private void checkSchedules(Calendar arrivalDateTime, Calendar departureDateTime, String flightNumber) throws FlightScheduleExistException {
 
-        List<FlightSchedulePlanEntity> listOfFlightSchedulePlan = em.createQuery("SELECT c FROM FlightSchedulePlanEntity c WHERE c.flightNumber =:flightNum AND c.isDeleted = TRUE").setParameter("flightNum", flightNumber).getResultList();
+        List<FlightSchedulePlanEntity> listOfFlightSchedulePlan = em.createQuery("SELECT c FROM FlightSchedulePlanEntity c WHERE c.flightNumber =:flightNum AND c.isDeleted = FALSE").setParameter("flightNum", flightNumber).getResultList();
         for (FlightSchedulePlanEntity tempFSP : listOfFlightSchedulePlan) {
             List<FlightScheduleEntity> tempFlight = tempFSP.getListOfFlightSchedule();
             for (FlightScheduleEntity tempFlightSchedule : tempFlight) {
+
                 GregorianCalendar tempFSPDepartureDate = tempFlightSchedule.getDepartureDateTime();
                 GregorianCalendar tempFSPArrivalDate = (GregorianCalendar) tempFSPDepartureDate.clone();
+
                 tempFSPArrivalDate.add(GregorianCalendar.MINUTE, tempFlightSchedule.getFlightDuration());
 
-                int departValue1 = tempFSPDepartureDate.compareTo(departureDateTime);
-                int arriveValue1 = tempFSPArrivalDate.compareTo(arrivalDateTime);
+//                boolean newDepartBeforeOld = tempFSPDepartureDate.after(departureDateTime);
+//                boolean newDepartAfterOld = tempFSPDepartureDate.before(departureDateTime);
+//                boolean newArriveBeforeOld = tempFSPArrivalDate.after(arrivalDateTime);
+//                boolean newArriveAfterOld = tempFSPArrivalDate.before(arrivalDateTime);
+//
+//                if ((newDepartBeforeOld && newArriveBeforeOld) || (newDepartBeforeOld && newArriveAfterOld) || (newDepartAfterOld && newArriveBeforeOld) || (newDepartAfterOld && newArriveAfterOld)) {
+//                    eJBContext.setRollbackOnly();
+//                    throw new FlightScheduleExistException("Flight Schedule has conflict with existing flight schedule!");
+//                }
+                boolean newArriveBeforeOldDepart = tempFSPDepartureDate.after(arrivalDateTime);
+                boolean newDepartureBeforeOldDepart = tempFSPDepartureDate.after(departureDateTime);
+                boolean newArriveAfterOldArrive = tempFSPArrivalDate.before(arrivalDateTime);
+                boolean newDepartAfterOldArrive = tempFSPArrivalDate.before(departureDateTime);
 
-                //>-1 for both = the new schedule is within an existing schedule
-                //=-1 for depart and <=-1 for arrive, new schedule either overlaps current schedule, or arrives in middle of current schedule
-                //=1 for depart and <=-1 for arrive, new schedule starts within current schedule, and ends either before or after current arriveDate
-//                if ((departValue1 > -1 && arriveValue1 > -1) || (departValue1 == -1 && arriveValue1 <= -1) || (departValue1 == 1 && arriveValue1 <= -1)) {
-                if (!((tempFSPArrivalDate.compareTo(departureDateTime) == -1 && tempFSPDepartureDate.compareTo(departureDateTime) == -1) && (tempFSPArrivalDate.compareTo(arrivalDateTime) == 1 && tempFSPDepartureDate.compareTo(arrivalDateTime) == 1))) {
+                if (!((newArriveBeforeOldDepart && newDepartureBeforeOldDepart) || (newArriveAfterOldArrive && newDepartAfterOldArrive))) {
+                    eJBContext.setRollbackOnly();
                     throw new FlightScheduleExistException("Flight Schedule has conflict with existing flight schedule!");
                 }
 
+              
             }
         }
 

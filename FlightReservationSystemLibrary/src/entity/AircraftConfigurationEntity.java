@@ -8,6 +8,7 @@ package entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -45,7 +46,7 @@ public class AircraftConfigurationEntity implements Serializable {
     @OneToOne(optional = false)
     private AircraftTypeEntity aircraftType;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.PERSIST)
     private List<CabinClassConfigurationEntity> cabinClasses;
 
     @NotEmpty(message = "Aircraft name cannot be empty!")
@@ -53,7 +54,7 @@ public class AircraftConfigurationEntity implements Serializable {
     @Column(nullable = false, length = 80)
     private String aircraftName;
     
-    @OneToMany(fetch = FetchType.EAGER )
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST )
     private List<SeatEntity> seatingPlan;
 
     public AircraftConfigurationEntity() {

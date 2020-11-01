@@ -20,6 +20,8 @@ import util.exception.AircraftConfigurationNotExistException;
 import javax.persistence.Query;
 import util.exception.FlightDoesNotExistException;
 import util.exception.FlightExistsException;
+import util.exception.FlightHasFlightSchedulePlanException;
+import util.exception.FlightIsDeletedException;
 import util.exception.FlightRecordIsEmptyException;
 import util.exception.FlightRouteDoesNotExistException;
 
@@ -145,9 +147,7 @@ public class FlightSessionBean implements FlightSessionBeanRemote, FlightSession
                 flight.getReturnFlight().getAircraftConfig().getCabinClasses().size();
                 flight.getReturnFlight().getFlightRoute();
             }
-
             return flight;
-
         } catch (NoResultException ex) {
             throw new FlightDoesNotExistException("Flight with this flight number : " + flightNumber + " does not exist!");
         }
@@ -155,16 +155,21 @@ public class FlightSessionBean implements FlightSessionBeanRemote, FlightSession
     }
 
     @Override
-    public void updateFlight(FlightEntity flight) throws FlightDoesNotExistException {
+    public void updateFlight(FlightEntity flight) throws FlightDoesNotExistException, FlightHasFlightSchedulePlanException {
         String flightNumber = flight.getFlightNumber();
+        FlightEntity oldFlight = null;
         try {
-            FlightEntity oldFlight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
+            oldFlight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
         } catch (NoResultException ex) {
             throw new FlightDoesNotExistException("Flight does not exist!");
         }
-        em.merge(flight);
-        em.flush();
 
+        if (!oldFlight.getListOfFlightSchedulePlan().isEmpty()) {
+            throw new FlightHasFlightSchedulePlanException("Flight has assigned Flight schedule plan(s)! Unable to make changes");
+        } else {
+            em.merge(flight);
+            em.flush();
+        }
 //        FlightEntity updatedFlight = em.find(FlightEntity.class, flight.getFlightId());
 //        if(updatedFlight == null){
 //            throw new FlightDoesNotExistException("Flight record does not exist!");
@@ -190,7 +195,7 @@ public class FlightSessionBean implements FlightSessionBeanRemote, FlightSession
         try {
             FlightEntity flight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
             List<FlightSchedulePlanEntity> listOfFlightSchedulePlan = em.createNamedQuery("queryFSPwithFlightNumber").setParameter("flightNum", flightNumber).getResultList();
-            
+
             if (listOfFlightSchedulePlan.isEmpty()) {
                 flight.setReturnFlight(null);
                 flight.setFlightRoute(null);
@@ -199,7 +204,7 @@ public class FlightSessionBean implements FlightSessionBeanRemote, FlightSession
                 return true;
             } else {
                 flight.setIsDeleted(true);
-                return true;
+                return false;
             }
         } catch (NoResultException ex) {
             throw new FlightDoesNotExistException("Flight with this flight number : " + flightNumber + " does not exist!");
@@ -210,5 +215,23 @@ public class FlightSessionBean implements FlightSessionBeanRemote, FlightSession
         Query query = em.createQuery("SELECT f FROM FlightEntity f WHERE f.listOfFlightSchedulePlan.listOfFlightSchedule.departureDateTime BETWEEN :=departureDate AND :=endDate").setParameter("departureDate", departureDate).setParameter("endDate", returnDate);
         List<FlightEntity> listOfFlightRecord = query.getResultList();
         return listOfFlightRecord;
+    }
+
+    @Override
+    public FlightEntity viewActiveFlight(String flightNumber) throws FlightIsDeletedException {
+        try {
+            FlightEntity activeFlight = (FlightEntity) em.createQuery("SELECT f FROM FlightEntity f WHERE f.isDeleted = FALSE AND f.isMainRoute = TRUE AND f.flightNumber =:flightNum").setParameter("flightNum", flightNumber).getSingleResult();
+            activeFlight.getAircraftConfig().getCabinClasses().size();
+            activeFlight.getFlightRoute();
+
+            if (activeFlight.getReturnFlight() != null) {
+                activeFlight.getReturnFlight().getAircraftConfig().getCabinClasses().size();
+                activeFlight.getReturnFlight().getFlightRoute();
+            }
+
+            return activeFlight;
+        } catch (NoResultException ex) {
+            throw new FlightIsDeletedException("Flight is no longer active or is not the main flight!");
+        }
     }
 }

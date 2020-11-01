@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.paint.Color;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -51,7 +52,7 @@ public abstract class FlightSchedulePlanEntity implements Serializable {
     @OneToOne
     private FlightSchedulePlanEntity returnFlightSchedulePlan;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.PERSIST)
     private List<FareEntity> listOfFare;
 
     private boolean isDeleted;

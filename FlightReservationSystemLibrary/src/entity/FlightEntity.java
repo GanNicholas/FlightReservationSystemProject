@@ -8,6 +8,7 @@ package entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,8 +26,9 @@ import javax.validation.constraints.Size;
  * @author sohqi
  */
 @Entity
-@NamedQuery(name = "retrieveFlightUsingFlightNumber", query = "SELECT e FROM FlightEntity e WHERE e.flightNumber = :flightNum")
-@NamedQuery(name = "retrieveFlightUsingFlightRoute", query = "SELECT e FROM FlightEntity e WHERE e.flightRoute = :flightRoute")
+@NamedQuery(name = "retrieveFlightUsingFlightNumber", query = "SELECT e FROM FlightEntity e WHERE e.flightNumber =:flightNum")
+@NamedQuery(name = "retrieveActiveFlightUsingFlightNumber", query = "SELECT e FROM FlightEntity e WHERE e.flightNumber =:flightNum AND e.isDeleted = FALSE")
+@NamedQuery(name = "retrieveFlightUsingFlightRouteId", query = "SELECT e FROM FlightEntity e WHERE e.flightRoute.originLocation.airportId =:airportId")
 public class FlightEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -42,7 +44,7 @@ public class FlightEntity implements Serializable {
     @ManyToOne
     private FlightRouteEntity flightRoute;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, cascade = CascadeType.PERSIST)
     private AircraftConfigurationEntity aircraftConfig;
 
     private boolean isDeleted;

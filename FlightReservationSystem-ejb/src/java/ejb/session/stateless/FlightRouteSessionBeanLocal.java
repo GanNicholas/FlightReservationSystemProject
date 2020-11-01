@@ -12,6 +12,7 @@ import javax.ejb.Local;
 import util.exception.AirportODPairNotFoundException;
 import util.exception.FlightRouteDoesNotExistException;
 import util.exception.FlightRouteExistInOtherClassException;
+import util.exception.FlightRouteIsNotMainRouteException;
 import util.exception.FlightRouteODPairExistException;
 
 /**
@@ -32,5 +33,7 @@ public interface FlightRouteSessionBeanLocal {
     public List<AirportEntity> getListOfAirportEntity();
 
     public FlightRouteEntity getFlightRoute(Long id) throws FlightRouteDoesNotExistException;
+
+    public FlightRouteEntity getMainFlightRoute(Long id) throws FlightRouteDoesNotExistException, FlightRouteIsNotMainRouteException;
 
 }

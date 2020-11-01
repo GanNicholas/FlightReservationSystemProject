@@ -15,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Persistence;
+import javax.validation.constraints.NotNull;
 
 /**
  *
