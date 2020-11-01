@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import util.enumeration.UserRole;
 
@@ -38,8 +39,8 @@ public class FRSCustomerEntity extends CustomerEntity implements Serializable {
     @Column(nullable = false, length = 320)
     private String email;
 
-    @Min(value = 8, message = "Phone number is minimum 8 numbers long, with country prefix")
-    @Max(value = 18, message = "Phone number is 18 numbers long, with country prefix")
+    @NotEmpty(message = "Mobile phone cannot be empty!")
+    @Size(min = 8, max = 18, message = "Phone number is 8 to 18 numbers long, with country prefix")
     @Column(nullable = false, length = 8, unique = true)
     private String phoneNumber;
 
@@ -60,7 +61,6 @@ public class FRSCustomerEntity extends CustomerEntity implements Serializable {
         this.phoneNumber = phoneNumber;
         this.address = address;
     }
-
 
     public String getFirstName() {
         return firstName;
@@ -105,7 +105,7 @@ public class FRSCustomerEntity extends CustomerEntity implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (this.customerId!= null ? this.customerId.hashCode() : 0);
+        hash += (this.customerId != null ? this.customerId.hashCode() : 0);
         return hash;
     }
 

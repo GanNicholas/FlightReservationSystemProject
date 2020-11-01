@@ -5,18 +5,38 @@
  */
 package reservationclient;
 
+import ejb.session.stateless.CustomerSessionBeanRemote;
+import ejb.session.stateless.FlightSessionBeanRemote;
+import java.util.Scanner;
+import javax.ejb.EJB;
+
 /**
  *
  * @author nickg
  */
 public class Main {
 
+    @EJB
+    private static FlightSessionBeanRemote flightSessionBean;
+
+    @EJB
+    private static CustomerSessionBeanRemote customerSessionBean;
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
 
-        //hi qc
+        Scanner sc = new Scanner(System.in);
+        System.out.println("1. Customer");
+        System.out.println("0. Exit");
+        String input = sc.nextLine();
+        while (true) {
+            if (input.equals("1")) {
+                Customer c = new Customer(customerSessionBean, flightSessionBean);
+                c.runApp();
+            }
+        }
     }
-    
+
 }

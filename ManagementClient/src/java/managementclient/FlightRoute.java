@@ -49,14 +49,14 @@ public class FlightRoute {
             System.out.println("2. View flight route.");
             System.out.println("3. Delete flight route.");
             System.out.println("0. Exit");
-            int choice = sc.nextInt();
-            if (choice == 1) {
+            String choice = sc.nextLine();
+            if (choice.equals("1")) {
                 createFlightRoute();
-            } else if (choice == 2) {
+            } else if (choice.equals("2")) {
                 viewFlightRoute();
-            } else if (choice == 3) {
+            } else if (choice.equals("3")) {
                 DeleteFlightRoute();
-            } else if (choice == 0) {
+            } else if (choice.equals("0")) {
                 break;
             }
         }
@@ -64,12 +64,13 @@ public class FlightRoute {
 
     public void createFlightRoute() {
         List<AirportEntity> listOfAirport = flightRouteSessionBean.getListOfAirportEntity();
-        System.out.println("***Airport List***");
-        System.out.printf("%16s%2s%3s", "Country", ":", "IATA Code:");
+        System.out.printf("%53s", "***Airport List***");
+        System.out.println();
+        System.out.printf("%40s%16s%3s%3s", "Airport Name", "Country", ":", "IATA Code");
         System.out.println();
         for (AirportEntity airportEntity : listOfAirport) {
 
-            System.out.printf("%16s%2s%3s", airportEntity.getCountry(), ":", airportEntity.getIataAirportCode());
+            System.out.printf("%40s%16s%3s%3s", airportEntity.getAirportName(), airportEntity.getCountry(), ":", airportEntity.getIataAirportCode());
             // .out.printf("Country: %s%10 || Airport IATA code: %s", airportEntity.getCountry(), airportEntity.getIataAirportCode());
             System.out.println();
         }
@@ -114,34 +115,53 @@ public class FlightRoute {
 
     public void viewFlightRoute() {
         List<FlightRouteEntity> listOfFlightRoute = flightRouteSessionBean.viewListOfFlightRoute();
+        System.out.println("***Flight Route***");
         for (int i = 0; i < listOfFlightRoute.size(); i++) {
             FlightRouteEntity fr = listOfFlightRoute.get(i);
-            System.out.println("***Flight Route***");
-            System.out.println(String.format("Origin Location(IATA airport Code): %s (%s)", fr.getOriginLocation().getAirportName(), fr.getOriginLocation().getIataAirportCode()));
+            System.out.printf("%-40s %-5s %-17s %-20s %-15s %-1s %-1s %-1s %-1s", "Origin Location(IATA airport Code):", "", "Country", "State", "City", "Time", "Zone", "", "");
+            System.out.println();
+            System.out.printf("%-40s %-5s %-17s %-20s %-15s %-1s %-1s %-1s %-1s", fr.getOriginLocation().getAirportName(), fr.getOriginLocation().getIataAirportCode(), fr.getOriginLocation().getCountry(), fr.getOriginLocation().getState(), fr.getOriginLocation().getCity(), fr.getOriginLocation().getTimeZoneHour(), "hour(s)", fr.getOriginLocation().getTimeZoneMin(), "min(s)");
+            System.out.println();
+            System.out.println();
+            /*System.out.println(String.format("Origin Location(IATA airport Code): %s (%s)", fr.getOriginLocation().getAirportName(), fr.getOriginLocation().getIataAirportCode()));
             System.out.println("Country: " + fr.getOriginLocation().getCountry());
             System.out.println("State: " + fr.getOriginLocation().getState());
             System.out.println("City: " + fr.getOriginLocation().getCity());
-            System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getOriginLocation().getTimeZoneHour(), fr.getOriginLocation().getTimeZoneMin()));
-
-            System.out.println(String.format("Destination Location(IATA airport Code): %s (%s)", fr.getDestinationLocation().getAirportName(), fr.getDestinationLocation().getIataAirportCode()));
+            System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getOriginLocation().getTimeZoneHour(), fr.getOriginLocation().getTimeZoneMin()));*/
+            System.out.printf("%-40s %-5s %-17s %-20s %-15s %-1s %-1s %-1s %-1s", "Origin Location(IATA airport Code):", "", "Country", "State", "City", "Time", "Zone", "", "");
+            System.out.println();
+            System.out.printf("%-40s %-5s %-17s %-20s %-15s %-1s %-1s %-1s %-1s", fr.getDestinationLocation().getAirportName(), fr.getDestinationLocation().getIataAirportCode(), fr.getDestinationLocation().getCountry(), fr.getDestinationLocation().getState(), fr.getDestinationLocation().getCity(), fr.getDestinationLocation().getTimeZoneHour(), "hour(s)", fr.getDestinationLocation().getTimeZoneMin(), "min(s)");
+            System.out.println();
+            System.out.println();
+            /* System.out.println(String.format("Destination Location(IATA airport Code): %s (%s)", fr.getDestinationLocation().getAirportName(), fr.getDestinationLocation().getIataAirportCode()));
             System.out.println("Country: " + fr.getDestinationLocation().getCountry());
             System.out.println("State: " + fr.getDestinationLocation().getState());
             System.out.println("City: " + fr.getDestinationLocation().getCity());
             System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getDestinationLocation().getTimeZoneHour(), fr.getDestinationLocation().getTimeZoneMin()));
-
+             */
             if (fr.getReturnRoute() != null) {
                 System.out.println("*** Return Flight Route***");
-                System.out.println(String.format("Origin Location(IATA airport Code): %s (%s)", fr.getReturnRoute().getOriginLocation().getAirportName(), fr.getReturnRoute().getOriginLocation().getIataAirportCode()));
+                System.out.printf("%-40s %-5s %-17s %-20s %-15s %-1s %-1s %-1s %-1s", "Origin Location(IATA airport Code):", "", "Country", "State", "City", "Time", " Zone", "", "");
+                System.out.println();
+                System.out.printf("%-40s %-5s %-17s %-20s %-15s %-1s %-1s %-1s %-1s", fr.getReturnRoute().getOriginLocation().getAirportName(), fr.getReturnRoute().getOriginLocation().getIataAirportCode(), fr.getReturnRoute().getOriginLocation().getCountry(), fr.getReturnRoute().getOriginLocation().getState(), fr.getReturnRoute().getOriginLocation().getCity(), fr.getReturnRoute().getOriginLocation().getTimeZoneHour(), "hour(s)", fr.getReturnRoute().getOriginLocation().getTimeZoneMin(), "min(s)");
+                System.out.println();
+                System.out.println();
+                /*  System.out.println(String.format("Origin Location(IATA airport Code): %s (%s)", fr.getReturnRoute().getOriginLocation().getAirportName(), fr.getReturnRoute().getOriginLocation().getIataAirportCode()));
                 System.out.println("Country: " + fr.getReturnRoute().getOriginLocation().getCountry());
                 System.out.println("State: " + fr.getReturnRoute().getOriginLocation().getState());
                 System.out.println("City: " + fr.getReturnRoute().getOriginLocation().getCity());
                 System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getReturnRoute().getOriginLocation().getTimeZoneHour(), fr.getReturnRoute().getOriginLocation().getTimeZoneMin()));
-
-                System.out.println(String.format("Destination Location(IATA airport Code): %s (%s)", fr.getReturnRoute().getDestinationLocation().getAirportName(), fr.getReturnRoute().getDestinationLocation().getIataAirportCode()));
+                 */
+                System.out.printf("%-40s %-5s %-17s %-20s %-15s %-1s %-1s %-1s %-1s", "Destination Location(IATA airport Code):", "", "Country", "State", "City", "Time", " Zone", "", "");
+                System.out.println();
+                System.out.printf("%-40s %-5s %-17s %-20s %-15s %-1s %-1s %-1s %-1s", fr.getReturnRoute().getDestinationLocation().getAirportName(), fr.getReturnRoute().getDestinationLocation().getIataAirportCode(), fr.getReturnRoute().getDestinationLocation().getCountry(), fr.getReturnRoute().getDestinationLocation().getState(), fr.getReturnRoute().getDestinationLocation().getCity(), fr.getReturnRoute().getDestinationLocation().getTimeZoneHour(), "hour(s)", fr.getReturnRoute().getDestinationLocation().getTimeZoneMin(), "min(s)");
+                System.out.println();
+                System.out.println();
+                /*  System.out.println(String.format("Destination Location(IATA airport Code): %s (%s)", fr.getReturnRoute().getDestinationLocation().getAirportName(), fr.getReturnRoute().getDestinationLocation().getIataAirportCode()));
                 System.out.println("Country: " + fr.getReturnRoute().getDestinationLocation().getCountry());
                 System.out.println("State: " + fr.getReturnRoute().getDestinationLocation().getState());
                 System.out.println("City: " + fr.getReturnRoute().getDestinationLocation().getCity());
-                System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getReturnRoute().getDestinationLocation().getTimeZoneHour(), fr.getReturnRoute().getDestinationLocation().getTimeZoneMin()));
+                System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getReturnRoute().getDestinationLocation().getTimeZoneHour(), fr.getReturnRoute().getDestinationLocation().getTimeZoneMin()));*/
             }
             System.out.println("--------------------------------------------------------------------------------------------------------------------------");
         }

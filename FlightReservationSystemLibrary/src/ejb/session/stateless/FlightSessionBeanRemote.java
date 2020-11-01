@@ -32,4 +32,6 @@ public interface FlightSessionBeanRemote {
     public void updateFlight(FlightEntity flight) throws FlightDoesNotExistException;
 
     public boolean deleteFlight(String flightNumber) throws FlightDoesNotExistException;
+
+    public List<FlightEntity> listOfFlightRecords(String tripType, String departureAirport, String destinationAirport, String departureDate, String returnDate, String passenger);
 }

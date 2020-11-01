@@ -71,7 +71,7 @@ public class AircraftSessionBean implements AircraftSessionBeanRemote, AircraftS
         SeatEntity s = null;
         String cabinCol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         int seatNumber = 1;
-        System.out.println("aircraftConfigurationEntity.getCabinClasses()" + aircraftConfigurationEntity.getCabinClasses().size());
+        //System.out.println("aircraftConfigurationEntity.getCabinClasses()" + aircraftConfigurationEntity.getCabinClasses().size());
         for (CabinClassConfigurationEntity cabin : aircraftConfigurationEntity.getCabinClasses()) {
 
             String[] getSeatingPerRow = cabin.getSeatingConfig().split("-");
@@ -85,7 +85,7 @@ public class AircraftSessionBean implements AircraftSessionBeanRemote, AircraftS
                 for (int col = 0; col < numPplPerRow; col++) {
                     s = new SeatEntity();
                     s.setSeatNumber((seatNumber) + "" + cabinCol.charAt(col));
-                    System.out.println("Seat : " + s.getSeatNumber());
+                    // System.out.println("Seat : " + s.getSeatNumber());
                     s.setReserved(false);
                     //s.(cabin.getCabinclassType());
                     em.persist(s);

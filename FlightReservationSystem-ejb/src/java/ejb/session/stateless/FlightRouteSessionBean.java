@@ -27,17 +27,17 @@ import util.exception.FlightRouteODPairExistException;
  */
 @Stateless
 public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, FlightRouteSessionBeanLocal {
-    
+
     @PersistenceContext(unitName = "FlightReservationSystem-ejbPU")
     private EntityManager em;
-    
+
     public Long createFlightRoute(String oIATA, String dIATA, String returnFlight) throws FlightRouteODPairExistException, AirportODPairNotFoundException {
         FlightRouteEntity flightRoute = new FlightRouteEntity();
         try {
             boolean frExistInDB = checkFlightRouteOD(oIATA, dIATA);
             //check origin exist in airportentity
             if (!frExistInDB) {
-                
+
                 Query oQuery = em.createQuery("SELECT a FROM AirportEntity a where a.iataAirportCode=:origin").setParameter("origin", oIATA);
                 AirportEntity oAirport = (AirportEntity) oQuery.getSingleResult();
                 Query dQuery = em.createQuery("SELECT a FROM AirportEntity a where a.iataAirportCode=:origin").setParameter("origin", dIATA);
@@ -57,39 +57,39 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
                     em.flush();
                     flightRoute.setReturnRoute(tempFr);
                 }
-                
+
             }
         } catch (FlightRouteODPairExistException ex) {
             throw new FlightRouteODPairExistException("Flight route O-D already exist");
         } catch (NoResultException ex) {
             throw new AirportODPairNotFoundException("Invalid O-D pair");
         }
-        
+
         return flightRoute.getFlightRouteId();
     }
-    
+
     public boolean checkFlightRouteOD(String oIATA, String dIATA) throws FlightRouteODPairExistException {
         try {
-            
+
             Query query = em.createQuery("SELECT a FROM FlightRouteEntity a WHERE a.originLocation.iataAirportCode = :original AND a.destinationLocation.iataAirportCode=:destination").setParameter("original", oIATA).setParameter("destination", dIATA);
             FlightRouteEntity tempFrEntity = (FlightRouteEntity) query.getSingleResult();
             throw new FlightRouteODPairExistException("Flight route O-D already exist");
         } catch (NoResultException ex) {
             return false;
         }
-        
+
     }
-    
+
     public List<FlightRouteEntity> viewListOfFlightRoute() {
-        
+
         Query query = em.createQuery("SELECT f FROM FlightRouteEntity f");
         List<FlightRouteEntity> listOfFlightRoute = query.getResultList();
         listOfFlightRoute.size();
         return listOfFlightRoute;
     }
-    
+
     public boolean checkFlightRouteUsedByOthers(Long id) {
-        
+
         try {
             Query query = em.createQuery("SELECT f FROM FlightEntity f where f.flightRoute.flightRouteId = :flightRouteId").setParameter("flightRouteId", id);
             FlightEntity flight = (FlightEntity) query.getSingleResult();
@@ -97,11 +97,11 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
         } catch (NoResultException ex) {
             return false;
         }
-        
+
     }
-    
+
     public boolean DeleteFlightRoute(Long id) throws FlightRouteDoesNotExistException, FlightRouteExistInOtherClassException {
-        
+
         try {
             Query query = em.createQuery("SELECT f FROM FlightRouteEntity f where f.flightRouteId = :flightRouteId").setParameter("flightRouteId", id);
             FlightRouteEntity flightRoute = (FlightRouteEntity) query.getSingleResult();
@@ -114,14 +114,14 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
         } catch (NoResultException ex) {
             throw new FlightRouteDoesNotExistException("Invalid flight route id");
         }
-        
+
     }
-    
+
     public List<AirportEntity> getListOfAirportEntity() {
-        
-        Query query = em.createQuery("SELECT a FROM AirportEntity a ");
+
+        Query query = em.createQuery("SELECT a FROM AirportEntity a GROUP BY a.airportName ORDER BY a.country ASC");
         List<AirportEntity> listOfAirport = query.getResultList();
         return listOfAirport;
     }
-    
+
 }

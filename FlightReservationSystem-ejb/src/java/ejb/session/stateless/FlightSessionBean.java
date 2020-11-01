@@ -16,6 +16,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import util.exception.FlightDoesNotExistException;
 import util.exception.FlightExistsException;
 import util.exception.FlightRecordIsEmptyException;
@@ -173,5 +174,11 @@ public class FlightSessionBean implements FlightSessionBeanRemote, FlightSession
         } catch (NoResultException ex) {
             throw new FlightDoesNotExistException("Flight with this flight number : " + flightNumber + " does not exist!");
         }
+    }
+
+    public List<FlightEntity> listOfFlightRecords(String tripType, String departureAirport, String destinationAirport, String departureDate, String returnDate, String passenger) {
+        Query query = em.createQuery("SELECT f FROM FlightEntity f WHERE f.listOfFlightSchedulePlan.listOfFlightSchedule.departureDateTime BETWEEN :=departureDate AND :=endDate").setParameter("departureDate", departureDate).setParameter("endDate", returnDate);
+        List<FlightEntity> listOfFlightRecord = query.getResultList();
+        return listOfFlightRecord;
     }
 }

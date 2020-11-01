@@ -52,10 +52,9 @@ public abstract class CustomerEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
-    @NotNull
+    //@NotNull
     @OneToMany(mappedBy = "customer")
     private List<FlightReservationEntity> listOfFlightReservation;
-    
 
     public CustomerEntity() {
         listOfFlightReservation = new ArrayList<>();
@@ -107,7 +106,6 @@ public abstract class CustomerEntity implements Serializable {
     public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
     }
-    
 
     @Override
     public int hashCode() {

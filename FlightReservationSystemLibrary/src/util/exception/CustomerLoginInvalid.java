@@ -3,12 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package managementclient;
+package util.exception;
 
 /**
  *
  * @author sohqi
  */
-public class Customer {
-    
+public class CustomerLoginInvalid extends Exception {
+
+    public CustomerLoginInvalid() {
+
+    }
+
+    public CustomerLoginInvalid(String msg) {
+        super(msg);
+    }
 }
