@@ -13,6 +13,7 @@ import entity.AirportEntity;
 import entity.CabinClassConfigurationEntity;
 import entity.FlightRouteEntity;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -49,7 +50,7 @@ public class AircraftConfiguration {
         this.aircraftSessionBeanRemote = aircraftSessionBeanRemote;
     }
 
-    public void AircraftConfigurationApp() {
+     public void AircraftConfigurationApp() {
         Scanner sc = new Scanner(System.in);
         System.out.println("**Welcome to creation of air craft configuration **");
         while (true) {
@@ -72,6 +73,7 @@ public class AircraftConfiguration {
     }
 
     public void createAircraftConfiguration() {
+        try{
         Scanner sc = new Scanner(System.in);
         List<CabinClassConfigurationEntity> listOfCabin = new ArrayList<CabinClassConfigurationEntity>();
         AircraftConfigurationEntity aircraftConfigurationEntity = new AircraftConfigurationEntity();
@@ -82,10 +84,10 @@ public class AircraftConfiguration {
         System.out.println("Please enter the aircraft type:");
         String aircraftType = sc.nextLine();
         System.out.println("Please enter the maximum number of seatings:");
-        String maxSeatingCapacity = sc.nextLine();
+        int maxSeatingCapacity = sc.nextInt();
         String buffer = sc.nextLine();
         aircraftConfigurationEntity.setAircraftName(aircraftName);
-        aircraftConfigurationEntity.setMaxSeatingCapacity(Integer.parseInt(maxSeatingCapacity));
+        aircraftConfigurationEntity.setMaxSeatingCapacity(maxSeatingCapacity);
         Set<ConstraintViolation<AircraftConfigurationEntity>> constraintViolationsAircraftConfig = validator.validate(aircraftConfigurationEntity);
         if (!constraintViolationsAircraftConfig.isEmpty()) {
             isValidationPassed = false;
@@ -122,7 +124,7 @@ public class AircraftConfiguration {
                 System.out.println("3. Premium economy class");
                 System.out.println("4. Economy class");
                 String cabinType = sc.nextLine();
-                while (Integer.parseInt(cabinType) > 4 || Integer.parseInt(cabinType) <= 0) {
+                while (Integer.parseInt(cabinType) > 4 && Integer.parseInt(cabinType) <= 0) {
                     System.out.println("Invalid cabin type!");
                     System.out.println("Do you wish to continue ? Yes/No");
                     String cabinType_YN = sc.nextLine();
@@ -143,9 +145,9 @@ public class AircraftConfiguration {
                 }
                 if (!brokenFromCabinType) {
                     System.out.println("Please enter the number of aisles:");
-                    String noOfAisle = sc.nextLine();
+                    int noOfAisle = sc.nextInt();
                     System.out.println("Please enter the number of row:");
-                    String numRows = sc.nextLine();
+                    int numRows = sc.nextInt();
                     buffer = sc.nextLine();
                     System.out.println("Please enter the actual seating configuration per column (i.e. 3-4-3):");
                     String seatingConfig = sc.nextLine();
@@ -159,8 +161,8 @@ public class AircraftConfiguration {
                     } else if (cabinType.equalsIgnoreCase("4")) {
                         cabin.setCabinclassType(CabinClassType.Y);
                     }
-                    cabin.setNumAisles(Integer.parseInt(noOfAisle));
-                    cabin.setNumRows(Integer.parseInt(numRows));
+                    cabin.setNumAisles(noOfAisle);
+                    cabin.setNumRows(numRows);
                     cabin.setSeatingConfig(seatingConfig);
                     //bean validation
                     Set<ConstraintViolation<CabinClassConfigurationEntity>> constraintViolationsCabin = validator.validate(cabin);
@@ -177,7 +179,7 @@ public class AircraftConfiguration {
                     String[] maxPplPerRow = seatingConfig.split("-");
                     //checking seat configuration input and no of aisle match
 
-                    if (maxPplPerRow.length != Integer.parseInt(noOfAisle + 1)) {
+                    if (maxPplPerRow.length != noOfAisle + 1) {
                         System.out.println("Your number of aisle does not match your seating configuration. Please check your input and add again.");
                         addRecordToDatabase = false;
 
@@ -187,14 +189,14 @@ public class AircraftConfiguration {
                             row += Integer.parseInt(maxPplPerRow[i]);
                         }
 
-                        int totalPplPerClass = row * Integer.parseInt(numRows);
+                        int totalPplPerClass = row * numRows;
                         totalSeat += totalPplPerClass;
 
                         cabin.setAvailableSeats(totalSeat);
                         cabin.setBalancedSeats(totalSeat);
                         cabin.setReservedSeats(0);
                         //validating total seat from user input must be lesser than max seat capacity from aircraft configuration
-                        if (totalSeat > Integer.parseInt(maxSeatingCapacity)) {
+                        if (totalSeat > maxSeatingCapacity) {
                             System.out.println("Please check your capacity. Seating configuration and row for all the cabin classes should not exceed the maximum capacity of aircraft configuration.");
                             addRecordToDatabase = false;
                             break;
@@ -234,10 +236,12 @@ public class AircraftConfiguration {
         } else {
             System.out.println("Please try again");
         }
-
+        }catch(InputMismatchException | NumberFormatException exception){
+            System.out.println("You have invalid input. Please try again");
+        }
     }
 
-    public void viewAircraftConfiguration() {
+      public void viewAircraftConfiguration() {
         System.out.printf("%90s", "**View all aircraft configurations.**");
         System.out.println();
         List<AircraftConfigurationEntity> aircrafttConfigList = aircraftSessionBeanRemote.viewAircraftConfiguration();
@@ -299,11 +303,11 @@ public class AircraftConfiguration {
                 System.out.printf("%110s", "***Cabin Class Configuration and Aircraft Type***");
                 System.out.println("");
                 System.out.println("");
-                System.out.printf("%-30s %-12s %-12s %-30s %-28s %-28s %-28s %-28s %-28s", "Cabin Class Configuration Id", "Cabin Class", "Class Type", "Cabin Class Number of Aisle(s)", "Cabin Class Number of Row(s)", "Cabin Class Available Seat(s)", "Cabin Class Reserved Seat(s)", "Cabin Class Balance Seat(s)", "Cabin Class Seating Configuration");
+                System.out.printf("%-30s %-12s %-30s %-28s %-28s %-28s %-28s %-28s", "Cabin Class Configuration Id",  "Class Type", "Cabin Class Number of Aisle(s)", "Cabin Class Number of Row(s)", "Cabin Class Available Seat(s)", "Cabin Class Reserved Seat(s)", "Cabin Class Balance Seat(s)", "Cabin Class Seating Configuration");
                 System.out.println();
                 for (int i = 0; i < aircraftConfigDetail.getCabinClasses().size(); i++) {
                     List<CabinClassConfigurationEntity> listOfCabinClass = aircraftConfigDetail.getCabinClasses();
-                    System.out.printf("%-31s %-13s %-13s %-31s %-29s %-29s %-29s %-29s %-29s", listOfCabinClass.get(i).getCabinClassConfigId(), listOfCabinClass.get(i).getCabinClassConfigId(), listOfCabinClass.get(i).getCabinclassType(),
+                    System.out.printf("%-31s %-13s %-31s %-29s %-29s %-29s %-29s %-29s", listOfCabinClass.get(i).getCabinClassConfigId(),  listOfCabinClass.get(i).getCabinclassType(),
                             listOfCabinClass.get(i).getNumAisles(), listOfCabinClass.get(i).getNumRows(), listOfCabinClass.get(i).getAvailableSeats(),
                             listOfCabinClass.get(i).getReservedSeats(), listOfCabinClass.get(i).getBalancedSeats(), listOfCabinClass.get(i).getSeatingConfig());
                     System.out.println();

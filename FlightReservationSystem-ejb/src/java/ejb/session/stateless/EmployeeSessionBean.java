@@ -10,6 +10,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import util.enumeration.UserRole;
 import util.exception.CurrentlyLoggedInException;
 import util.exception.CurrentlyLoggedOutException;
 import util.exception.EmployeeDoesNotExistException;
@@ -37,6 +38,16 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
             } else {
                 throw new WrongPasswordException("Wrong password has been entered!");
             }
+        } catch (NoResultException ex) {
+            throw new EmployeeDoesNotExistException("Employee does not exist!");
+        }
+    }
+    
+    @Override
+    public UserRole getEmployeeRole(String userId) throws EmployeeDoesNotExistException{
+          try {
+            EmployeeEntity employee = (EmployeeEntity) em.createNamedQuery("retrieveUsingLogin").setParameter("login", userId).getSingleResult();
+            return employee.getUserRole();
         } catch (NoResultException ex) {
             throw new EmployeeDoesNotExistException("Employee does not exist!");
         }

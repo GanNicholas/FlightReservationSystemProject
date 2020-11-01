@@ -27,7 +27,9 @@ public interface FlightRouteSessionBeanRemote {
 
     public List<FlightRouteEntity> viewListOfFlightRoute();
 
-    public boolean DeleteFlightRoute(Long id) throws FlightRouteDoesNotExistException, FlightRouteExistInOtherClassException;
+    public void DeleteFlightRoute(Long id) throws FlightRouteDoesNotExistException;
 
     public List<AirportEntity> getListOfAirportEntity();
+
+    public FlightRouteEntity getFlightRoute(Long id) throws FlightRouteDoesNotExistException;
 }

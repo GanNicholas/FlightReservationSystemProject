@@ -49,8 +49,8 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         FlightScheduleEntity flightSchedule = new FlightScheduleEntity(departureDateTime, flightDuration, fsp);
         //get seatingplan - need get seating plan from aircraft config, add to flight schedule
         List<SeatEntity> seatingPlan = flight.getAircraftConfig().getSeatingPlan();
-        
-        for(SeatEntity seat : flight.getAircraftConfig().getSeatingPlan()){
+
+        for (SeatEntity seat : flight.getAircraftConfig().getSeatingPlan()) {
             flightSchedule.getSeatingPlan().add(seat);
         }
 
@@ -73,7 +73,8 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
                 //>-1 for both = the new schedule is within an existing schedule
                 //=-1 for depart and <=-1 for arrive, new schedule either overlaps current schedule, or arrives in middle of current schedule
                 //=1 for depart and <=-1 for arrive, new schedule starts within current schedule, and ends either before or after current arriveDate
-                if ((departValue1 > -1 && arriveValue1 > -1) || (departValue1 == -1 && arriveValue1 <= -1) || (departValue1 == 1 && arriveValue1 <= -1)) {
+//                if ((departValue1 > -1 && arriveValue1 > -1) || (departValue1 == -1 && arriveValue1 <= -1) || (departValue1 == 1 && arriveValue1 <= -1)) {
+                if (!((tempFSPArrivalDate.compareTo(departureDateTime) == -1 && tempFSPDepartureDate.compareTo(departureDateTime) == -1) && (tempFSPArrivalDate.compareTo(arrivalDateTime) == 1 && tempFSPDepartureDate.compareTo(arrivalDateTime) == 1))) {
                     throw new FlightScheduleExistException("Flight Schedule has conflict with existing flight schedule!");
                 }
 

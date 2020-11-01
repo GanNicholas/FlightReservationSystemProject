@@ -5,32 +5,38 @@
  */
 package managementclient;
 
+import ejb.session.stateless.AircraftSessionBeanRemote;
+import ejb.session.stateless.FlightRouteSessionBeanRemote;
 import ejb.session.stateless.FlightSchedulePlanSessionBeanRemote;
 import ejb.session.stateless.FlightSessionBeanRemote;
+import entity.AircraftConfigurationEntity;
 import entity.CabinClassConfigurationEntity;
 import entity.FareEntity;
 import entity.FlightEntity;
+import entity.FlightRouteEntity;
 import entity.FlightScheduleEntity;
 import entity.FlightSchedulePlanEntity;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.enumeration.CabinClassType;
+import util.exception.AircraftConfigurationNotExistException;
 import util.exception.FlightDoesNotExistException;
+import util.exception.FlightExistsException;
+import util.exception.FlightRouteDoesNotExistException;
 import util.exception.FlightScheduleExistException;
 import util.exception.FlightSchedulePlanDoesNotExistException;
 import util.exception.FlightSchedulePlanIsEmptyException;
+import util.exception.IncorrectFormatException;
 
 /**
  *
@@ -42,9 +48,15 @@ public class FlightSchedulePlan {
 
     private FlightSessionBeanRemote flightSessionBean;
 
-    public FlightSchedulePlan(FlightSchedulePlanSessionBeanRemote flightSchedulePlanSessionBean, FlightSessionBeanRemote flightSessionBean) {
+    private AircraftSessionBeanRemote aircraftSessionBeanRemote;
+
+    private FlightRouteSessionBeanRemote flightRouteSessionBean;
+
+    public FlightSchedulePlan(FlightSchedulePlanSessionBeanRemote flightSchedulePlanSessionBean, FlightSessionBeanRemote flightSessionBean, AircraftSessionBeanRemote aircraftSessionBeanRemote, FlightRouteSessionBeanRemote flightRouteSessionBean) {
         this.flightSchedulePlanSessionBean = flightSchedulePlanSessionBean;
         this.flightSessionBean = flightSessionBean;
+        this.aircraftSessionBeanRemote = aircraftSessionBeanRemote;
+        this.flightRouteSessionBean = flightRouteSessionBean;
     }
 
     public void runFSP() {
@@ -52,23 +64,39 @@ public class FlightSchedulePlan {
         while (true) {
             System.out.println("**Welcome to Flight Schedule Plan Management **");
             System.out.println("What would you like to do? ");
-            System.out.println("1. Create Flight Schedule Plan.");
-            System.out.println("2. View all flight schedule plan");
-            System.out.println("3. View detail of a flight schedule plan.");
-            System.out.println("4. Update flight schedule plan.");
-            System.out.println("5. Delete flight schedule plan");
+            System.out.println("1. Create Flight.");
+            System.out.println("2. Update Flight.");
+            System.out.println("3. View All Flights.");
+            System.out.println("4. View Flight Details.");
+            System.out.println("5. Delete Flight.");
+            System.out.println("6. Create Flight Schedule Plan.");
+            System.out.println("7. View all flight schedule plan");
+            System.out.println("8. View detail of a flight schedule plan.");
+            System.out.println("9. Update flight schedule plan.");
+            System.out.println("10. Delete flight schedule plan");
             System.out.println("0. Exit");
+            System.out.print("Please enter your choice: ");
             int choice = sc.nextInt();
             sc.nextLine();
             if (choice == 1) {
-                createfsp(sc, flightSchedulePlanSessionBean);
+                createFlight(sc);
             } else if (choice == 2) {
-                viewAllFsp(sc);
+                updateFlight(sc);
             } else if (choice == 3) {
-                viewSpecificFsp(sc);
+                viewAllFlights(sc);
             } else if (choice == 4) {
 
             } else if (choice == 5) {
+
+            } else if (choice == 6) {
+                createfsp(sc, flightSchedulePlanSessionBean);
+            } else if (choice == 7) {
+                viewAllFsp(sc);
+            } else if (choice == 8) {
+                viewSpecificFsp(sc);
+            } else if (choice == 9) {
+
+            } else if (choice == 10) {
 
             } else if (choice == 0) {
                 System.out.println("Goodbye!");
@@ -84,6 +112,7 @@ public class FlightSchedulePlan {
             System.out.println("----Create a new Flight Schedule Plan----");
             System.out.println("1. Create single/Multiple Flight Schedules");
             System.out.println("2. Create Recurrent Flight Schedules");
+            System.out.println("3. Back");
             System.out.print("Please enter your choice: ");
             String choiceStr = sc.nextLine().trim();
             int choice = Integer.parseInt(choiceStr);
@@ -93,6 +122,8 @@ public class FlightSchedulePlan {
                 counter = 0;
             } else if (choice == 2) {
                 recurrentFlightSchedule(sc);
+            } else if (choice == 3) {
+                break;
             } else {
                 System.out.println("Please enter a valid entry!");
                 counter++;
@@ -117,6 +148,8 @@ public class FlightSchedulePlan {
         List<GregorianCalendar> listOfDepartDateTime = new ArrayList<>();
         while (true) {
             reenter = false;
+            listOfDepartDateTime.clear();
+            listOfFares.clear();
             System.out.print("Please enter flight number: ");
             String flightNumber = sc.nextLine().trim();
             System.out.print("Please enter number of flight schedule you wish to create: ");
@@ -127,12 +160,16 @@ public class FlightSchedulePlan {
             for (int i = 0; i < numSchedule; i++) {
                 System.out.print("Please enter departure date and time (Please enter in this format: dd/mm/yyyy/hh/mm) ");
                 String dateTime = sc.nextLine().trim();
-                GregorianCalendar departDateTime = createDateTime(dateTime);
-                System.out.println(departDateTime.get(GregorianCalendar.DAY_OF_MONTH) + "/" + departDateTime.get(GregorianCalendar.MONTH) + "/"
-                        + departDateTime.get(GregorianCalendar.YEAR) + " " + departDateTime.get(GregorianCalendar.HOUR_OF_DAY) + ":"
-                        + departDateTime.get(GregorianCalendar.MINUTE));
+                try {
+                    GregorianCalendar departDateTime = createDateTime(dateTime);
+                    Date date = departDateTime.getTime();
+                    System.out.println(format.format(date));
 
-                listOfDepartDateTime.add(departDateTime);
+                    listOfDepartDateTime.add(departDateTime);
+                } catch (IncorrectFormatException ex) {
+                    System.out.println(ex.getMessage());
+                }
+
             }
 
             System.out.print("Please enter flight duration (in minutes)");
@@ -168,7 +205,7 @@ public class FlightSchedulePlan {
                     Set<ConstraintViolation<FareEntity>> violations = validator.validate(fare);
                     if (!violations.isEmpty()) {
                         for (ConstraintViolation<FareEntity> violation : violations) {
-                            System.out.println(violation.getPropertyPath() + "\n " + violation.getMessage() + " " + violation.getInvalidValue());
+                            System.out.println(violation.getPropertyPath() + "\n " + violation.getMessage() + "  " + violation.getInvalidValue());
                             reenter = true;
                         }
                     }
@@ -199,6 +236,8 @@ public class FlightSchedulePlan {
         List<GregorianCalendar> listOfDepartDateTime = new ArrayList<>();
 
         while (true) {
+            listOfDepartDateTime.clear();
+            listOfFares.clear();
             reenter = false;
             System.out.print("Please enter flight number: ");
             String flightNumber = sc.nextLine().trim();
@@ -206,16 +245,25 @@ public class FlightSchedulePlan {
             String numFrequencyString = sc.nextLine().trim();
             int numFrequency = Integer.parseInt(numFrequencyString);
 
-            // run a for loop to take in a list of date and time
             System.out.print("Please enter departure date and time (Please enter in this format (dd/mm/yyyy/hh/mm) : ");
             String dateTime = sc.nextLine().trim();
-            GregorianCalendar departDateTime = createDateTime(dateTime);
-
+            GregorianCalendar departDateTime = null;
+            try {
+                departDateTime = createDateTime(dateTime);
+            } catch (IncorrectFormatException ex) {
+                System.out.println(ex.getMessage());
+                reenter = true;
+            }
             //POTENTIAL ERROR
-            System.out.println("Please enter end date (dd/mm/yyyy/hh/mm) : ");
+            System.out.print("Please enter end date (dd/mm/yyyy/hh/mm) : ");
             String endDateTimeStr = sc.nextLine().trim();
-            GregorianCalendar endDateTime = createDateTime(endDateTimeStr);
-
+            GregorianCalendar endDateTime = null;
+            try {
+                endDateTime = createDateTime(endDateTimeStr);
+            } catch (IncorrectFormatException ex) {
+                System.out.println(ex.getMessage());
+                reenter = true;
+            }
             System.out.print("Please enter flight duration (in minutes) : ");
             String duration = sc.nextLine().trim();
             Integer flightDuration = Integer.parseInt(duration);
@@ -284,10 +332,7 @@ public class FlightSchedulePlan {
         }
         System.out.println("Please enter " + listOfCabin.size() + " number of fares");
         for (int i = 0; i < listOfCabin.size(); i++) {
-            System.out.print("Please enter fare basis code: ");
-            String fareBasis = sc.nextLine().trim();
-            System.out.print("Please enter fare amount: $");
-            BigDecimal fareAmount = sc.nextBigDecimal();
+
             boolean incorrectFare = false;
 
             while (!incorrectFare) {
@@ -300,19 +345,27 @@ public class FlightSchedulePlan {
                 int choice = sc.nextInt();
                 sc.nextLine();
                 if (choice == 1) {
-                    FareEntity newFare = new FareEntity(fareBasis, fareAmount, CabinClassType.F);
+                    System.out.print("Please enter fare amount: $");
+                    BigDecimal fareAmount = sc.nextBigDecimal();
+                    FareEntity newFare = new FareEntity("F", fareAmount, CabinClassType.F);
                     listOfFares.add(newFare);
                     incorrectFare = true;
                 } else if (choice == 2) {
-                    FareEntity newFare = new FareEntity(fareBasis, fareAmount, CabinClassType.J);
+                    System.out.print("Please enter fare amount: $");
+                    BigDecimal fareAmount = sc.nextBigDecimal();
+                    FareEntity newFare = new FareEntity("J", fareAmount, CabinClassType.J);
                     listOfFares.add(newFare);
                     incorrectFare = true;
                 } else if (choice == 3) {
-                    FareEntity newFare = new FareEntity(fareBasis, fareAmount, CabinClassType.W);
+                    System.out.print("Please enter fare amount: $");
+                    BigDecimal fareAmount = sc.nextBigDecimal();
+                    FareEntity newFare = new FareEntity("W", fareAmount, CabinClassType.W);
                     listOfFares.add(newFare);
                     incorrectFare = true;
                 } else if (choice == 4) {
-                    FareEntity newFare = new FareEntity(fareBasis, fareAmount, CabinClassType.Y);
+                    System.out.print("Please enter fare amount: $");
+                    BigDecimal fareAmount = sc.nextBigDecimal();
+                    FareEntity newFare = new FareEntity("Y", fareAmount, CabinClassType.Y);
                     listOfFares.add(newFare);
                     incorrectFare = true;
                 }
@@ -323,17 +376,19 @@ public class FlightSchedulePlan {
 
     }
 
-    public GregorianCalendar createDateTime(String dateTime) {
+    public GregorianCalendar createDateTime(String dateTime) throws IncorrectFormatException {
         String[] information = dateTime.split("/");
         List<Integer> informationInteger = new ArrayList<>();
         for (String info : information) {
             informationInteger.add(Integer.parseInt(info));
         }
-        
-        System.out.println(informationInteger.toString());
+
+        if (informationInteger.size() != 5) {
+            throw new IncorrectFormatException("Wrong date format!");
+        }
 
         //NEED VALIDATE CALENDAR INPUT 
-        GregorianCalendar newCalendar = new GregorianCalendar(informationInteger.get(2), (informationInteger.get(1)), informationInteger.get(0), informationInteger.get(3), informationInteger.get(4));
+        GregorianCalendar newCalendar = new GregorianCalendar(informationInteger.get(2), (informationInteger.get(1) - 1), informationInteger.get(0), informationInteger.get(3), informationInteger.get(4));
         return newCalendar;
     }
 
@@ -346,17 +401,16 @@ public class FlightSchedulePlan {
                 System.out.println("Flight Schedule Plan : " + fsp.getFlightSchedulePlanId());
                 System.out.println("Flight Number: " + fsp.getFlightNumber());
                 System.out.println();
-                System.out.println("-----List of Flight Schedule-----");
                 for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
-                    System.out.println("-----------------------------");
+                    System.out.println("-------Flight Schedule-------");
                     System.out.println("Flight Schedule  " + fs.getFlightScheduleId());
-                    String departureDate = format.format(fs.getDepartureDateTime());
-                    System.out.println("Departure Date:  " + departureDate);
+                    GregorianCalendar departDateTime = fs.getDepartureDateTime();
+                    Date date = departDateTime.getTime();
+                    System.out.println("Departure Date: " + format.format(date));
                     System.out.println("Flight Duration: " + fs.getFlightDuration());
                     System.out.println("-----------END---------------");
                     System.out.println();
                 }
-                System.out.println();
                 System.out.println("=========FLIGHT SCHEDULE PLAN==========");
             }
         } catch (FlightSchedulePlanIsEmptyException ex) {
@@ -366,21 +420,34 @@ public class FlightSchedulePlan {
 
     public void viewSpecificFsp(Scanner sc) {
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        System.out.println("Please enter the flight number: ");
+        System.out.print("Please enter the flight number: ");
         String flightNumber = sc.nextLine().trim();
         try {
-            FlightSchedulePlanEntity fsp = flightSchedulePlanSessionBean.viewFlightSchedulePlan(flightNumber);
+            List<FlightSchedulePlanEntity> listOfFsp = flightSchedulePlanSessionBean.viewAllFlightSchedulePlan();
+
+            for (FlightSchedulePlanEntity fsp : listOfFsp) {
+                System.out.println("------------Flight Schedule Plan------------");
+                System.out.println("FSP ID: " + fsp.getFlightSchedulePlanId());
+                System.out.println("Flight depart from: " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getAirportName());
+                System.out.println("Flight arrive at  : " + fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName());
+            }
+
+            System.out.print("Please enter ID of FSP you wish to view: ");
+            String choiceStr = sc.nextLine().trim();
+            Long id = Long.parseLong(choiceStr);
+
+            FlightSchedulePlanEntity fsp = flightSchedulePlanSessionBean.viewFlightSchedulePlan(flightNumber, id);
             System.out.println("============FLIGHT SCHEDULE=============");
             System.out.println("Flight number:   " + flightNumber);
             System.out.println("Flight depart from: " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getAirportName());
             System.out.println("Flight arrive at  : " + fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName());
             System.out.println();
-            System.out.println("-----List of Flight Schedule-----");
             for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
-                System.out.println("-----------------------------");
+                System.out.println("-------Flight Schedule-------");
                 System.out.println("Flight Schedule  " + fs.getFlightScheduleId());
-                String departureDate = format.format(fs.getDepartureDateTime());
-                System.out.println("Departure Date:  " + departureDate);
+                GregorianCalendar departDateTime = fs.getDepartureDateTime();
+                Date date = departDateTime.getTime();
+                System.out.println("Departure Date: " + format.format(date));
                 System.out.println("Flight Duration: " + fs.getFlightDuration());
                 System.out.println("-----------END---------------");
                 System.out.println();
@@ -389,10 +456,182 @@ public class FlightSchedulePlan {
             System.out.println("-----Fares for Flight Schedule Plan-----");
             for (FareEntity fare : fsp.getListOfFare()) {
                 System.out.printf("%25s%20s%20s", "Fare basis code", "Fare amount", "Fare cabin type");
+                System.out.println();
                 System.out.printf("%10s%8.2f%8s", fare.getFareBasisCode(), fare.getFareAmount(), fare.getCabinType());
+                System.out.println();
             }
-        } catch (FlightSchedulePlanDoesNotExistException ex) {
+            System.out.println();
+            System.out.println();
+        } catch (FlightSchedulePlanDoesNotExistException | FlightSchedulePlanIsEmptyException ex) {
             System.out.println(ex.getMessage());
+        }
+    }
+
+    public void createFlight(Scanner sc) {
+        String choice = "";
+        while (true) {
+            System.out.print("Please enter Flight Number: ");
+            String flightNumber = sc.nextLine().trim();
+            List<FlightRouteEntity> listOfRoute = flightRouteSessionBean.viewListOfFlightRoute();
+            for (FlightRouteEntity fr : listOfRoute) {
+                System.out.println("=======Flight Route======");
+                System.out.printf("%-20s%-30s%-30s%-20s", "Flight Route ID", "Origin Location", "Destination Location", "Return Route");
+                System.out.println();
+                System.out.printf("%-20d%-30s%-30s%-20b", fr.getFlightRouteId(), fr.getOriginLocation().getAirportName(), fr.getDestinationLocation().getAirportName(), fr.getReturnRoute());
+                System.out.println();
+            }
+            System.out.print("Please select flight route ID: ");
+            String flightRouteIdStr = sc.nextLine().trim();
+            Long flightRouteId = Long.parseLong(flightRouteIdStr);
+            System.out.println();
+            try {
+                FlightRouteEntity flightRoute = flightRouteSessionBean.getFlightRoute(flightRouteId);
+                List<AircraftConfigurationEntity> listOfAircraftConfig = aircraftSessionBeanRemote.viewAircraftConfiguration();
+                for (AircraftConfigurationEntity aircraftConfig : listOfAircraftConfig) {
+                    System.out.println("Aircraft Configuration Id:" + aircraftConfig.getAircraftConfigId());
+                    System.out.println("Aircraft Configuration Name:" + aircraftConfig.getAircraftName());
+                    System.out.println("Aircraft Type Name:" + aircraftConfig.getAircraftType().getAircraftTypeName());
+                    System.out.println("Aircraft Configuration Maximum Seating Capacity:" + aircraftConfig.getMaxSeatingCapacity());
+                    System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
+                }
+                System.out.println();
+                System.out.print("Please select aircraft configuration ID: ");
+                String airConfigStr = sc.nextLine().trim();
+                Long airConfigId = Long.parseLong(airConfigStr);
+                AircraftConfigurationEntity aircraftConfig = aircraftSessionBeanRemote.viewDetailAircraftConfiguration(airConfigId);
+
+                FlightEntity flight = flightSessionBean.createFlightWithoutReturnFlight(flightNumber, flightRoute, aircraftConfig);
+                System.out.println("A new flight " + flight.getFlightNumber() + " has been created!");
+
+                if (flightRoute.getReturnRoute() != null) {
+                    System.out.println("There is a return route for this flight route.");
+                    System.out.println("Woud you like to create a return flight? (y/n)");
+                    System.out.print("Please enter choice: ");
+                    choice = sc.nextLine().trim();
+                    if (choice.toLowerCase().equals("y")) {
+                        System.out.println("Please enter the return flight number: ");
+                        String returnFlightNumber = sc.nextLine().trim();
+                        FlightRouteEntity returnRoute = flightRoute.getReturnRoute();
+                        FlightEntity returnFlight = flightSessionBean.createFlightWithReturnFlight(returnFlightNumber, returnRoute, aircraftConfig, flightNumber);
+                        System.out.println("A return flight " + returnFlight.getFlightNumber() + " for flight " + flight.getFlightNumber() + " has been created!");
+                        break;
+                    }
+                } else {
+                    break;
+                }
+                break;
+            } catch (FlightRouteDoesNotExistException | AircraftConfigurationNotExistException | FlightExistsException | FlightDoesNotExistException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    public void updateFlight(Scanner sc) {
+        int counter = 0;
+        while (counter < 3) {
+            try {
+                System.out.print("Please enter flight number: ");
+                String flightNumber = sc.nextLine().trim();
+                FlightEntity flight = flightSessionBean.viewFlightDetails(flightNumber);
+                System.out.println();
+                System.out.println("What woud you like to update? ");
+                System.out.println("1. Flight Route");
+                System.out.println("2. Aircraft Configuration");
+                System.out.println("3. Back");
+                System.out.print("Please enter choice: ");
+                String choiceStr = sc.nextLine().trim();
+                int choice = Integer.parseInt(choiceStr);
+                System.out.println();
+                if (choice == 1) {
+                    counter = 0;
+                    List<FlightRouteEntity> listOfRoute = flightRouteSessionBean.viewListOfFlightRoute();
+                    for (FlightRouteEntity fr : listOfRoute) {
+                        System.out.println("=======Flight Route======");
+                        System.out.printf("%-20s%-30s%-30s%-20s", "Flight Route ID", "Origin Location", "Destination Location", "Return Route");
+                        System.out.println();
+                        System.out.printf("%-20d%-30s%-30s%-20b", fr.getFlightRouteId(), fr.getOriginLocation().getAirportName(), fr.getDestinationLocation().getAirportName(), fr.getReturnRoute());
+                        System.out.println();
+                    }
+
+                    System.out.print("Please enter ID of flight route you wish to choose: ");
+                    String frId = sc.nextLine().trim();
+                    Long flightRouteId = Long.parseLong(frId);
+                    if (flight.getReturnFlight() != null && flightRouteId != flight.getFlightRoute().getFlightRouteId() && flightRouteId != flight.getReturnFlight().getFlightRoute().getFlightRouteId()) {
+                        System.out.println("Return flight detected. Would you like to change the flight route for the return flight as well? ");
+                        System.out.print("Please enter choice (y/n) : ");
+                        String decision = sc.nextLine().trim();
+                        if (decision.toLowerCase().equals("y")) {
+
+                            FlightEntity returnFlight = flight.getReturnFlight();
+                            FlightRouteEntity flightRoute = flightRouteSessionBean.getFlightRoute(flightRouteId);
+                            flight.setFlightRoute(flightRoute);
+                            flightSessionBean.updateFlight(flight);
+
+                            FlightRouteEntity returnFlightRoute = flightRoute.getReturnRoute();
+                            returnFlight.setFlightRoute(returnFlightRoute);
+                            flightSessionBean.updateFlight(returnFlight);
+                            System.out.println("Flight routes have been updated for flights " + flight.getFlightNumber() + " and " + returnFlight.getFlightNumber());
+                            System.out.println();
+                            break;
+                        } else {
+                            System.out.println("Unable to update flight! Flight is paired to return flight!");
+                            System.out.println();
+                        }
+
+                    } else if (flightRouteId != flight.getFlightRoute().getFlightRouteId()) {
+                        FlightRouteEntity flightRoute = flightRouteSessionBean.getFlightRoute(flightRouteId);
+                        flight.setFlightRoute(flightRoute);
+                        flightSessionBean.updateFlight(flight);
+                        System.out.println("Flight routes have been updated for flight " + flight.getFlightNumber());
+                        System.out.println();
+                        break;
+                    } else {
+                        System.out.println("You cannot pick the same flight route! Please select a different flight route!");
+                        System.out.println();
+                    }
+
+                } else if (choice == 2) {
+                    counter = 0;
+                    List<AircraftConfigurationEntity> listOfAircraftConfig = aircraftSessionBeanRemote.viewAircraftConfiguration();
+                    for (AircraftConfigurationEntity aircraftConfig : listOfAircraftConfig) {
+                        System.out.println("Aircraft Configuration Id:" + aircraftConfig.getAircraftConfigId());
+                        System.out.println("Aircraft Configuration Name:" + aircraftConfig.getAircraftName());
+                        System.out.println("Aircraft Type Name:" + aircraftConfig.getAircraftType().getAircraftTypeName());
+                        System.out.println("Aircraft Configuration Maximum Seating Capacity:" + aircraftConfig.getMaxSeatingCapacity());
+                        System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
+                    }
+                    System.out.println();
+                    System.out.print("Please select aircraft configuration ID: ");
+                    String airConfigStr = sc.nextLine().trim();
+                    Long airConfigId = Long.parseLong(airConfigStr);
+                    AircraftConfigurationEntity aircraftConfig = aircraftSessionBeanRemote.viewDetailAircraftConfiguration(airConfigId);
+                    if (airConfigId != aircraftConfig.getAircraftConfigId()) {
+                        flight.setAircraftConfig(aircraftConfig);
+                        flightSessionBean.updateFlight(flight);
+                        System.out.println("Aircraft configuration has been changed for flight " + flight.getFlightNumber());
+                        break;
+                    } else {
+                        System.out.println("You cannot pick the same aircraft configuration! Please select a different aircraft configuration!");
+                        System.out.println();
+                    }
+                } else if (choice == 3) {
+                    counter = 4;
+                } else {
+                    System.out.println("Please enter a valid choice!");
+                    counter++;
+                }
+            } catch (FlightDoesNotExistException | FlightRouteDoesNotExistException | AircraftConfigurationNotExistException ex) {
+                System.out.println(ex.getMessage());
+                counter++;
+            }
+
+        }
+    }
+
+    public void viewAllFlights(Scanner sc) {
+        int counter = 0;
+        while (counter < 3) {
+
         }
     }
 

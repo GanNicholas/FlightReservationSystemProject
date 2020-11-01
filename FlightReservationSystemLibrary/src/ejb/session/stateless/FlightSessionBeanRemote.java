@@ -10,9 +10,11 @@ import entity.FlightEntity;
 import entity.FlightRouteEntity;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.AircraftConfigurationNotExistException;
 import util.exception.FlightDoesNotExistException;
 import util.exception.FlightExistsException;
 import util.exception.FlightRecordIsEmptyException;
+import util.exception.FlightRouteDoesNotExistException;
 
 /**
  *
@@ -21,9 +23,9 @@ import util.exception.FlightRecordIsEmptyException;
 @Remote
 public interface FlightSessionBeanRemote {
 
-    public FlightEntity createFlightWithoutReturnFlight(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig) throws FlightExistsException;
+    public FlightEntity createFlightWithoutReturnFlight(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig) throws FlightExistsException, FlightRouteDoesNotExistException, AircraftConfigurationNotExistException;
 
-    public FlightEntity createFlightWithReturnFlight(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig, FlightEntity returnFlight) throws FlightExistsException;
+    public FlightEntity createFlightWithReturnFlight(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig, String mainFlightNumber) throws FlightExistsException, FlightRouteDoesNotExistException, AircraftConfigurationNotExistException, FlightDoesNotExistException;
 
     public List<FlightEntity> viewAllFlights() throws FlightRecordIsEmptyException;
 

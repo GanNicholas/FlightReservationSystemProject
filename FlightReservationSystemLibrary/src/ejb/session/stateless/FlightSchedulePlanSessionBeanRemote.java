@@ -27,7 +27,8 @@ public interface FlightSchedulePlanSessionBeanRemote {
     public String createRecurrentFlightSchedulePlan(String flightNumber, GregorianCalendar departureDateTime, GregorianCalendar endDate, Integer flightDuration, boolean createReturnFlightSchedule, List<FareEntity> listOfFares, Integer layover, Integer recurrency) throws FlightDoesNotExistException, FlightScheduleExistException;
 
     public List<FlightSchedulePlanEntity> viewAllFlightSchedulePlan() throws FlightSchedulePlanIsEmptyException;
-    
-    public FlightSchedulePlanEntity viewFlightSchedulePlan(String flightNumber) throws FlightSchedulePlanDoesNotExistException;
+
+    public FlightSchedulePlanEntity viewFlightSchedulePlan(String flightNumber, Long fspId) throws FlightSchedulePlanDoesNotExistException;
+
 
 }

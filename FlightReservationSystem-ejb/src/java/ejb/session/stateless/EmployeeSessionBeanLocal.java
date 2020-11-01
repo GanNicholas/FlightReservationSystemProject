@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import javax.ejb.Local;
+import util.enumeration.UserRole;
 import util.exception.CurrentlyLoggedInException;
 import util.exception.CurrentlyLoggedOutException;
 import util.exception.EmployeeDoesNotExistException;
@@ -19,6 +20,8 @@ import util.exception.WrongPasswordException;
 public interface EmployeeSessionBeanLocal {
 
     public boolean employeeLogin(String userId, String userPw) throws EmployeeDoesNotExistException, WrongPasswordException, CurrentlyLoggedInException;
+
+    public UserRole getEmployeeRole(String userId) throws EmployeeDoesNotExistException;
 
     public boolean employeeLogOut(String userId) throws EmployeeDoesNotExistException, CurrentlyLoggedOutException;
 

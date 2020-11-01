@@ -40,7 +40,7 @@ public class FlightRoute {
         this.flightRouteSessionBean = flightRouteSessionBean;
     }
 
-    public void FlightRouteApp() {
+    public void flightRouteApp() {
         Scanner sc = new Scanner(System.in);
         System.out.println("**Welcome to creation of air craft configuration **");
         while (true) {
@@ -178,14 +178,11 @@ public class FlightRoute {
         System.out.println("Please enter the id you wish to delete");
         Long id = sc.nextLong();
         try {
-            boolean isDelete = flightRouteSessionBean.DeleteFlightRoute(id);
-            if (isDelete) {
-                System.out.println("You have successfully deleted");
-            }
+            flightRouteSessionBean.DeleteFlightRoute(id);
+            System.out.println("You have successfully deleted");
+
         } catch (FlightRouteDoesNotExistException ex) {
             System.out.println("The id you have entered does not exist in the database.");
-        } catch (FlightRouteExistInOtherClassException ex) {
-            System.out.println("The id you have entered is currently used by other flight record(s).");
         }
 
     }

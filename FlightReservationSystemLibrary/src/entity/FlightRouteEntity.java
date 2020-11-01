@@ -40,14 +40,17 @@ public class FlightRouteEntity implements Serializable {
     @OneToOne
     private FlightRouteEntity returnRoute;
 
+    private boolean mainRoute;
+
     public FlightRouteEntity() {
 
     }
 
-    public FlightRouteEntity(AirportEntity originLocation, AirportEntity destinationLocation, FlightRouteEntity returnRoute) {
+    public FlightRouteEntity(AirportEntity originLocation, AirportEntity destinationLocation, FlightRouteEntity returnRoute, boolean isReturnRoute) {
         this.originLocation = originLocation;
         this.destinationLocation = destinationLocation;
         this.returnRoute = returnRoute;
+        this.mainRoute = false;
     }
 
     public Long getFlightRouteId() {
@@ -88,6 +91,14 @@ public class FlightRouteEntity implements Serializable {
 
     public void setReturnRoute(FlightRouteEntity returnRoute) {
         this.returnRoute = returnRoute;
+    }
+
+    public boolean isMainRoute() {
+        return mainRoute;
+    }
+
+    public void setMainRoute(boolean mainRoute) {
+        this.mainRoute = mainRoute;
     }
 
     @Override
