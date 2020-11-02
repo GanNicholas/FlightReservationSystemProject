@@ -27,6 +27,7 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @NamedQuery(name = "retrieveFlightUsingFlightNumber", query = "SELECT e FROM FlightEntity e WHERE e.flightNumber =:flightNum")
+@NamedQuery(name = "retrieveReturnFlightUsingODPair", query = "SELECT e FROM FlightEntity e WHERE e.flightRoute.originLocation.iataAirportCode =:originIata AND e.flightRoute.destinationLocation.iataAirportCode =:destinIata")
 @NamedQuery(name = "retrieveActiveFlightUsingFlightNumber", query = "SELECT e FROM FlightEntity e WHERE e.flightNumber =:flightNum AND e.isDeleted = FALSE")
 @NamedQuery(name = "retrieveFlightUsingFlightRouteId", query = "SELECT e FROM FlightEntity e WHERE e.flightRoute.originLocation.airportId =:airportId")
 public class FlightEntity implements Serializable {

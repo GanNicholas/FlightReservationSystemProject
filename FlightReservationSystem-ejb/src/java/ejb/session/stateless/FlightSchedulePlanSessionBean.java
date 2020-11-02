@@ -51,16 +51,15 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
         } catch (NoResultException ex) {
             throw new FlightDoesNotExistException("Flight with flight number does not exist!");
         }
-        
+
         FlightSchedulePlanEntity fsp;
         if (listOfDepartureDateTime.size() == 1) {
             fsp = new SingleFlightScheduleEntity(flightNumber, false, flight);
         } else {
             fsp = new MultipleFlightScheduleEntity(flightNumber, false, flight);
         }
-        
-//        em.persist(fsp);
 
+//        em.persist(fsp);
         for (FareEntity fare : listOfFares) {
 //            em.persist(fare);
             fsp.getListOfFare().add(fare);
@@ -93,8 +92,9 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             AirportEntity destination = flight.getFlightRoute().getOriginLocation();
             try {
                 FlightRouteEntity returnFlightRoute = (FlightRouteEntity) em.createNamedQuery("findFlightRoute").setParameter("origin", origin).setParameter("destination", destination).getSingleResult();
-                Long airportId = returnFlightRoute.getOriginLocation().getAirportId();
-                returnFlight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightRouteId").setParameter("airportId", airportId).getSingleResult();
+                String originIata = returnFlightRoute.getOriginLocation().getIataAirportCode();
+                String destiIata = returnFlightRoute.getDestinationLocation().getIataAirportCode();
+                returnFlight = (FlightEntity) em.createNamedQuery("retrieveReturnFlightUsingODPair").setParameter("originIata", originIata).setParameter("destinIata", destiIata).getSingleResult();
             } catch (NoResultException ex) {
                 throw new FlightDoesNotExistException("Flight does not exist!");
             }
@@ -110,9 +110,8 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             for (FareEntity fare : listOfFares) {
                 returnFSP.getListOfFare().add(fare);
             }
-            
-//            em.persist(returnFSP);
 
+//            em.persist(returnFSP);
             // GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight
             for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
                 GregorianCalendar returnFlightDeparture = (GregorianCalendar) fs.getArrivalDateTime().clone();
@@ -139,7 +138,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             }
 
             fsp.setReturnFlightSchedulePlan(returnFSP);
-            
+
             em.persist(returnFSP);
             em.flush();
 
@@ -168,7 +167,6 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             fsp = new RecurringWeeklyScheduleEntity(flightNumber, false, flight, endDate);
         }
 
-        
         for (FareEntity fare : listOfFares) {
             fsp.getListOfFare().add(fare);
         }
@@ -218,9 +216,8 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             } else { //MUST CHECK RECURRENCY 7 OR LESSER
                 returnFSP = new RecurringWeeklyScheduleEntity(returnFlight.getFlightNumber(), false, returnFlight, endDate);
             }
-            
+
 //            em.persist(returnFSP);
-            
             for (FareEntity fare : listOfFares) {
                 returnFSP.getListOfFare().add(fare);
             }
@@ -250,7 +247,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             }
 
             fsp.setReturnFlightSchedulePlan(returnFSP);
-            
+
             em.persist(returnFSP);
             em.flush();
 
@@ -265,7 +262,10 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
 
     @Override
     public List<FlightSchedulePlanEntity> viewAllFlightSchedulePlan() throws FlightSchedulePlanIsEmptyException {
-        List<FlightSchedulePlanEntity> listOfFsp = em.createQuery("SELECT c FROM FlightSchedulePlanEntity c WHERE c.isDeleted = FALSE ORDER BY c.flightNumber ASC").getResultList();
+//        List<FlightSchedulePlanEntity> listOfFsp = em.createQuery("SELECT c FROM FlightSchedulePlanEntity c WHERE c.isDeleted = FALSE ORDER BY c.flightNumber ASC").getResultList();
+        
+        List<FlightSchedulePlanEntity> listOfFsp = em.createQuery("SELECT f FROM FlightSchedulePlanEntity f, IN (f.listOfFlightSchedule) fs  WHERE f.isDeleted = FALSE AND f.flightEntity.isMainRoute = TRUE GROUP BY f.flightSchedulePlanId ORDER BY f.flightEntity.flightNumber ASC, fs.departureDateTime DESC").getResultList();
+     
         if (listOfFsp.isEmpty()) {
             throw new FlightSchedulePlanIsEmptyException("No flight schedule plan exists");
         }
@@ -306,7 +306,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             for (int j = i + 1; j < fsp.getListOfFlightSchedule().size(); j++) {
                 FlightScheduleEntity fs1 = fsp.getListOfFlightSchedule().get(i);
                 FlightScheduleEntity fs2 = fsp.getListOfFlightSchedule().get(j);
-                if (fs1.getDepartureDateTime().compareTo(fs2.getDepartureDateTime()) == -1) {
+                if (fs1.getDepartureDateTime().after(fs2.getDepartureDateTime())) {
                     FlightScheduleEntity temp = fsp.getListOfFlightSchedule().get(i);
                     fsp.getListOfFlightSchedule().set(i, fs2);
                     fsp.getListOfFlightSchedule().set(j, temp);
@@ -318,7 +318,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
     }
 
     @Override
-    public FlightSchedulePlanEntity viewFlightSchedulePlan(String flightNumber, Long fspId) throws FlightSchedulePlanDoesNotExistException {
+    public FlightSchedulePlanEntity viewFlightSchedulePlan(Long fspId) throws FlightSchedulePlanDoesNotExistException {
 //            FlightSchedulePlanEntity fsp = (FlightSchedulePlanEntity) em.createNamedQuery("queryFSPwithFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
         FlightSchedulePlanEntity fsp = em.find(FlightSchedulePlanEntity.class, fspId);
         if (fsp == null) {

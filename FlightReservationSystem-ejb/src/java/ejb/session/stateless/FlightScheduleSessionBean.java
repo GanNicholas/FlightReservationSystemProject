@@ -51,7 +51,7 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         this.checkSchedules(arrivalDateTime, departureDateTime, flightNumber);
 
         //create flight schedule
-        FlightScheduleEntity flightSchedule = new FlightScheduleEntity(departureDateTime, flightDuration, fsp);
+        FlightScheduleEntity flightSchedule = new FlightScheduleEntity(departureDateTime, flightDuration, fsp, arrivalDateTime);
         //get seatingplan - need get seating plan from aircraft config, add to flight schedule
         List<SeatEntity> seatingPlan = flight.getAircraftConfig().getSeatingPlan();
 
