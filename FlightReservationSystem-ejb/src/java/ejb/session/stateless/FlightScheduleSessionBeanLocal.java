@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.FlightEntity;
 import entity.FlightScheduleEntity;
 import entity.FlightSchedulePlanEntity;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import javax.ejb.Local;
 import util.exception.FlightScheduleExistException;
@@ -18,7 +19,7 @@ import util.exception.FlightScheduleExistException;
  */
 @Local
 public interface FlightScheduleSessionBeanLocal {
-    
+
     public FlightScheduleEntity createFlightSchedule(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight) throws FlightScheduleExistException;
-    
+
 }

@@ -500,6 +500,7 @@ public class FlightSchedulePlan {
             System.out.println("=========FLIGHT SCHEDULE PLAN==========");
             System.out.printf("%-10s%-20s%-70s%-70s%-30s", "FSP ID", "Flight Number", "Origin Airport", "Destination Airport", "Flight Schedule Plan Type");
             System.out.println();
+            System.out.println();
             for (FlightSchedulePlanEntity fsp : listOfFsp) {
                 String originLocation = fsp.getFlightEntity().getFlightRoute().getOriginLocation().getAirportName() + " in " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getCountry() + ", " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getCity();
                 String destinationLocation = fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName() + " in " + fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getCountry() + ", " + fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getCity();
@@ -517,7 +518,7 @@ public class FlightSchedulePlan {
                 System.out.println();
             }
 
-            System.out.print("Please enter ID of FSP you wish to view: ");
+            System.out.print("Please enter ID of FSP you wish to view (eg 1): ");
             Long id = sc.nextLong();
             sc.nextLine();
 
@@ -525,6 +526,7 @@ public class FlightSchedulePlan {
 
             System.out.println("===================Flight Route Details===================");
             System.out.printf("%-15s%-25s%-14s%-70s", "Flight ID", "Origin/Destination", "IATA Code", " Airport");
+            System.out.println();
             System.out.println();
             FlightRouteEntity fr = fsp.getFlightEntity().getFlightRoute();
             String originLocation = fsp.getFlightEntity().getFlightRoute().getOriginLocation().getAirportName() + " in " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getCountry() + ", " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getCity();
@@ -540,7 +542,7 @@ public class FlightSchedulePlan {
             System.out.println();
             for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
                 int flightMins = fs.getFlightDuration();
-                int flightHour = flightMins/60;
+                int flightHour = flightMins / 60;
                 flightMins %= 60;
                 String flightduration = flightHour + "hr " + flightMins + " mins";
                 System.out.printf("%-30s%-30s%-30s", format.format(fs.getDepartureDateTime().getTime()), flightduration, format.format(fs.getArrivalDateTime().getTime()));

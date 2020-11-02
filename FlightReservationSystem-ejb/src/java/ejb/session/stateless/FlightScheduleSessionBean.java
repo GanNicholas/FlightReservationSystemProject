@@ -43,7 +43,7 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         int departTimeZone = (originAirport.getTimeZoneHour() * 60) + originAirport.getTimeZoneMin();
         int arriveTimeZone = (destinationAirport.getTimeZoneHour() * 60) + destinationAirport.getTimeZoneMin();
         int timeDiff = arriveTimeZone - departTimeZone;
-  
+
         GregorianCalendar arrivalDateTime = (GregorianCalendar) departureDateTime.clone();
         arrivalDateTime.add(GregorianCalendar.MINUTE, flightDuration);
         arrivalDateTime.add(GregorianCalendar.MINUTE, timeDiff);
@@ -96,6 +96,16 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
             }
         }
 
+    }
+
+    //checks if flight has been booked by anyone
+    public boolean checkFlightScheduleSeats(FlightScheduleEntity fs) {
+        for (SeatEntity seat : fs.getSeatingPlan()) {
+            if (seat.getPassenger() != null) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
