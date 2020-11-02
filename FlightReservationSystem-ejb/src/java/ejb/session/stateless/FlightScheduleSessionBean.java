@@ -40,13 +40,13 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         AirportEntity originAirport = flight.getFlightRoute().getOriginLocation();
         AirportEntity destinationAirport = flight.getFlightRoute().getDestinationLocation();
 
-        int timeDiffHour = destinationAirport.getTimeZoneHour() - originAirport.getTimeZoneHour();
-        int timeDiffMin = destinationAirport.getTimeZoneMin() - originAirport.getTimeZoneMin();
-
+        int departTimeZone = (originAirport.getTimeZoneHour() * 60) + originAirport.getTimeZoneMin();
+        int arriveTimeZone = (destinationAirport.getTimeZoneHour() * 60) + destinationAirport.getTimeZoneMin();
+        int timeDiff = arriveTimeZone - departTimeZone;
+  
         GregorianCalendar arrivalDateTime = (GregorianCalendar) departureDateTime.clone();
         arrivalDateTime.add(GregorianCalendar.MINUTE, flightDuration);
-        arrivalDateTime.add(GregorianCalendar.HOUR, timeDiffHour);
-        arrivalDateTime.add(GregorianCalendar.MINUTE, timeDiffMin);
+        arrivalDateTime.add(GregorianCalendar.MINUTE, timeDiff);
 
         this.checkSchedules(arrivalDateTime, departureDateTime, flightNumber);
 
@@ -93,7 +93,6 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
                     throw new FlightScheduleExistException("Flight Schedule has conflict with existing flight schedule!");
                 }
 
-              
             }
         }
 

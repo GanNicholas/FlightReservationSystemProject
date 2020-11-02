@@ -288,8 +288,8 @@ public class FlightSchedulePlan {
                 if (flight.getReturnFlight() != null) {
                     System.out.println("Please enter if you would like to create a return flight schedule plan for your existing flight? (1 for yes)");
                     System.out.print("Please enter your choice: ");
-                    String choiceInString = sc.nextLine().trim();
-                    int choice = Integer.parseInt(choiceInString);
+                    int choice = sc.nextInt();
+                    sc.nextLine();
                     if (choice == 1) {
                         returnFlight = true;
                         System.out.print("Please enter layover duration: ");
@@ -299,7 +299,7 @@ public class FlightSchedulePlan {
                         returnFlight = false;
                     }
                 }
-            } catch (FlightDoesNotExistException ex) {
+            } catch (FlightDoesNotExistException | InputMismatchException ex) {
                 System.out.println(ex.getMessage());
                 reenter = true;
             }
@@ -335,70 +335,90 @@ public class FlightSchedulePlan {
     }
 
     public List<FareEntity> createFare(Scanner sc, FlightEntity flight) {
+        boolean firstClass = false;
+        boolean businessClass = false;
+        boolean premiumEconomyClass = false;
+        boolean economyClass = false;
+
+        List<CabinClassType> listOfCabinClassTypes = new ArrayList<>();
+
         while (true) {
             try {
                 List<CabinClassConfigurationEntity> listOfCabin = flight.getAircraftConfig().getCabinClasses();
                 List<FareEntity> listOfFares = new ArrayList<>();
-                System.out.println("You have " + listOfCabin.size() + " in you current flight");
+                System.out.println("You have " + listOfCabin.size() + " cabin configurations in you current flight");
+                System.out.println();
+                System.out.println("==============================LIST OF CABIN TYPES FOR FLIGHT========================================");
                 for (CabinClassConfigurationEntity cabin : listOfCabin) {
-                    System.out.printf("%-25s%-30s%-30s", "Cabin class type", "Avaialable Seats", "Seating Configuration");
+                    System.out.printf("%-20s%-25s%-30s%-30s", "ID Number", "Cabin class type", "Avaialable Seats", "Seating Configuration");
                     System.out.println();
-                    System.out.printf("%-25s%-30s%-30s", cabin.getCabinclassType(), cabin.getAvailableSeats(), cabin.getSeatingConfig());
+                    System.out.printf("%-20d%-25s%-30s%-30s", cabin.getCabinClassConfigId(), cabin.getCabinclassType(), cabin.getAvailableSeats(), cabin.getSeatingConfig());
                     System.out.println();
+                    listOfCabinClassTypes.add(cabin.getCabinclassType());
                 }
-                System.out.println("Please enter " + listOfCabin.size() + " number of fares");
-                for (int i = 0; i < listOfCabin.size(); i++) {
+                System.out.println();
+                for (CabinClassType cabinType : listOfCabinClassTypes) {
+                    boolean stillHaveFare = true;
 
-                    boolean incorrectFare = false;
+                    while (stillHaveFare) {
 
-                    while (!incorrectFare) {
-                        System.out.println("--Please enter cabin type--");
-                        System.out.println("1.First Class");
-                        System.out.println("2.Business Class");
-                        System.out.println("3.Premium Economy");
-                        System.out.println("4.Economy");
-                        System.out.print("Please enter your choice: ");
-                        int choice = sc.nextInt();
-                        sc.nextLine();
-                        if (choice == 1) {
-                            System.out.print("Please enter your fare basis code: ");
+                        if (cabinType.equals(CabinClassType.F)) {
+                            System.out.print("Please enter your fare basis code for First Class Cabin : ");
                             String fbc = "F" + sc.nextLine().trim();
                             System.out.print("Please enter fare amount: $");
                             BigDecimal fareAmount = sc.nextBigDecimal();
                             sc.nextLine();
                             FareEntity newFare = new FareEntity(fbc, fareAmount, CabinClassType.F);
                             listOfFares.add(newFare);
-                            incorrectFare = true;
-                        } else if (choice == 2) {
-                            System.out.print("Please enter your fare basis code: ");
+                            System.out.print("Do you still wish to add fares for First Class Cabin (y/n) : ");
+                            String choice = sc.nextLine().trim();
+                            if (choice.toLowerCase().equals("n")) {
+                                stillHaveFare = false;
+                            }
+                        } else if (cabinType.equals(CabinClassType.J)) {
+                            System.out.print("Please enter your fare basis code for Business Class Cabin : ");
                             String fbc = "J" + sc.nextLine().trim();
                             System.out.print("Please enter fare amount: $");
                             BigDecimal fareAmount = sc.nextBigDecimal();
                             sc.nextLine();
                             FareEntity newFare = new FareEntity(fbc, fareAmount, CabinClassType.J);
                             listOfFares.add(newFare);
-                            incorrectFare = true;
-                        } else if (choice == 3) {
-                            System.out.print("Please enter your fare basis code: ");
+                            System.out.print("Do you still wish to add fares for Business Class Cabin (y/n) : ");
+                            String choice = sc.nextLine().trim();
+                            if (choice.toLowerCase().equals("n")) {
+                                stillHaveFare = false;
+                            }
+                        } else if (cabinType.equals(CabinClassType.W)) {
+                            System.out.print("Please enter your fare basis code for Premium Economy Class : ");
                             String fbc = "W" + sc.nextLine().trim();
                             System.out.print("Please enter fare amount: $");
                             BigDecimal fareAmount = sc.nextBigDecimal();
                             sc.nextLine();
                             FareEntity newFare = new FareEntity(fbc, fareAmount, CabinClassType.W);
                             listOfFares.add(newFare);
-                            incorrectFare = true;
-                        } else if (choice == 4) {
-                            System.out.print("Please enter your fare basis code: ");
+                            System.out.print("Do you still wish to add fares for Business Class Cabin (y/n) : ");
+                            String choice = sc.nextLine().trim();
+                            if (choice.toLowerCase().equals("n")) {
+                                stillHaveFare = false;
+                            }
+                        } else if (cabinType.equals(CabinClassType.Y)) {
+                            System.out.print("Please enter your fare basis code for Economy Class : ");
                             String fbc = "Y" + sc.nextLine().trim();
                             System.out.print("Please enter fare amount: $");
                             BigDecimal fareAmount = sc.nextBigDecimal();
                             sc.nextLine();
                             FareEntity newFare = new FareEntity(fbc, fareAmount, CabinClassType.Y);
                             listOfFares.add(newFare);
-                            incorrectFare = true;
+                            System.out.print("Do you still wish to add fares for Business Class Cabin (y/n) : ");
+                            String choice = sc.nextLine().trim();
+                            if (choice.toLowerCase().equals("n")) {
+                                stillHaveFare = false;
+                            }
                         }
                     }
                 }
+                
+                System.out.println(listOfFares);
 
                 return listOfFares;
             } catch (InputMismatchException ex) {
@@ -727,7 +747,7 @@ public class FlightSchedulePlan {
         String flightNumber = sc.nextLine().trim();
         try {
             boolean deleted = flightSessionBean.deleteFlight(flightNumber);
-            if(deleted){
+            if (deleted) {
                 System.out.println("Flight " + flightNumber + " has been deleted!");
             } else {
                 System.out.println("Flight " + flightNumber + " is still in use, but is no longer taking in new schedules!");

@@ -162,7 +162,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
         }
 
         FlightSchedulePlanEntity fsp;
-        if (recurrency < 7) {
+        if (recurrency != 7) {
             fsp = new RecurringScheduleEntity(flightNumber, false, flight, endDate, recurrency);
         } else { //MUST CHECK RECURRENCY 7 OR LESSER
             fsp = new RecurringWeeklyScheduleEntity(flightNumber, false, flight, endDate);
