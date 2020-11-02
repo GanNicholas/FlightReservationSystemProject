@@ -245,11 +245,11 @@ public class AircraftConfiguration {
         System.out.printf("%90s", "**View all aircraft configurations.**");
         System.out.println();
         List<AircraftConfigurationEntity> aircrafttConfigList = aircraftSessionBeanRemote.viewAircraftConfiguration();
-        System.out.printf("%-35s %-30s %-22s %-51s", "Aircraft Configuration Id", "Aircraft Configuration Name", "Aircraft Type Name", "Aircraft Configuration Maximum Seating Capacity");
+        System.out.printf("%-30s %-30s %-40s %-51s", "Aircraft Configuration Id", "Aircraft Configuration Name", "Aircraft Type Name", "Aircraft Configuration Maximum Seating Capacity");
         System.out.println("");
         for (AircraftConfigurationEntity aircraftConfig : aircrafttConfigList) {
 
-            System.out.printf("%-35s %-30s %-22s %-51s", aircraftConfig.getAircraftConfigId(), aircraftConfig.getAircraftName(), aircraftConfig.getAircraftType().getAircraftTypeName(), aircraftConfig.getMaxSeatingCapacity());
+            System.out.printf("%-30s %-30s %-40s %-51d", aircraftConfig.getAircraftConfigId(), aircraftConfig.getAircraftName(), aircraftConfig.getAircraftType().getAircraftTypeName(), aircraftConfig.getMaxSeatingCapacity());
             System.out.println("");
             // System.out.println("Aircraft Configuration Name:" + aircraftConfig.getAircraftName());
             //System.out.println("Aircraft Type Name:" + aircraftConfig.getAircraftType().getAircraftTypeName());
@@ -266,11 +266,11 @@ public class AircraftConfiguration {
             System.out.println();
 
             List<AircraftConfigurationEntity> aircrafttConfigList = aircraftSessionBeanRemote.viewAircraftConfiguration();
-            System.out.printf("%-35s %-30s %-22s %-51s ", "Aircraft Configuration Id", "Aircraft Configuration Name", "Aircraft Type Name", "Aircraft Configuration Maximum Seating Capacity");
+            System.out.printf("%-30s %-30s %-40s %-51s ", "Aircraft Configuration Id", "Aircraft Configuration Name", "Aircraft Type Name", "Aircraft Configuration Maximum Seating Capacity");
             System.out.println();
             for (AircraftConfigurationEntity aircraftConfig : aircrafttConfigList) {
 
-                System.out.printf("%-35s %-30s %-22s %-51s", aircraftConfig.getAircraftConfigId(), aircraftConfig.getAircraftName(), aircraftConfig.getAircraftType().getAircraftTypeName(), aircraftConfig.getMaxSeatingCapacity());
+                System.out.printf("%-30s %-30s %-40s %-51d", aircraftConfig.getAircraftConfigId(), aircraftConfig.getAircraftName(), aircraftConfig.getAircraftType().getAircraftTypeName(), aircraftConfig.getMaxSeatingCapacity());
                 System.out.println();
                 /* System.out.println("Aircraft Configuration Id:" + aircraftConfig.getAircraftConfigId());
                 System.out.println("Aircraft Configuration Name:" + aircraftConfig.getAircraftName());
@@ -289,9 +289,9 @@ public class AircraftConfiguration {
             }
             try {
                 AircraftConfigurationEntity aircraftConfigDetail = aircraftSessionBeanRemote.viewDetailAircraftConfiguration(selectedId);
-                System.out.printf("%-35s %-30s %-22s %-51s", "Aircraft Configuration Id", "Aircraft Configuration Name", "Aircraft Type Name", "Aircraft Configuration Maximum Seating Capacity");
+                System.out.printf("%-30s %-30s %-40s %-51s", "Aircraft Configuration Id", "Aircraft Configuration Name", "Aircraft Type Name", "Aircraft Configuration Maximum Seating Capacity");
                 System.out.println();
-                System.out.printf("%-35s %-30s %-22s %-51s", aircraftConfigDetail.getAircraftConfigId(), aircraftConfigDetail.getAircraftName(), aircraftConfigDetail.getAircraftType().getAircraftTypeName(), aircraftConfigDetail.getMaxSeatingCapacity());
+                System.out.printf("%-30s %-30s %-40s %-51d", aircraftConfigDetail.getAircraftConfigId(), aircraftConfigDetail.getAircraftName(), aircraftConfigDetail.getAircraftType().getAircraftTypeName(), aircraftConfigDetail.getMaxSeatingCapacity());
 
                 //aircraftConfigDetail.getCabinClasses().size();
                 /* System.out.println("***Aircraft Configuration and Aircraft Type***");
@@ -303,11 +303,11 @@ public class AircraftConfiguration {
                 System.out.printf("%110s", "***Cabin Class Configuration and Aircraft Type***");
                 System.out.println("");
                 System.out.println("");
-                System.out.printf("%-30s %-12s %-30s %-28s %-28s %-28s %-28s %-28s", "Cabin Class Configuration Id",  "Class Type", "Cabin Class Number of Aisle(s)", "Cabin Class Number of Row(s)", "Cabin Class Available Seat(s)", "Cabin Class Reserved Seat(s)", "Cabin Class Balance Seat(s)", "Cabin Class Seating Configuration");
+                System.out.printf("%-30s %-14s %-32s %-30s %-30s %-30s %-30s %-30s", "Cabin Class Configuration Id",  "Class Type", "Cabin Class Number of Aisle(s)", "Cabin Class Number of Row(s)", "Cabin Class Available Seat(s)", "Cabin Class Reserved Seat(s)", "Cabin Class Balance Seat(s)", "Cabin Class Seating Configuration");
                 System.out.println();
                 for (int i = 0; i < aircraftConfigDetail.getCabinClasses().size(); i++) {
                     List<CabinClassConfigurationEntity> listOfCabinClass = aircraftConfigDetail.getCabinClasses();
-                    System.out.printf("%-31s %-13s %-31s %-29s %-29s %-29s %-29s %-29s", listOfCabinClass.get(i).getCabinClassConfigId(),  listOfCabinClass.get(i).getCabinclassType(),
+                    System.out.printf("%-30s %-14s %-32s %-30s %-30s %-30s %-30s %-30s", listOfCabinClass.get(i).getCabinClassConfigId(),  listOfCabinClass.get(i).getCabinclassType(),
                             listOfCabinClass.get(i).getNumAisles(), listOfCabinClass.get(i).getNumRows(), listOfCabinClass.get(i).getAvailableSeats(),
                             listOfCabinClass.get(i).getReservedSeats(), listOfCabinClass.get(i).getBalancedSeats(), listOfCabinClass.get(i).getSeatingConfig());
                     System.out.println();
