@@ -9,6 +9,7 @@ import ejb.session.stateless.AircraftSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.FlightRouteSessionBeanRemote;
 import ejb.session.stateless.FlightSchedulePlanSessionBeanRemote;
+import ejb.session.stateless.FlightScheduleSessionBeanRemote;
 import ejb.session.stateless.FlightSessionBeanRemote;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -33,16 +34,19 @@ public class RunApp {
 
     private EmployeeSessionBeanRemote employeeSessionBean;
 
+    private FlightScheduleSessionBeanRemote flightScheduleSessionBean;
+
     private boolean loggedIn;
 
     private String userId;
 
-    public RunApp(FlightSessionBeanRemote flightSessionBean, FlightSchedulePlanSessionBeanRemote flightSchedulePlanSessionBean, FlightRouteSessionBeanRemote flightRouteSessionBean, AircraftSessionBeanRemote aircraftSessionBean, EmployeeSessionBeanRemote employeeSessionBean) {
+    public RunApp(FlightSessionBeanRemote flightSessionBean, FlightSchedulePlanSessionBeanRemote flightSchedulePlanSessionBean, FlightRouteSessionBeanRemote flightRouteSessionBean, AircraftSessionBeanRemote aircraftSessionBean, EmployeeSessionBeanRemote employeeSessionBean, FlightScheduleSessionBeanRemote flightScheduleSessionBean) {
         this.flightSessionBean = flightSessionBean;
         this.flightSchedulePlanSessionBean = flightSchedulePlanSessionBean;
         this.flightRouteSessionBean = flightRouteSessionBean;
         this.aircraftSessionBean = aircraftSessionBean;
         this.employeeSessionBean = employeeSessionBean;
+        this.flightScheduleSessionBean = flightScheduleSessionBean;
         this.loggedIn = false;
         this.userId = "";
     }
@@ -52,22 +56,30 @@ public class RunApp {
         while (counter < 3) {
             System.out.println("-----Welcome to Flight Reservation System-----");
             System.out.println("------------------Login-----------------------");
-            System.out.println("(enter 'bye' to exit)");
-            System.out.print("ID        : ");
-            String iD = sc.nextLine().trim();
-            if (iD.toLowerCase().equals("bye")) {
-                break;
-            }
-            this.userId = iD;
-            System.out.print("Password  : ");
-            String pw = sc.nextLine().trim();
+            System.out.println("1. Log in ");
+            System.out.println("2. Exit");
+            int choice = sc.nextInt();
+            sc.nextLine();
 
-            try {
-                loggedIn = employeeSessionBean.employeeLogin(iD, pw);
-                counter = 0;
-                menu(sc);
-            } catch (EmployeeDoesNotExistException | WrongPasswordException | CurrentlyLoggedInException ex) {
-                System.out.println(ex.getMessage());
+            if (choice == 1) {
+                System.out.print("ID        : ");
+                String iD = sc.nextLine().trim();
+                this.userId = iD;
+                System.out.print("Password  : ");
+                String pw = sc.nextLine().trim();
+
+                try {
+                    loggedIn = employeeSessionBean.employeeLogin(iD, pw);
+                    counter = 0;
+                    menu(sc);
+                } catch (EmployeeDoesNotExistException | WrongPasswordException | CurrentlyLoggedInException ex) {
+                    System.out.println(ex.getMessage());
+                    counter++;
+                }
+            } else if (choice == 2) {
+                break;
+            } else {
+                System.out.println("Invalid input, please try again!");
                 counter++;
             }
 
@@ -115,7 +127,7 @@ public class RunApp {
                 } else if (choice == 2) {
                     try {
                         if (employeeSessionBean.getEmployeeRole(userId).equals(UserRole.SCHEDULEMANAGER)) {
-                            FlightSchedulePlan fsp = new FlightSchedulePlan(flightSchedulePlanSessionBean, flightSessionBean, aircraftSessionBean, flightRouteSessionBean);
+                            FlightSchedulePlan fsp = new FlightSchedulePlan(flightSchedulePlanSessionBean, flightSessionBean, aircraftSessionBean, flightRouteSessionBean, flightScheduleSessionBean);
                             fsp.runFSP();
                         } else {
                             System.out.println("Sorry, you do not have the access right. Please try again!");

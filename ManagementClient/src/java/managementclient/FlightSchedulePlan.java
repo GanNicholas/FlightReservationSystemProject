@@ -8,6 +8,7 @@ package managementclient;
 import ejb.session.stateless.AircraftSessionBeanRemote;
 import ejb.session.stateless.FlightRouteSessionBeanRemote;
 import ejb.session.stateless.FlightSchedulePlanSessionBeanRemote;
+import ejb.session.stateless.FlightScheduleSessionBeanRemote;
 import ejb.session.stateless.FlightSessionBeanRemote;
 import entity.AircraftConfigurationEntity;
 import entity.CabinClassConfigurationEntity;
@@ -29,6 +30,8 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -61,11 +64,16 @@ public class FlightSchedulePlan {
 
     private FlightRouteSessionBeanRemote flightRouteSessionBean;
 
-    public FlightSchedulePlan(FlightSchedulePlanSessionBeanRemote flightSchedulePlanSessionBean, FlightSessionBeanRemote flightSessionBean, AircraftSessionBeanRemote aircraftSessionBeanRemote, FlightRouteSessionBeanRemote flightRouteSessionBean) {
+    private FlightScheduleSessionBeanRemote flightScheduleSessionBean;
+
+    private final SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+    public FlightSchedulePlan(FlightSchedulePlanSessionBeanRemote flightSchedulePlanSessionBean, FlightSessionBeanRemote flightSessionBean, AircraftSessionBeanRemote aircraftSessionBeanRemote, FlightRouteSessionBeanRemote flightRouteSessionBean, FlightScheduleSessionBeanRemote flightScheduleSessionBean) {
         this.flightSchedulePlanSessionBean = flightSchedulePlanSessionBean;
         this.flightSessionBean = flightSessionBean;
         this.aircraftSessionBeanRemote = aircraftSessionBeanRemote;
         this.flightRouteSessionBean = flightRouteSessionBean;
+        this.flightScheduleSessionBean = flightScheduleSessionBean;
     }
 
     public void runFSP() {
@@ -101,11 +109,11 @@ public class FlightSchedulePlan {
                 } else if (choice == 6) {
                     createfsp(sc);
                 } else if (choice == 7) {
-                    viewAllFsp(sc);
+                    viewAllFsp();
                 } else if (choice == 8) {
                     viewSpecificFsp(sc);
                 } else if (choice == 9) {
-
+                    updateFsp(sc);
                 } else if (choice == 10) {
 
                 } else if (choice == 0) {
@@ -184,6 +192,7 @@ public class FlightSchedulePlan {
                         listOfDepartDateTime.add(departDateTime);
                     } catch (IncorrectFormatException ex) {
                         System.out.println(ex.getMessage());
+                        i--;
                     }
 
                 }
@@ -274,7 +283,7 @@ public class FlightSchedulePlan {
                 System.out.println(ex.getMessage());
                 reenter = true;
             }
-            //POTENTIAL ERROR
+            //maybe can add if statement for reenter
             System.out.print("Please enter end date (dd/mm/yyyy/hh/mm) : ");
             String endDateTimeStr = sc.nextLine().trim();
             GregorianCalendar endDateTime = null;
@@ -460,7 +469,7 @@ public class FlightSchedulePlan {
         return newCalendar;
     }
 
-    public void viewAllFsp(Scanner sc) {
+    public void viewAllFsp() {
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         try {
             List<FlightSchedulePlanEntity> listOfFsp = flightSchedulePlanSessionBean.viewAllFlightSchedulePlan();
@@ -493,8 +502,6 @@ public class FlightSchedulePlan {
 
     public void viewSpecificFsp(Scanner sc) {
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-//        System.out.print("Please enter the flight number: ");
-//        String flightNumber = sc.nextLine().trim();
         try {
             List<FlightSchedulePlanEntity> listOfFsp = flightSchedulePlanSessionBean.viewAllFlightSchedulePlan();
             System.out.println("=========FLIGHT SCHEDULE PLAN==========");
@@ -822,6 +829,81 @@ public class FlightSchedulePlan {
         } catch (FlightDoesNotExistException ex) {
             System.out.println(ex.getMessage());
         }
+    }
+
+    public void updateFsp(Scanner sc) {
+        boolean canEdit = false;
+        
+        viewAllFsp();
+        try {
+            System.out.println("Which Flight Schedule Plan would you like to edit (enter FSP ID) : ");
+            Long fspId = sc.nextLong();
+            sc.nextLine();
+
+            FlightSchedulePlanEntity fsp = flightSchedulePlanSessionBean.viewFlightSchedulePlan(fspId);
+
+            System.out.println("===================Flight Route Details===================");
+            System.out.printf("%-15s%-25s%-14s%-70s", "Flight ID", "Origin/Destination", "IATA Code", " Airport");
+            System.out.println();
+            System.out.println();
+            FlightRouteEntity fr = fsp.getFlightEntity().getFlightRoute();
+            String originLocation = fsp.getFlightEntity().getFlightRoute().getOriginLocation().getAirportName() + " in " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getCountry() + ", " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getCity();
+            String destinationLocation = fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName() + " in " + fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getCountry() + ", " + fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getCity();
+            System.out.printf("%-15s%-25s%-15s%-70s", fr.getFlightRouteId(), "Origin", fr.getOriginLocation().getIataAirportCode(), originLocation);
+            System.out.println();
+            System.out.printf("%-15s%-25s%-15s%-70s", fr.getFlightRouteId(), "Destination", fr.getDestinationLocation().getIataAirportCode(), destinationLocation);
+            System.out.println();
+            System.out.println();
+            System.out.println("============FLIGHT SCHEDULE=============");
+            System.out.println();
+            System.out.printf("%-30s%-30s%-30s", "Departure Date/Time", "Flight Duration", "Arrival Date/Time");
+            System.out.println();
+            for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
+                int flightMins = fs.getFlightDuration();
+                int flightHour = flightMins / 60;
+                flightMins %= 60;
+                String flightduration = flightHour + "hr " + flightMins + " mins";
+                System.out.printf("%-30s%-30s%-30s", format.format(fs.getDepartureDateTime().getTime()), flightduration, format.format(fs.getArrivalDateTime().getTime()));
+                System.out.println();
+            }
+
+            System.out.println();
+            System.out.println("-----Fares for Flight Schedule Plan-----");
+            for (FareEntity fare : fsp.getListOfFare()) {
+                System.out.printf("%-20s%-15s%-15s", "Fare basis code", "Fare amount", "Fare cabin type");
+                System.out.println();
+                System.out.printf("%-20s%-15.2f%-15s", fare.getFareBasisCode(), fare.getFareAmount(), fare.getCabinType());
+                System.out.println();
+            }
+            System.out.println();
+            System.out.println();
+            System.out.println();
+
+            System.out.println("What would you like to edit? ");
+            if (fsp instanceof SingleFlightScheduleEntity) {
+                System.out.println("1. Edit Flight Schedule");
+                System.out.println("2. Edit Fares");
+                int choice = sc.nextInt();
+
+                
+                //STOPPED HERE!!
+                if (choice == 1) {
+                    for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
+                         canEdit = flightScheduleSessionBean.checkFlightScheduleSeats(fs);
+                    }
+                }
+
+            } else if (fsp instanceof MultipleFlightScheduleEntity) {
+            } else if (fsp instanceof RecurringScheduleEntity) {
+            } else if (fsp instanceof RecurringWeeklyScheduleEntity) {
+            }
+
+        } catch (InputMismatchException ex) {
+            System.out.println("Wrong input for FSP ID!");
+        } catch (FlightSchedulePlanDoesNotExistException ex) {
+            System.out.println(ex.getMessage());
+        }
+
     }
 
 }

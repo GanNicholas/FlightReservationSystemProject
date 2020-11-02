@@ -22,4 +22,5 @@ public interface FlightScheduleSessionBeanRemote {
 
     public FlightScheduleEntity createFlightSchedule(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight) throws FlightScheduleExistException;
 
+    public boolean checkFlightScheduleSeats(FlightScheduleEntity fs);
 }
