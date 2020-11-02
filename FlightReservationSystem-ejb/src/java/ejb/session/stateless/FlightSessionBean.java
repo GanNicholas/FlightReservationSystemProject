@@ -9,9 +9,11 @@ import entity.AircraftConfigurationEntity;
 import entity.AirportEntity;
 import entity.FlightEntity;
 import entity.FlightRouteEntity;
+import entity.FlightScheduleEntity;
 import entity.FlightSchedulePlanEntity;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -211,11 +213,7 @@ public class FlightSessionBean implements FlightSessionBeanRemote, FlightSession
         }
     }
 
-    public List<FlightEntity> listOfFlightRecords(String tripType, String departureAirport, String destinationAirport, String departureDate, String returnDate, String passenger) {
-        Query query = em.createQuery("SELECT f FROM FlightEntity f WHERE f.listOfFlightSchedulePlan.listOfFlightSchedule.departureDateTime BETWEEN :=departureDate AND :=endDate").setParameter("departureDate", departureDate).setParameter("endDate", returnDate);
-        List<FlightEntity> listOfFlightRecord = query.getResultList();
-        return listOfFlightRecord;
-    }
+ 
 
     @Override
     public FlightEntity viewActiveFlight(String flightNumber) throws FlightIsDeletedException {

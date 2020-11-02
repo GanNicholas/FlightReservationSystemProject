@@ -51,16 +51,15 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
         } catch (NoResultException ex) {
             throw new FlightDoesNotExistException("Flight with flight number does not exist!");
         }
-        
+
         FlightSchedulePlanEntity fsp;
         if (listOfDepartureDateTime.size() == 1) {
             fsp = new SingleFlightScheduleEntity(flightNumber, false, flight);
         } else {
             fsp = new MultipleFlightScheduleEntity(flightNumber, false, flight);
         }
-        
-//        em.persist(fsp);
 
+//        em.persist(fsp);
         for (FareEntity fare : listOfFares) {
 //            em.persist(fare);
             fsp.getListOfFare().add(fare);
@@ -110,9 +109,8 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             for (FareEntity fare : listOfFares) {
                 returnFSP.getListOfFare().add(fare);
             }
-            
-//            em.persist(returnFSP);
 
+//            em.persist(returnFSP);
             // GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight
             for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
                 GregorianCalendar returnFlightDeparture = (GregorianCalendar) fs.getArrivalDateTime().clone();
@@ -139,7 +137,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             }
 
             fsp.setReturnFlightSchedulePlan(returnFSP);
-            
+
             em.persist(returnFSP);
             em.flush();
 
@@ -156,8 +154,10 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
     public String createRecurrentFlightSchedulePlan(String flightNumber, GregorianCalendar departureDateTime, GregorianCalendar endDate, Integer flightDuration, boolean createReturnFlightSchedule, List<FareEntity> listOfFares, Integer layover, Integer recurrency) throws FlightDoesNotExistException, FlightScheduleExistException {
         FlightEntity flight;
         try {
+            System.out.println("*******flightNumber******" + flightNumber);
             flight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
         } catch (NoResultException ex) {
+            System.out.println("*******error at top flightNumber******" + flightNumber);
             throw new FlightDoesNotExistException("Flight with flight number does not exist!");
         }
 
@@ -168,7 +168,6 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             fsp = new RecurringWeeklyScheduleEntity(flightNumber, false, flight, endDate);
         }
 
-        
         for (FareEntity fare : listOfFares) {
             fsp.getListOfFare().add(fare);
         }
@@ -181,6 +180,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
                 //link flight schedule to FSP
                 fsp.getListOfFlightSchedule().add(fe1);
             } catch (FlightScheduleExistException ex) {
+                System.out.println("*******in while flightNumber******" + flightNumber);
                 throw new FlightScheduleExistException(ex.getMessage());
             }
 
@@ -204,10 +204,16 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             AirportEntity origin = flight.getFlightRoute().getDestinationLocation();
             AirportEntity destination = flight.getFlightRoute().getOriginLocation();
             try {
+                System.out.println("*********airport id :" + origin);
                 FlightRouteEntity returnFlightRoute = (FlightRouteEntity) em.createNamedQuery("findFlightRoute").setParameter("origin", origin).setParameter("destination", destination).getSingleResult();
+                System.out.println("*********0 airport id :" + origin);
                 Long airportId = returnFlightRoute.getOriginLocation().getAirportId();
+                System.out.println("*********1 airport id :" + origin);
                 returnFlight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightRouteId").setParameter("airportId", airportId).getSingleResult();
+                System.out.println("*********2 airport id :" + origin);
+
             } catch (NoResultException ex) {
+                System.out.println("*********Error at return flight origin :" + origin);
                 throw new FlightDoesNotExistException("Flight does not exist!");
             }
 
@@ -218,9 +224,8 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             } else { //MUST CHECK RECURRENCY 7 OR LESSER
                 returnFSP = new RecurringWeeklyScheduleEntity(returnFlight.getFlightNumber(), false, returnFlight, endDate);
             }
-            
+
 //            em.persist(returnFSP);
-            
             for (FareEntity fare : listOfFares) {
                 returnFSP.getListOfFare().add(fare);
             }
@@ -250,7 +255,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             }
 
             fsp.setReturnFlightSchedulePlan(returnFSP);
-            
+
             em.persist(returnFSP);
             em.flush();
 

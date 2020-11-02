@@ -11,6 +11,7 @@ import entity.FlightScheduleEntity;
 import entity.FlightSchedulePlanEntity;
 import entity.SeatEntity;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import javax.annotation.Resource;
@@ -18,6 +19,7 @@ import javax.ejb.EJBContext;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import util.exception.FlightScheduleExistException;
 
 /**
@@ -97,6 +99,20 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
             }
         }
 
+    }
+       public List<FlightScheduleEntity> listOfConnectingFlightRecords(Date departureDate, Date endDate) {
+        Query query = em.createQuery("SELECT f FROM FlightScheduleEntity f WHERE f.departureDateTime BETWEEN :startDate AND :endDate").setParameter("startDate", departureDate).setParameter("endDate", endDate);
+        //+ "BETWEEN :=departureDate AND :=endDate").setParameter("departureDate", departureDate).setParameter("endDate", returnDate);
+        List<FlightScheduleEntity> listOfFlightRecord = query.getResultList();
+        return listOfFlightRecord;
+    }
+
+    public List<FlightScheduleEntity> listOfODQuery(String origin, String destination, Date departureDate, Date endDate) {
+        Query query = em.createQuery("SELECT f FROM FlightScheduleEntity f WHERE f.departureDateTime BETWEEN :startDate AND :endDate AND f.flightSchedulePlan.flightEntity.flightRoute.originLocation.iataAirportCode=:originIATA AND f.flightSchedulePlan.flightEntity.flightRoute.destinationLocation=:desIATA")
+                .setParameter("startDate", departureDate).setParameter("endDate", endDate).setParameter("originIATA", origin).setParameter("desIATA", destination);
+        //+ "BETWEEN :=departureDate AND :=endDate").setParameter("departureDate", departureDate).setParameter("endDate", returnDate);
+        List<FlightScheduleEntity> listOfFlightRecord = query.getResultList();
+        return listOfFlightRecord;
     }
 
 }
