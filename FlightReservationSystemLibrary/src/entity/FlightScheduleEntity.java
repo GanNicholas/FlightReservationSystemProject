@@ -37,6 +37,9 @@ public class FlightScheduleEntity implements Serializable {
     @Future
     private GregorianCalendar departureDateTime;
 
+    @Future
+    private GregorianCalendar arrivalDateTime;
+
     @Max(value = 480, message = "Maximum flight duration is 480 minutes (8 hours)!")
     @Positive
     private Integer flightDuration;
@@ -52,18 +55,20 @@ public class FlightScheduleEntity implements Serializable {
         seatingPlan = new ArrayList<SeatEntity>();
     }
 
-    public FlightScheduleEntity(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity flightSchedulePlan) {
+    public FlightScheduleEntity(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity flightSchedulePlan, GregorianCalendar arrivalDateTime) {
         this();
         this.departureDateTime = departureDateTime;
         this.flightDuration = flightDuration;
         this.flightSchedulePlan = flightSchedulePlan;
+        this.arrivalDateTime = arrivalDateTime;
     }
 
-    public FlightScheduleEntity(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity flightSchedulePlan, List<SeatEntity> seatingPlan) {
+    public FlightScheduleEntity(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity flightSchedulePlan, List<SeatEntity> seatingPlan, GregorianCalendar arrivalDateTime) {
         this.departureDateTime = departureDateTime;
         this.flightDuration = flightDuration;
         this.flightSchedulePlan = flightSchedulePlan;
         this.seatingPlan = seatingPlan;
+        this.arrivalDateTime = arrivalDateTime;
     }
 
     public FlightScheduleEntity(GregorianCalendar departureDateTime) {
@@ -101,10 +106,8 @@ public class FlightScheduleEntity implements Serializable {
     public GregorianCalendar getDepartureDateTime() {
         return departureDateTime;
     }
-    
-    public GregorianCalendar getArrivalDateTime(){
-        GregorianCalendar arrivalDateTime = (GregorianCalendar) departureDateTime.clone();
-        arrivalDateTime.add(GregorianCalendar.MINUTE, flightDuration);
+
+    public GregorianCalendar getArrivalDateTime() {
         return arrivalDateTime;
     }
 

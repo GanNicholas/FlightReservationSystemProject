@@ -128,7 +128,7 @@ public class FlightRoute {
             System.out.println("State: " + fr.getOriginLocation().getState());
             System.out.println("City: " + fr.getOriginLocation().getCity());
             System.out.println(String.format("Time Zone: %d hour(s) : %d minute(s)  ", fr.getOriginLocation().getTimeZoneHour(), fr.getOriginLocation().getTimeZoneMin()));*/
-            System.out.printf("%-40s %-5s %-17s %-20s %-15s %-1s %-1s %-1s %-1s", "Origin Location(IATA airport Code):", "", "Country", "State", "City", "Time", "Zone", "", "");
+            System.out.printf("%-40s %-5s %-17s %-20s %-15s %-1s %-1s %-1s %-1s", "Destination Location(IATA airport Code):", "", "Country", "State", "City", "Time", "Zone", "", "");
             System.out.println();
             System.out.printf("%-40s %-5s %-17s %-20s %-15s %-1s %-1s %-1s %-1s", fr.getDestinationLocation().getAirportName(), fr.getDestinationLocation().getIataAirportCode(), fr.getDestinationLocation().getCountry(), fr.getDestinationLocation().getState(), fr.getDestinationLocation().getCity(), fr.getDestinationLocation().getTimeZoneHour(), "hour(s)", fr.getDestinationLocation().getTimeZoneMin(), "min(s)");
             System.out.println();

@@ -10,6 +10,7 @@ import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.FlightRouteSessionBeanRemote;
 import ejb.session.stateless.FlightSchedulePlanSessionBeanRemote;
 import ejb.session.stateless.FlightSessionBeanRemote;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import util.enumeration.UserRole;
 import util.exception.CurrentlyLoggedInException;
@@ -83,8 +84,9 @@ public class RunApp {
                 System.out.println("2. Flight Operation");
                 System.out.println("3. Sales Management");
                 System.out.println("4. Log out");
-                String input = sc.nextLine().trim();
-                int choice = Integer.parseInt(input);
+                System.out.print("Please enter choice: ");
+                int choice = sc.nextInt();
+                sc.nextLine();
 
                 if (choice == 1) {
                     try {
@@ -142,8 +144,12 @@ public class RunApp {
                     break;
                 }
             }
-        } catch (NumberFormatException ex) {
-            System.out.println("You have invalid input.");
+        } catch (NumberFormatException | InputMismatchException ex) {
+            if (ex instanceof NumberFormatException) {
+                System.out.println("You have invalid input.");
+            } else {
+                System.out.println(ex.getMessage());
+            }
         }
     }
 }
