@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.FareEntity;
+import entity.FlightEntity;
 import entity.FlightSchedulePlanEntity;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -29,5 +30,11 @@ public interface FlightSchedulePlanSessionBeanRemote {
     public List<FlightSchedulePlanEntity> viewAllFlightSchedulePlan() throws FlightSchedulePlanIsEmptyException;
 
     public FlightSchedulePlanEntity viewFlightSchedulePlan(Long fspId) throws FlightSchedulePlanDoesNotExistException;
+
+    public void updateSingleFspDate(FlightEntity flight, GregorianCalendar newDepartureDateTime, FlightSchedulePlanEntity specificFsp) throws FlightSchedulePlanDoesNotExistException, FlightScheduleExistException, FlightDoesNotExistException;
+
+    public void mergeFSPForFare(FlightSchedulePlanEntity fsp) throws FlightSchedulePlanDoesNotExistException;
+
+    public void mergeFPSWithNewFlightDuration(int newFlightDuration, FlightSchedulePlanEntity fsp, GregorianCalendar updatedDepartureDateTime) throws FlightSchedulePlanDoesNotExistException, FlightScheduleExistException, FlightDoesNotExistException;
 
 }

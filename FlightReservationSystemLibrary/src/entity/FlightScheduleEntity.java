@@ -111,6 +111,10 @@ public class FlightScheduleEntity implements Serializable {
         return arrivalDateTime;
     }
 
+    public void setArrivalDateTime(GregorianCalendar arrivalDateTime) {
+        this.arrivalDateTime = arrivalDateTime;
+    }
+
     public void setDepartureDateTime(GregorianCalendar departureDateTime) {
         this.departureDateTime = departureDateTime;
     }

@@ -58,6 +58,7 @@ public class RunApp {
             System.out.println("------------------Login-----------------------");
             System.out.println("1. Log in ");
             System.out.println("2. Exit");
+            System.out.print("Please enter choice: ");
             int choice = sc.nextInt();
             sc.nextLine();
 

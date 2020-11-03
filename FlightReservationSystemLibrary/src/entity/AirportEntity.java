@@ -51,9 +51,11 @@ public class AirportEntity implements Serializable {
     private String city;
 
     @Max(value = 28, message = "Maximum time zone in hour  is 28!")
+    @Column(nullable = false)
     private Integer timeZoneHour;
 
     @Max(value = 59, message = "Maximum time zone in minute is 59!")
+    @Column(nullable = false)
     private Integer timeZoneMin;
 
     public AirportEntity() {

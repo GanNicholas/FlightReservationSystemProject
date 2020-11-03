@@ -833,7 +833,7 @@ public class FlightSchedulePlan {
 
     public void updateFsp(Scanner sc) {
         boolean canEdit = false;
-        
+
         viewAllFsp();
         try {
             System.out.println("Which Flight Schedule Plan would you like to edit (enter FSP ID) : ");
@@ -883,14 +883,90 @@ public class FlightSchedulePlan {
             if (fsp instanceof SingleFlightScheduleEntity) {
                 System.out.println("1. Edit Flight Schedule");
                 System.out.println("2. Edit Fares");
-                int choice = sc.nextInt();
+                int mainChoice = sc.nextInt();
 
-                
-                //STOPPED HERE!!
-                if (choice == 1) {
-                    for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
-                         canEdit = flightScheduleSessionBean.checkFlightScheduleSeats(fs);
+                if (mainChoice == 1) {
+                    FlightScheduleEntity fs = fsp.getListOfFlightSchedule().get(0);
+                    FlightScheduleEntity returnFs = null;
+                    boolean returnFlight = false;
+                    if (fs.getFlightSchedulePlan().getReturnFlightSchedulePlan() == null) { // one way flight
+                        canEdit = flightScheduleSessionBean.checkFlightScheduleSeats(fs);
+                    } else if (fs.getFlightSchedulePlan().getReturnFlightSchedulePlan() != null) { // two way flight
+                        canEdit = flightScheduleSessionBean.checkFlightScheduleSeats(fs);
+                        returnFs = fs.getFlightSchedulePlan().getReturnFlightSchedulePlan().getListOfFlightSchedule().get(0);
+                        canEdit = flightScheduleSessionBean.checkFlightScheduleSeats(returnFs);
+                        returnFlight = true;
                     }
+                    //means flight has existing reservations and cannot be edited
+                    if (canEdit == false) {
+                        System.out.println("Flight Schedule Plan has a flight schedule with reservations made! Changes can not longer be made!");
+                    } else {
+
+//                    for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
+//                        canEdit = flightScheduleSessionBean.checkFlightScheduleSeats(fs);
+//                        //means flight has existing reservations and cannot be edited
+//                        if (canEdit == false) {
+//                            System.out.println("Flight Schedule Plan has a flight schedule with reservations made! Changes can not longer be made!");
+//                            break;
+//                        }
+//                    }
+                        int fsChoice = 0;
+                        //means flight has no reservation, so can change
+                        while (fsChoice != 2) {
+                            System.out.println("What would you like to edit? ");
+                            System.out.println("1. Flight departure date/time and duration");
+                            System.out.println("2. Exit");
+                            System.out.print("Please enter choice: ");
+                            fsChoice = sc.nextInt();
+                            sc.nextLine();
+
+                            if (fsChoice == 1) {
+                                System.out.println();
+                                System.out.print("Please enter departure date and time (Please enter in this format: dd/mm/yyyy/hh/mm) ");
+                                String dateTime = sc.nextLine().trim();
+                                try {
+                                    GregorianCalendar departDateTime = createDateTime(dateTime);
+                                    Date date = departDateTime.getTime();
+                                    System.out.println(format.format(date));
+
+                                    System.out.println("Would you like to change flight duration as well? (press 'y' for yes)");
+                                    String choice = sc.nextLine().trim();
+
+                                    if (choice.toLowerCase().equals("y")) {
+
+                                        System.out.println("What is the new flight duration: ");
+                                        int newFlightDuration = sc.nextInt();
+                                        sc.nextLine();
+
+                                        flightSchedulePlanSessionBean.mergeFPSWithNewFlightDuration(newFlightDuration, fsp, departDateTime);
+                                        System.out.println("Update for date and duration successful!");
+                                        System.out.println();
+                                    } else {
+                                        //call fsp update method - if got return flight, run code to replace flight schedule
+                                        flightSchedulePlanSessionBean.updateSingleFspDate(fsp.getFlightEntity(), departDateTime, fsp);
+                                        System.out.println("Update for date successful!");
+                                        System.out.println();
+                                    }
+                                } catch (FlightScheduleExistException | FlightDoesNotExistException | IncorrectFormatException ex) {
+                                    System.out.println(ex.getMessage());
+                                }
+
+                            } else if (fsChoice == 3) { // update flight duration
+                                //FOR FARE CHANGE
+//                                System.out.println();
+//                                FlightEntity flight = fsp.getFlightEntity();
+//                                List<FareEntity> listOfFare = createFare(sc, flight);
+//                                fsp.getListOfFare().clear();
+//                                for(FareEntity fare : listOfFare){
+//                                    fsp.getListOfFare().add(fare);
+
+                            } else if (fsChoice != 2) {
+                                System.out.println("Invalid choice selected, please enter again!");
+                            }
+                        }
+                    }
+                } else if (mainChoice == 2) { // edit fare
+
                 }
 
             } else if (fsp instanceof MultipleFlightScheduleEntity) {

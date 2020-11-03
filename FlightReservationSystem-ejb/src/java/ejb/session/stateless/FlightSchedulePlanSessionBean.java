@@ -19,6 +19,8 @@ import entity.SingleFlightScheduleEntity;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -52,6 +54,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             throw new FlightDoesNotExistException("Flight with flight number does not exist!");
         }
 
+        flight.setLayOver(layover);
         FlightSchedulePlanEntity fsp;
         if (listOfDepartureDateTime.size() == 1) {
             fsp = new SingleFlightScheduleEntity(flightNumber, false, flight);
@@ -96,6 +99,8 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             } catch (NoResultException ex) {
                 throw new FlightDoesNotExistException("Flight does not exist!");
             }
+
+            returnFlight.setLayOver(layover);
 
             //create return FSP
             FlightSchedulePlanEntity returnFSP;
@@ -158,6 +163,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             throw new FlightDoesNotExistException("Flight with flight number does not exist!");
         }
 
+        flight.setLayOver(layover);
         FlightSchedulePlanEntity fsp;
         if (recurrency != 7) {
             fsp = new RecurringScheduleEntity(flightNumber, false, flight, endDate, recurrency);
@@ -205,6 +211,8 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             } catch (NoResultException ex) {
                 throw new FlightDoesNotExistException("Flight does not exist!");
             }
+
+            returnFlight.setLayOver(layover);
 
             //create return FSP
             FlightSchedulePlanEntity returnFSP;
@@ -336,10 +344,107 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
 
     }
 
-//    public boolean updateSingleFSP(SingleFlightScheduleEntity fsp){
-//        
-//        for(FlightScheduleEntity fs : fsp.getListOfFlightSchedule()){
-//            flightScheduleSessionBean.checkSchedules(arrivalDateTime, departureDateTime, flightNumber);
-//        }
-//    }
+    @Override
+    public void updateSingleFspDate(FlightEntity flight, GregorianCalendar newDepartureDateTime, FlightSchedulePlanEntity specificFsp) throws FlightSchedulePlanDoesNotExistException, FlightScheduleExistException, FlightDoesNotExistException {
+
+        specificFsp = viewFlightSchedulePlan(specificFsp.getFlightSchedulePlanId());
+
+        FlightScheduleEntity fs = specificFsp.getListOfFlightSchedule().get(0);
+
+        FlightScheduleEntity newFs = flightScheduleSessionBean.createFlightSchedule(newDepartureDateTime, fs.getFlightDuration(), specificFsp, flight);
+
+        GregorianCalendar replacementDepartDateTime = (GregorianCalendar) newFs.getDepartureDateTime().clone();
+        GregorianCalendar replacementArrivalDateTime = (GregorianCalendar) newFs.getArrivalDateTime().clone();
+
+        fs.setDepartureDateTime(replacementDepartDateTime);
+        fs.setArrivalDateTime(replacementArrivalDateTime);
+
+//        int indexOfOldFs = specificFsp.getListOfFlightSchedule().indexOf(fs);
+//        specificFsp.getListOfFlightSchedule().set(indexOfOldFs, fs);
+        //do i need to merge FS
+        flight = em.find(FlightEntity.class, flight.getFlightId());
+        if (flight == null) {
+            throw new FlightDoesNotExistException("Flight does not exist!");
+        }
+
+        //potential fault - flight unmanaged instancce
+        if (flight.getReturnFlight() != null) {
+            int flightDuration = fs.getFlightDuration();
+            int layOver = flight.getLayOver();
+
+            FlightEntity returnFlight = null;
+            try {
+                String flightNumber = specificFsp.getFlightNumber();
+                returnFlight = (FlightEntity) em.createNamedQuery("retrieveReturnFlightUsingMainFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
+            } catch (NoResultException ex) {
+                throw new FlightDoesNotExistException("Flight does not exist!");
+            }
+
+            FlightSchedulePlanEntity returnFSP = specificFsp.getReturnFlightSchedulePlan();
+            FlightScheduleEntity returnFs = returnFSP.getListOfFlightSchedule().get(0);
+
+            GregorianCalendar newReturnDepart = (GregorianCalendar) replacementArrivalDateTime.clone();
+            newReturnDepart.add(GregorianCalendar.MINUTE, layOver);
+
+            FlightScheduleEntity newReturnFs = flightScheduleSessionBean.createFlightSchedule(newReturnDepart, flightDuration, returnFSP, returnFlight);
+
+            newReturnDepart = (GregorianCalendar) newReturnFs.getDepartureDateTime().clone();
+            GregorianCalendar newReturnArrive = (GregorianCalendar) newReturnFs.getArrivalDateTime().clone();
+            returnFs.setDepartureDateTime(newReturnDepart);
+            returnFs.setArrivalDateTime(newReturnArrive);
+
+        }
+
+    }
+
+    @Override
+    public void mergeFSPForFare(FlightSchedulePlanEntity fsp) throws FlightSchedulePlanDoesNotExistException {
+        viewFlightSchedulePlan(fsp.getFlightSchedulePlanId());
+        em.merge(fsp);
+        em.flush();
+
+    }
+
+    @Override
+    public void mergeFPSWithNewFlightDuration(int newFlightDuration, FlightSchedulePlanEntity fsp, GregorianCalendar updatedDepartureDateTime) throws FlightSchedulePlanDoesNotExistException, FlightScheduleExistException, FlightDoesNotExistException {
+        fsp = viewFlightSchedulePlan(fsp.getFlightSchedulePlanId());
+        for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
+            FlightScheduleEntity newFs = flightScheduleSessionBean.createFlightSchedule(updatedDepartureDateTime, newFlightDuration, fsp, fsp.getFlightEntity());
+            GregorianCalendar newDepartureDateTime = (GregorianCalendar) newFs.getDepartureDateTime().clone();
+            GregorianCalendar newArrivalDateTime = (GregorianCalendar) newFs.getArrivalDateTime().clone();
+            fs.setFlightDuration(newFlightDuration);
+            fs.setDepartureDateTime(newDepartureDateTime);
+            fs.setArrivalDateTime(newArrivalDateTime);
+        }
+        FlightEntity returnFlight = null;
+        if (fsp.getFlightEntity().getReturnFlight() != null) {
+            try {
+                String flightNumber = fsp.getFlightNumber();
+                returnFlight = (FlightEntity) em.createNamedQuery("retrieveReturnFlightUsingMainFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
+            } catch (NoResultException ex) {
+                throw new FlightDoesNotExistException("Flight does not exist!");
+            }
+
+            int layover = fsp.getFlightEntity().getLayOver();
+
+            FlightSchedulePlanEntity returnFsp = fsp.getReturnFlightSchedulePlan();
+            // GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight
+            int index = 0;
+            for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
+                GregorianCalendar returnFlightDeparture = (GregorianCalendar) fs.getArrivalDateTime().clone();
+                returnFlightDeparture.add(GregorianCalendar.MINUTE, layover);
+                FlightScheduleEntity fe1 = flightScheduleSessionBean.createFlightSchedule(returnFlightDeparture, newFlightDuration, returnFsp, returnFlight);
+                //link flight schedule to FSP
+                FlightScheduleEntity returnFs = returnFsp.getListOfFlightSchedule().get(index);
+
+                GregorianCalendar newDepartDateTime = (GregorianCalendar) fe1.getDepartureDateTime().clone();
+                GregorianCalendar newArriveDateTime = (GregorianCalendar) fe1.getArrivalDateTime().clone();
+
+                returnFs.setDepartureDateTime(newDepartDateTime);
+                returnFs.setArrivalDateTime(newArriveDateTime);
+                returnFs.setFlightDuration(newFlightDuration);
+
+            }
+        }
+    }
 }
