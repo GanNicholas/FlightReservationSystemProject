@@ -36,10 +36,10 @@ public class FlightScheduleEntity implements Serializable {
 
     @Future
     private GregorianCalendar departureDateTime;
-
     @Future
     private GregorianCalendar arrivalDateTime;
 
+    private GregorianCalendar localArrivalTime;
     @Max(value = 480, message = "Maximum flight duration is 480 minutes (8 hours)!")
     @Positive
     private Integer flightDuration;
@@ -61,6 +61,7 @@ public class FlightScheduleEntity implements Serializable {
         this.flightDuration = flightDuration;
         this.flightSchedulePlan = flightSchedulePlan;
         this.arrivalDateTime = arrivalDateTime;
+
     }
 
     public FlightScheduleEntity(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity flightSchedulePlan, List<SeatEntity> seatingPlan, GregorianCalendar arrivalDateTime) {
@@ -71,8 +72,14 @@ public class FlightScheduleEntity implements Serializable {
         this.arrivalDateTime = arrivalDateTime;
     }
 
-    public FlightScheduleEntity(GregorianCalendar departureDateTime) {
-        this.departureDateTime = departureDateTime;
+    
+
+    public GregorianCalendar getLocalArrivalTime() {
+        return localArrivalTime;
+    }
+
+    public void setLocalArrivalTime(GregorianCalendar localArrivalTime) {
+        this.localArrivalTime = localArrivalTime;
     }
 
     public Long getFlightScheduleId() {
@@ -109,6 +116,10 @@ public class FlightScheduleEntity implements Serializable {
 
     public GregorianCalendar getArrivalDateTime() {
         return arrivalDateTime;
+    }
+
+    public void setArrivalDateTime(GregorianCalendar arrivalDateTime) {
+        this.arrivalDateTime = arrivalDateTime;
     }
 
     public void setDepartureDateTime(GregorianCalendar departureDateTime) {

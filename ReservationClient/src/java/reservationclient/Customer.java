@@ -17,6 +17,7 @@ import entity.FlightRouteEntity;
 import entity.FlightScheduleEntity;
 import entity.FlightSchedulePlanEntity;
 import entity.SingleFlightScheduleEntity;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -53,24 +54,44 @@ public class Customer {
         validator = validatorFactory.getValidator();
     }
 
-    public Customer(CustomerSessionBeanRemote customerSessionBean, FlightScheduleSessionBeanRemote flightSessionBean) {
+    public Customer(CustomerSessionBeanRemote customerSessionBean, FlightScheduleSessionBeanRemote flightScheduleSessionBean) {
         this();
         this.customerSessionBean = customerSessionBean;
         this.flightScheduleSessionBean = flightScheduleSessionBean;
     }
 
     public void runApp() {
+        try {
+            Scanner sc = new Scanner(System.in);
+            System.out.println("1. Register Customer");
+            System.out.println("2. Customer Login");
+            String input = sc.nextLine();
+            //while (true) {
+            if (input.equals("1")) {
+                registerCustomer();
+            } else if (input.equals("2")) {
+                boolean loginSuccessful = customerLogin();
+                if (loginSuccessful) {
+                    afterLoginPage();
+                }
+            }
+        } catch (NumberFormatException ex) {
+            System.out.println("You have invalid input.");
+            runApp();
+        }
+        //}
+    }
+
+    public void afterLoginPage() {
+        System.out.println("Welcome ");
         Scanner sc = new Scanner(System.in);
-        System.out.println("1. Register Customer");
-        System.out.println("2. Customer Login");
+        System.out.println("1. Seach for flight");
+        // System.out.println("2. Customer Login");
         String input = sc.nextLine();
         //while (true) {
         if (input.equals("1")) {
-            registerCustomer();
-        } else if (input.equals("2")) {
-            customerLogin();
+            searchFlight();
         }
-        //}
     }
 
     public void registerCustomer() {//need to do validation factory to for bean validation @unique for user name;
@@ -109,7 +130,7 @@ public class Customer {
         }
     }
 
-    public void customerLogin() {
+    public boolean customerLogin() {
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter your user name");
         String username = sc.nextLine();
@@ -120,15 +141,19 @@ public class Customer {
             if (username.length() > 5 && username.length() <= 16 && password.length() > 7 && password.length() <= 16) {
                 customer = customerSessionBean.customerLogin(username, password);
                 System.out.println("You have successfully login");
+                return true;
             } else {
                 System.out.println("Please fill in your login credential. Username should have at least 6 characters and maximum of 16 characters. Password should have at least 8 character and maximum of 16 characters");
+                return false;
             }
         } catch (CustomerLoginInvalid ex) {
             System.out.println("Invalid username or password. Please try again.");
         }
+
+        return false;
     }
 
-    public void SearchFlight() { // no validation yet
+    public void searchFlight() { // no validation yet
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter trip type:");
         String tripType = sc.nextLine();
@@ -142,7 +167,7 @@ public class Customer {
         String returnDate = sc.nextLine();
         System.out.println("Enter number of passenger:");
         String passenger = sc.nextLine();
-
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         LocalDate searchDate = null;
         String[] splitDepartDate = departureDate.split("/");
         if (splitDepartDate.length == 3) {
@@ -150,12 +175,97 @@ public class Customer {
         } else {
             System.out.println("You have invalid input");
         }
+
         LocalDate threeDayBeforeSearchDate = searchDate.minusDays(3);
-        LocalDate threeDayAftSearchDate = searchDate.minusDays(3);
+        LocalDate threeDayAftSearchDate = searchDate.plusDays(3);
         Date dateThreeDateBefore = Date.from(threeDayBeforeSearchDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Date dateThreeDateAfter = Date.from(threeDayAftSearchDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         List<FlightScheduleEntity> listOfFlightSchedules = flightScheduleSessionBean.listOfConnectingFlightRecords(dateThreeDateBefore, dateThreeDateAfter);
-        /* for (int i = 0; i < listOfFlight.size(); i++) {
+        List<FlightScheduleEntity> listOfSearchFlight = new ArrayList<FlightScheduleEntity>();
+        for (int i = 0; i < listOfFlightSchedules.size(); i++) {
+            for (int j = 0; j < listOfFlightSchedules.size(); j++) {
+                FlightSchedulePlanEntity iFsp = listOfFlightSchedules.get(i).getFlightSchedulePlan();
+                FlightSchedulePlanEntity jFsp = listOfFlightSchedules.get(j).getFlightSchedulePlan();
+
+                if (iFsp.getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode().equalsIgnoreCase(departureAirport)
+                        && iFsp.getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode().equalsIgnoreCase(jFsp.getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode())
+                        && jFsp.getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode().equalsIgnoreCase(destinationAirport)) {
+                    int firstFlightDesTimeZoneHr = iFsp.getFlightEntity().getFlightRoute().getOriginLocation().getTimeZoneHour();
+                    int firstFlightDesTimeZoneMin = iFsp.getFlightEntity().getFlightRoute().getOriginLocation().getTimeZoneMin();
+                    int secFlightDesTimeZoneHr = jFsp.getFlightEntity().getFlightRoute().getOriginLocation().getTimeZoneHour();
+                    int secFlightDesTimeZoneMin = jFsp.getFlightEntity().getFlightRoute().getOriginLocation().getTimeZoneMin();
+                    int flightDuration = listOfFlightSchedules.get(i).getFlightDuration();
+                    GregorianCalendar firstFlightActualTime = (GregorianCalendar) listOfFlightSchedules.get(i).getDepartureDateTime().clone();
+                    int convertFirstFlightToMin = 0;
+                    int convertSecFlightToMin = 0;
+                    int actualDiffTime = 0;
+                    if (firstFlightDesTimeZoneHr > 0) {
+                        convertFirstFlightToMin = firstFlightDesTimeZoneHr * 60;
+                    }
+                    convertFirstFlightToMin += convertFirstFlightToMin;
+                    convertFirstFlightToMin += firstFlightDesTimeZoneMin;
+                    convertFirstFlightToMin += flightDuration;
+                    if (secFlightDesTimeZoneHr > 0) {
+                        convertSecFlightToMin = secFlightDesTimeZoneHr * 60;
+                    }
+                    convertSecFlightToMin += secFlightDesTimeZoneMin;
+                    actualDiffTime = convertSecFlightToMin - convertFirstFlightToMin;
+
+                    firstFlightActualTime.add(GregorianCalendar.MINUTE, actualDiffTime);
+                    listOfFlightSchedules.get(i).setArrivalDateTime(firstFlightActualTime);
+                    System.out.println("Local time i :" + format.format(listOfFlightSchedules.get(i).getArrivalDateTime().getTime()));
+                    firstFlightActualTime.add(GregorianCalendar.MINUTE, 120);// 2h buffer time
+                    if (firstFlightActualTime.before(listOfFlightSchedules.get(j).getDepartureDateTime())) {
+                        int maxWaitingConnectingFlight = 22 * 60; // max conencting flight 24hr - 2 hr (buffer) - convert to mins
+                        firstFlightActualTime.add(GregorianCalendar.MINUTE, maxWaitingConnectingFlight);
+                        if (firstFlightActualTime.before(listOfFlightSchedules.get(j).getDepartureDateTime())) {
+                            //calculate local timing at 2nd destination
+                            int secDepartInMin = 0;
+                            int secArrInMin = 0;
+                            int secTotalDiff = 0;
+                            int secFlightDuration = listOfFlightSchedules.get(j).getFlightDuration();
+                            int secDepartTimeZoneMin = jFsp.getFlightEntity().getFlightRoute().getOriginLocation().getTimeZoneMin();
+                            int secDepartTimeZoneHr = jFsp.getFlightEntity().getFlightRoute().getOriginLocation().getTimeZoneHour();
+                            if (secDepartTimeZoneHr > 0) {
+                                secDepartInMin = secDepartTimeZoneHr * 60;
+                            }
+                            secDepartInMin += secDepartTimeZoneMin;
+                            secDepartInMin += secFlightDuration;
+
+                            int secArrTimeZoneMin = jFsp.getFlightEntity().getFlightRoute().getDestinationLocation().getTimeZoneMin();
+                            int secArrTimeZoneHr = jFsp.getFlightEntity().getFlightRoute().getDestinationLocation().getTimeZoneHour();
+                            if (secArrTimeZoneHr > 0) {
+                                secArrInMin = secArrTimeZoneHr * 60;
+                            }
+                            secArrInMin += secArrTimeZoneMin;
+                            secTotalDiff = secArrInMin - secDepartInMin;
+
+                            GregorianCalendar secFlightActualTime = (GregorianCalendar) listOfFlightSchedules.get(j).getDepartureDateTime().clone();
+                            secFlightActualTime.add(GregorianCalendar.MINUTE, secTotalDiff);
+                            listOfFlightSchedules.get(j).setArrivalDateTime(secFlightActualTime);
+                            listOfSearchFlight.add(listOfFlightSchedules.get(i));
+                            listOfSearchFlight.add(listOfFlightSchedules.get(j));
+                            System.out.println("Local time j :" + format.format(listOfFlightSchedules.get(j).getArrivalDateTime().getTime()));
+                        }
+                    }
+                }
+            }
+        }
+
+        /*test print
+        for (int i = 0; i < listOfFlightSchedules.size(); i += 2) {
+
+            FlightSchedulePlanEntity fsp = listOfFlightSchedules.get(i).getFlightSchedulePlan();
+            System.out.println("fsp flight number: " + fsp.getFlightNumber());
+
+            System.out.println(" O - D : " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode() + ":D:" + fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode());
+            SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+            String departDate = format.format(listOfFlightSchedules.get(i).getDepartureDateTime().getTime());
+            String arrivalDate = format.format(listOfFlightSchedules.get(i).getArrivalDateTime().getTime());
+            System.out.println("Depart" + departDate + ": Arrival" + arrivalDate);
+        }*/
+
+ /*for (int i = 0; i < listOfFlight.size(); i++) {
             for (int j = 0; j < listOfFlight.size(); j++) {
                 //if(listOfFlight.get(j).getFlightRoute().getDestinationLocation().equalsIgnoreCase(departureAirport) && listOfFlight.get(i).getFlightRoute().getOriginLocation().equals(listOfFlight.get(j).getFlightRoute().get)){
                 if (listOfFlight.get(i).getFlightRoute().getOriginLocation().equals(departureAirport) && listOfFlight.get(i).getFlightRoute().getDestinationLocation().equals(listOfFlight.get(j).getFlightRoute().getOriginLocation())
@@ -170,7 +280,7 @@ public class Customer {
             }
         }*/
         //Search for departure flight
-        List<FlightEntity> listOfConnectingDepartFlights = new ArrayList<FlightEntity>();
+        /* List<FlightEntity> listOfConnectingDepartFlights = new ArrayList<FlightEntity>();
         for (int i = 0; i < listOfFlightSchedules.size(); i++) {
             for (int j = 0; j < listOfFlightSchedules.size(); j++) {
                 FlightEntity fI = listOfFlightSchedules.get(i).getFlightSchedulePlan().getFlightEntity();
@@ -206,38 +316,38 @@ public class Customer {
                     if (departTimeBeforeArrive && timeWithin22hrsExclude2h) {
                         //add depart detail into list index (even)
                         FlightEntity firstFlight = fI;
-                        /*FlightRouteEntity fFlightFR = listOfFSP.get(i).getFlightEntity().getFlightRoute();
-                        FlightScheduleEntity firstFS = listOfFSP.get(i).getListOfFlightSchedule().get(k);
-                        FlightSchedulePlanEntity fFSP = listOfFSP.get(i).getListOfFlightSchedule().get(k).getFlightSchedulePlan();
-                        dFsp.getListOfFlightSchedule().add(dFs);
-                        departFlight.setFlightRoute(dFr);
-                        departFlight.getListOfFlightSchedulePlan().add(dFsp);
-                        listOfFlight.add(departFlight);*/
+                       
                         listOfConnectingDepartFlights.add(fI);
                         listOfConnectingDepartFlights.add(fJ);
                     }
 
                 }
             }
-        }
+        }*/
         //connecting flight
-        System.out.printf("%-15s %-30s %-30s %-15s %-15s ", "Flight Number ", " Origin Airport ", " Destination Airport ", "Departure Date", "Arriving Time");
-
-        for (int i = 0; i < listOfConnectingDepartFlights.size(); i += 2) {
+        System.out.printf("%-15s %-30s %-30s %-25s %-25s ", "Flight Number ", " Origin Airport ", " Destination Airport ", "Departure Date", "Arriving Time");
+        System.out.println();
+        for (int i = 0; i < listOfSearchFlight.size(); i += 2) {
+            System.out.println("====================================================================================================================================");
+            String firstDepartTime = format.format(listOfFlightSchedules.get(i).getArrivalDateTime().getTime());
+            String firstArrTime = format.format(listOfFlightSchedules.get(i).getDepartureDateTime().getTime());
+            System.out.printf("%-15s %-30s %-30s %-25s %-25s ", listOfSearchFlight.get(i).getFlightSchedulePlan().getFlightEntity().getFlightNumber(),
+                    listOfSearchFlight.get(i).getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getAirportName(),
+                    listOfSearchFlight.get(i).getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName(),
+                    firstDepartTime, firstArrTime);
             System.out.println();
-            System.out.printf("%-15s %-30s %-30s %-15s %-15s ", listOfConnectingDepartFlights.get(i).getFlightNumber(),
-                    listOfConnectingDepartFlights.get(i).getFlightRoute().getOriginLocation(), listOfConnectingDepartFlights.get(i).getFlightRoute().getDestinationLocation(),
-                    listOfConnectingDepartFlights.get(i).getListOfFlightSchedulePlan().get(0).getListOfFlightSchedule().get(0).getDepartureDateTime(),
-                    listOfConnectingDepartFlights.get(i).getListOfFlightSchedulePlan().get(0).getListOfFlightSchedule().get(0).getArrivalDateTime()
-            //,listOfConnectingDepartFlights.get(i).getListOfFlightSchedulePlan().get(0).getListOfFare().get(i)
-            );
             System.out.println();
-            System.out.printf("%-15s %-30s %-30s %-15s %-15s ", listOfConnectingDepartFlights.get(i + 1).getFlightNumber(),
-                    listOfConnectingDepartFlights.get(i + 1).getFlightRoute().getOriginLocation(), listOfConnectingDepartFlights.get(i + 1).getFlightRoute().getDestinationLocation(),
-                    listOfConnectingDepartFlights.get(i + 1).getListOfFlightSchedulePlan().get(0).getListOfFlightSchedule().get(0).getDepartureDateTime(),
-                    listOfConnectingDepartFlights.get(i + 1).getListOfFlightSchedulePlan().get(0).getListOfFlightSchedule().get(0).getArrivalDateTime()
-            //,listOfConnectingDepartFlights.get(i).getListOfFlightSchedulePlan().get(0).getListOfFare().get(i)
-            );
+            System.out.println("Connecting flight: ");
+            System.out.println();
+            System.out.println();
+            String secDepartTime = format.format(listOfFlightSchedules.get(i + 1).getDepartureDateTime().getTime());
+            String secArrTime = format.format(listOfFlightSchedules.get(i + 1).getArrivalDateTime().getTime());
+            System.out.printf("%-15s %-30s %-30s %-15s %-15s ", listOfSearchFlight.get(i + 1).getFlightSchedulePlan().getFlightEntity().getFlightNumber(),
+                    listOfSearchFlight.get(i + 1).getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getAirportName(),
+                    listOfSearchFlight.get(i + 1).getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName(),
+                    secDepartTime, secArrTime);
+            System.out.println();
+            System.out.println("========================================================================================================================================");
         }
 
         //Wrong retrieval  

@@ -18,6 +18,7 @@ import entity.FareEntity;
 import entity.FlightEntity;
 import entity.FlightRouteEntity;
 import entity.FlightScheduleEntity;
+import entity.FlightSchedulePlanEntity;
 import entity.PartnerEntity;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -260,9 +261,9 @@ public class DataInitSessionBean {
             int counterForFareBasis = 0;
             //1
             GregorianCalendar departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 05, 02, 00, 10, 0);
+            departureDateTime.set(2021, 04, 02, 00, 10, 0);
             GregorianCalendar endDate = new GregorianCalendar();
-            endDate.set(2021, 07, 02, 00, 10, 0);
+            endDate.set(2021, 05, 16, 00, 10, 0);
             List<FareEntity> listOfFare = new ArrayList<>();
             for (int i = 0; i < 2; i++) {
                 FareEntity fe = new FareEntity();
@@ -272,12 +273,12 @@ public class DataInitSessionBean {
                 listOfFare.add(fe);
                 counterForFareBasis++;
             }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML001", departureDateTime, endDate, 10, true, listOfFare, 600, 2);
+            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML001", departureDateTime, endDate, 100, false, listOfFare, 600, 2);
             //2
             departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 04, 01, 00, 10, 0);
+            departureDateTime.set(2021, 4, 01, 00, 10, 0);
             endDate = new GregorianCalendar();
-            endDate.set(2021, 07, 02, 00, 10, 0);
+            endDate.set(2021, 6, 02, 00, 10, 0);
             listOfFare = new ArrayList<>();
             for (int i = 0; i < 2; i++) {
                 FareEntity fe = new FareEntity();
@@ -287,12 +288,12 @@ public class DataInitSessionBean {
                 listOfFare.add(fe);
                 counterForFareBasis++;
             }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML002", departureDateTime, endDate, 2, true, listOfFare, 120, 3);
+            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML002", departureDateTime, endDate, 400, false, listOfFare, 120, 3);
             //3
             departureDateTime = new GregorianCalendar();
             departureDateTime.set(2021, 04, 01, 00, 10, 0);
             endDate = new GregorianCalendar();
-            endDate.set(2021, 07, 02, 00, 10, 0);
+            endDate.set(2021, 06, 02, 00, 10, 0);
             listOfFare = new ArrayList<>();
             for (int i = 0; i < 2; i++) {
                 FareEntity fe = new FareEntity();
@@ -302,13 +303,13 @@ public class DataInitSessionBean {
                 listOfFare.add(fe);
                 counterForFareBasis++;
             }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML003", departureDateTime, endDate, 10, true, listOfFare, 600, 5);
+            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML003", departureDateTime, endDate, 420, false, listOfFare, 600, 5);
 
             //4
             departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 05, 02, 00, 10, 0);
+            departureDateTime.set(2021, 04, 02, 00, 10, 0);
             endDate = new GregorianCalendar();
-            endDate.set(2021, 05, 02, 00, 10, 0);
+            endDate.set(2021, 04, 03, 16, 00, 0);
             listOfFare = new ArrayList<>();
             for (int i = 0; i < 2; i++) {
                 FareEntity fe = new FareEntity();
@@ -318,13 +319,13 @@ public class DataInitSessionBean {
                 listOfFare.add(fe);
                 counterForFareBasis++;
             }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML004", departureDateTime, endDate, 2, true, listOfFare, 240, 1);
+            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML004", departureDateTime, endDate, 450, false, listOfFare, 240, 1);
 
             //5
             departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 04, 01, 00, 10, 0);
+            departureDateTime.set(2021, 4, 01, 00, 10, 0);
             endDate = new GregorianCalendar();
-            endDate.set(2021, 07, 01, 00, 10, 0);
+            endDate.set(2021, 7, 01, 00, 10, 0);
             listOfFare = new ArrayList<>();
             for (int i = 0; i < 2; i++) {
                 FareEntity fe = new FareEntity();
@@ -334,13 +335,13 @@ public class DataInitSessionBean {
                 listOfFare.add(fe);
                 counterForFareBasis++;
             }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML005", departureDateTime, endDate, 3, true, listOfFare, 700, 3);
+            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML005", departureDateTime, endDate, 120, false, listOfFare, 700, 3);
 
             //6
             departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 05, 01, 00, 10, 0);
+            departureDateTime.set(2021, 04, 01, 00, 10, 0);
             endDate = new GregorianCalendar();
-            endDate.set(2021, 05, 14, 00, 10, 0);
+            endDate.set(2021, 04, 14, 00, 10, 0);
             listOfFare = new ArrayList<>();
             for (int i = 0; i < 2; i++) {
                 FareEntity fe = new FareEntity();
@@ -350,13 +351,13 @@ public class DataInitSessionBean {
                 listOfFare.add(fe);
                 counterForFareBasis++;
             }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML006", departureDateTime, endDate, 12, true, listOfFare, 700, 1);
+            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML006", departureDateTime, endDate, 470, false, listOfFare, 700, 1);
 
             //7
             departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 05, 19, 00, 10, 0);
+            departureDateTime.set(2021, 04, 05, 00, 10, 0);
             endDate = new GregorianCalendar();
-            endDate.set(2021, 05, 19, 00, 10, 0);
+            endDate.set(2021, 04, 19, 00, 10, 0);
             listOfFare = new ArrayList<>();
             for (int i = 0; i < 2; i++) {
                 FareEntity fe = new FareEntity();
@@ -366,13 +367,13 @@ public class DataInitSessionBean {
                 listOfFare.add(fe);
                 counterForFareBasis++;
             }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML007", departureDateTime, endDate, 6, true, listOfFare, 200, 1);
+            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML007", departureDateTime, endDate, 300, false, listOfFare, 200, 1);
 
-            //7
+            //8
             departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 05, 05, 19, 10, 0);
+            departureDateTime.set(2021, 04, 06, 19, 10, 0);
             endDate = new GregorianCalendar();
-            endDate.set(2021, 05, 19, 00, 19, 0);
+            endDate.set(2021, 04, 19, 00, 19, 0);
             listOfFare = new ArrayList<>();
             for (int i = 0; i < 2; i++) {
                 FareEntity fe = new FareEntity();
@@ -382,13 +383,13 @@ public class DataInitSessionBean {
                 listOfFare.add(fe);
                 counterForFareBasis++;
             }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML008", departureDateTime, endDate, 10, true, listOfFare, 200, 3);
+            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML008", departureDateTime, endDate, 420, false, listOfFare, 200, 3);
 
             //9
-            /*  departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 05, 07, 8, 10, 0);
+            departureDateTime = new GregorianCalendar();
+            departureDateTime.set(2021, 04, 07, 8, 10, 0);
             endDate = new GregorianCalendar();
-            endDate.set(2021, 05, 19, 00, 19, 0);
+            endDate.set(2021, 04, 21, 00, 19, 0);
             listOfFare = new ArrayList<>();
             for (int i = 0; i < 2; i++) {
                 FareEntity fe = new FareEntity();
@@ -398,7 +399,7 @@ public class DataInitSessionBean {
                 listOfFare.add(fe);
                 counterForFareBasis++;
             }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML009", departureDateTime, endDate, 10, true, listOfFare, 200, 3);*/
+            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML009", departureDateTime, endDate, 300, true, listOfFare, 200, 3);
         } catch (FlightScheduleExistException ex) {
             System.out.println("FlightScheduleExistException went wrong at fsp");
         } catch (FlightDoesNotExistException ex) {

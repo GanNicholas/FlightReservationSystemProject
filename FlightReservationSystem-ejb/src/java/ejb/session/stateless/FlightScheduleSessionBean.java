@@ -10,6 +10,7 @@ import entity.FlightEntity;
 import entity.FlightScheduleEntity;
 import entity.FlightSchedulePlanEntity;
 import entity.SeatEntity;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -20,6 +21,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 import util.exception.FlightScheduleExistException;
 
 /**
@@ -45,7 +47,7 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         int departTimeZone = (originAirport.getTimeZoneHour() * 60) + originAirport.getTimeZoneMin();
         int arriveTimeZone = (destinationAirport.getTimeZoneHour() * 60) + destinationAirport.getTimeZoneMin();
         int timeDiff = arriveTimeZone - departTimeZone;
-  
+
         GregorianCalendar arrivalDateTime = (GregorianCalendar) departureDateTime.clone();
         arrivalDateTime.add(GregorianCalendar.MINUTE, flightDuration);
         arrivalDateTime.add(GregorianCalendar.MINUTE, timeDiff);
@@ -89,7 +91,6 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
                 boolean newDepartureBeforeOldDepart = tempFSPDepartureDate.after(departureDateTime);
                 boolean newArriveAfterOldArrive = tempFSPArrivalDate.before(arrivalDateTime);
                 boolean newDepartAfterOldArrive = tempFSPArrivalDate.before(departureDateTime);
-
                 if (!((newArriveBeforeOldDepart && newDepartureBeforeOldDepart) || (newArriveAfterOldArrive && newDepartAfterOldArrive))) {
                     eJBContext.setRollbackOnly();
                     throw new FlightScheduleExistException("Flight Schedule has conflict with existing flight schedule!");
@@ -99,10 +100,27 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         }
 
     }
-       public List<FlightScheduleEntity> listOfConnectingFlightRecords(Date departureDate, Date endDate) {
-        Query query = em.createQuery("SELECT f FROM FlightScheduleEntity f WHERE f.departureDateTime BETWEEN :startDate AND :endDate").setParameter("startDate", departureDate).setParameter("endDate", endDate);
+
+    public List<FlightScheduleEntity> listOfConnectingFlightRecords(Date departureDate, Date endDate) {
+        GregorianCalendar gDepart = new GregorianCalendar();
+        gDepart.setTime(departureDate);
+
+        GregorianCalendar gEndDate = new GregorianCalendar();
+        gEndDate.setTime(endDate);
+        gEndDate.add(GregorianCalendar.HOUR_OF_DAY, 23);
+
+
+        /* SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        String strEndDate = format.format(gEndDate.getTime());
+       System.out.println("**************strEndDate *********** = " + strEndDate);
+        String strDepart = format.format(gDepart.getTime());
+        System.out.println("strDepart = " + strDepart);
+        System.out.println("**************Came into List of connectin **********");*/
+        Query query = em.createQuery("SELECT f FROM FlightScheduleEntity f WHERE f.departureDateTime BETWEEN :startDate AND :endDate").setParameter("startDate", gDepart).setParameter("endDate", gEndDate);
         //+ "BETWEEN :=departureDate AND :=endDate").setParameter("departureDate", departureDate).setParameter("endDate", returnDate);
         List<FlightScheduleEntity> listOfFlightRecord = query.getResultList();
+        listOfFlightRecord.size();
+        System.out.println("*********************listOfFlightRecord.size():*****************************" + listOfFlightRecord.size());
         return listOfFlightRecord;
     }
 
