@@ -79,11 +79,11 @@ public class AircraftConfiguration {
         AircraftConfigurationEntity aircraftConfigurationEntity = new AircraftConfigurationEntity();
         boolean isValidationPassed = true;
         //aircraftconfig name and aircraft type
-        System.out.println("Please enter the aircraft name:");
+        System.out.print("Please enter the aircraft name:  ");
         String aircraftName = sc.nextLine();
-        System.out.println("Please enter the aircraft type:");
+        System.out.print("Please enter the aircraft type:  ");
         String aircraftType = sc.nextLine();
-        System.out.println("Please enter the maximum number of seatings:");
+        System.out.print("Please enter the maximum number of seatings:  ");
         int maxSeatingCapacity = sc.nextInt();
         String buffer = sc.nextLine();
         aircraftConfigurationEntity.setAircraftName(aircraftName);
@@ -126,7 +126,7 @@ public class AircraftConfiguration {
                 String cabinType = sc.nextLine();
                 while (Integer.parseInt(cabinType) > 4 && Integer.parseInt(cabinType) <= 0) {
                     System.out.println("Invalid cabin type!");
-                    System.out.println("Do you wish to continue ? Yes/No");
+                    System.out.print("Do you wish to continue ? Yes/No  ");
                     String cabinType_YN = sc.nextLine();
                     if (cabinType_YN.equalsIgnoreCase("Yes")) {
                         System.out.println("Cabin class: ");
@@ -135,7 +135,7 @@ public class AircraftConfiguration {
                         System.out.println("2. Business class");
                         System.out.println("3. Premium economy class");
                         System.out.println("4. Economy class");
-                        System.out.println("Please enter the cabin type:");
+                        System.out.print("Please enter the cabin type:  ");
                         cabinType = sc.nextLine();
                     } else if (cabinType_YN.equalsIgnoreCase("No")) {
                         brokenFromCabinType = true;
@@ -144,12 +144,12 @@ public class AircraftConfiguration {
 
                 }
                 if (!brokenFromCabinType) {
-                    System.out.println("Please enter the number of aisles:");
+                    System.out.print("Please enter the number of aisles:  ");
                     int noOfAisle = sc.nextInt();
-                    System.out.println("Please enter the number of row:");
+                    System.out.print("Please enter the number of row:  ");
                     int numRows = sc.nextInt();
                     buffer = sc.nextLine();
-                    System.out.println("Please enter the actual seating configuration per column (i.e. 3-4-3):");
+                    System.out.print("Please enter the actual seating configuration per column (i.e. 3-4-3):  ");
                     String seatingConfig = sc.nextLine();
 
                     if (cabinType.equalsIgnoreCase("1")) {
@@ -209,7 +209,7 @@ public class AircraftConfiguration {
 
                     }
 
-                    System.out.println("Do you wish to add more cabin class? Yes/No");
+                    System.out.print("Do you wish to add more cabin class? Yes/No  ");
                     String addMoreCabin = sc.nextLine();
                     if (!addMoreCabin.equalsIgnoreCase("Yes")) {
                         break;

@@ -101,6 +101,17 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
 
     }
 
+    //checks if flight has been booked by anyone
+    @Override
+    public boolean checkFlightScheduleSeats(FlightScheduleEntity fs) {
+        for (SeatEntity seat : fs.getSeatingPlan()) {
+            if (seat.getPassenger() != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public List<FlightScheduleEntity> listOfConnectingFlightRecords(Date departureDate, Date endDate) {
         GregorianCalendar gDepart = new GregorianCalendar();
         gDepart.setTime(departureDate);

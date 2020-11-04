@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.FlightEntity;
 import entity.FlightScheduleEntity;
 import entity.FlightSchedulePlanEntity;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -22,6 +23,8 @@ import util.exception.FlightScheduleExistException;
 public interface FlightScheduleSessionBeanRemote {
 
     public FlightScheduleEntity createFlightSchedule(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight) throws FlightScheduleExistException;
+
+    public boolean checkFlightScheduleSeats(FlightScheduleEntity fs);
 
     public List<FlightScheduleEntity> listOfODQuery(String origin, String destination, Date departureDate, Date endDate);
 

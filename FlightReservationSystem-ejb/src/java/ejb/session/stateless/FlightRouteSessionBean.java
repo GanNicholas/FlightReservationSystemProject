@@ -99,11 +99,11 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
 
     public boolean checkFlightRouteUsedByOthers(Long id) {
 
-        try {
-            Query query = em.createQuery("SELECT f FROM FlightEntity f where f.flightRoute.flightRouteId = :flightRouteId").setParameter("flightRouteId", id);
-            FlightEntity flight = (FlightEntity) query.getSingleResult();
+        Query query = em.createQuery("SELECT f FROM FlightEntity f where f.flightRoute.flightRouteId = :flightRouteId").setParameter("flightRouteId", id);
+        List<FlightEntity> flight = query.getResultList();
+        if (!flight.isEmpty()) {
             return true;
-        } catch (NoResultException ex) {
+        } else {
             return false;
         }
 

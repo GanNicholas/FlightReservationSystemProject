@@ -190,62 +190,16 @@ public class Customer {
                 if (iFsp.getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode().equalsIgnoreCase(departureAirport)
                         && iFsp.getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode().equalsIgnoreCase(jFsp.getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode())
                         && jFsp.getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode().equalsIgnoreCase(destinationAirport)) {
-                    int firstFlightDesTimeZoneHr = iFsp.getFlightEntity().getFlightRoute().getOriginLocation().getTimeZoneHour();
-                    int firstFlightDesTimeZoneMin = iFsp.getFlightEntity().getFlightRoute().getOriginLocation().getTimeZoneMin();
-                    int secFlightDesTimeZoneHr = jFsp.getFlightEntity().getFlightRoute().getOriginLocation().getTimeZoneHour();
-                    int secFlightDesTimeZoneMin = jFsp.getFlightEntity().getFlightRoute().getOriginLocation().getTimeZoneMin();
-                    int flightDuration = listOfFlightSchedules.get(i).getFlightDuration();
-                    GregorianCalendar firstFlightActualTime = (GregorianCalendar) listOfFlightSchedules.get(i).getDepartureDateTime().clone();
-                    int convertFirstFlightToMin = 0;
-                    int convertSecFlightToMin = 0;
-                    int actualDiffTime = 0;
-                    if (firstFlightDesTimeZoneHr > 0) {
-                        convertFirstFlightToMin = firstFlightDesTimeZoneHr * 60;
-                    }
-                    convertFirstFlightToMin += convertFirstFlightToMin;
-                    convertFirstFlightToMin += firstFlightDesTimeZoneMin;
-                    convertFirstFlightToMin += flightDuration;
-                    if (secFlightDesTimeZoneHr > 0) {
-                        convertSecFlightToMin = secFlightDesTimeZoneHr * 60;
-                    }
-                    convertSecFlightToMin += secFlightDesTimeZoneMin;
-                    actualDiffTime = convertSecFlightToMin - convertFirstFlightToMin;
-
-                    firstFlightActualTime.add(GregorianCalendar.MINUTE, actualDiffTime);
-                    listOfFlightSchedules.get(i).setArrivalDateTime(firstFlightActualTime);
-                    System.out.println("Local time i :" + format.format(listOfFlightSchedules.get(i).getArrivalDateTime().getTime()));
-                    firstFlightActualTime.add(GregorianCalendar.MINUTE, 120);// 2h buffer time
-                    if (firstFlightActualTime.before(listOfFlightSchedules.get(j).getDepartureDateTime())) {
+                    GregorianCalendar firstFlightArrTime = (GregorianCalendar) listOfFlightSchedules.get(i).getArrivalDateTime().clone();
+                    GregorianCalendar secFlightDepartTime = (GregorianCalendar) listOfFlightSchedules.get(j).getDepartureDateTime().clone();
+                    firstFlightArrTime.add(GregorianCalendar.MINUTE, 120);// 2h buffer time
+                    if (firstFlightArrTime.before(secFlightDepartTime)) {
                         int maxWaitingConnectingFlight = 22 * 60; // max conencting flight 24hr - 2 hr (buffer) - convert to mins
-                        firstFlightActualTime.add(GregorianCalendar.MINUTE, maxWaitingConnectingFlight);
-                        if (firstFlightActualTime.before(listOfFlightSchedules.get(j).getDepartureDateTime())) {
-                            //calculate local timing at 2nd destination
-                            int secDepartInMin = 0;
-                            int secArrInMin = 0;
-                            int secTotalDiff = 0;
-                            int secFlightDuration = listOfFlightSchedules.get(j).getFlightDuration();
-                            int secDepartTimeZoneMin = jFsp.getFlightEntity().getFlightRoute().getOriginLocation().getTimeZoneMin();
-                            int secDepartTimeZoneHr = jFsp.getFlightEntity().getFlightRoute().getOriginLocation().getTimeZoneHour();
-                            if (secDepartTimeZoneHr > 0) {
-                                secDepartInMin = secDepartTimeZoneHr * 60;
-                            }
-                            secDepartInMin += secDepartTimeZoneMin;
-                            secDepartInMin += secFlightDuration;
+                        firstFlightArrTime.add(GregorianCalendar.MINUTE, maxWaitingConnectingFlight);
+                        if (firstFlightArrTime.before(listOfFlightSchedules.get(j).getDepartureDateTime())) {
 
-                            int secArrTimeZoneMin = jFsp.getFlightEntity().getFlightRoute().getDestinationLocation().getTimeZoneMin();
-                            int secArrTimeZoneHr = jFsp.getFlightEntity().getFlightRoute().getDestinationLocation().getTimeZoneHour();
-                            if (secArrTimeZoneHr > 0) {
-                                secArrInMin = secArrTimeZoneHr * 60;
-                            }
-                            secArrInMin += secArrTimeZoneMin;
-                            secTotalDiff = secArrInMin - secDepartInMin;
-
-                            GregorianCalendar secFlightActualTime = (GregorianCalendar) listOfFlightSchedules.get(j).getDepartureDateTime().clone();
-                            secFlightActualTime.add(GregorianCalendar.MINUTE, secTotalDiff);
-                            listOfFlightSchedules.get(j).setArrivalDateTime(secFlightActualTime);
                             listOfSearchFlight.add(listOfFlightSchedules.get(i));
                             listOfSearchFlight.add(listOfFlightSchedules.get(j));
-                            System.out.println("Local time j :" + format.format(listOfFlightSchedules.get(j).getArrivalDateTime().getTime()));
                         }
                     }
                 }
