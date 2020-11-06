@@ -7,11 +7,15 @@ package ejb.session.stateless;
 
 import entity.FareEntity;
 import entity.FlightEntity;
+import entity.FlightScheduleEntity;
 import entity.FlightSchedulePlanEntity;
 import java.util.GregorianCalendar;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.FareCannotBeDeletedException;
+import util.exception.FareDoesNotExistException;
 import util.exception.FlightDoesNotExistException;
+import util.exception.FlightScheduleDoesNotExistException;
 import util.exception.FlightScheduleExistException;
 import util.exception.FlightSchedulePlanDoesNotExistException;
 import util.exception.FlightSchedulePlanIsEmptyException;
@@ -31,10 +35,25 @@ public interface FlightSchedulePlanSessionBeanRemote {
 
     public FlightSchedulePlanEntity viewFlightSchedulePlan(Long fspId) throws FlightSchedulePlanDoesNotExistException;
 
-    public void updateSingleFspDate(FlightEntity flight, GregorianCalendar newDepartureDateTime, FlightSchedulePlanEntity specificFsp) throws FlightSchedulePlanDoesNotExistException, FlightScheduleExistException, FlightDoesNotExistException;
+    public void updateSingleFspDate(FlightEntity flight, GregorianCalendar newDepartureDateTime, FlightSchedulePlanEntity specificFsp, FlightScheduleEntity fs) throws FlightSchedulePlanDoesNotExistException, FlightScheduleExistException, FlightDoesNotExistException;
 
     public void mergeFSPForFare(FlightSchedulePlanEntity fsp) throws FlightSchedulePlanDoesNotExistException;
 
-    public void mergeFPSWithNewFlightDuration(int newFlightDuration, FlightSchedulePlanEntity fsp, GregorianCalendar updatedDepartureDateTime) throws FlightSchedulePlanDoesNotExistException, FlightScheduleExistException, FlightDoesNotExistException;
+    public void mergeFSPWithNewFlightDuration(int newFlightDuration, FlightSchedulePlanEntity fsp, GregorianCalendar updatedDepartureDateTime, FlightScheduleEntity fs) throws FlightSchedulePlanDoesNotExistException, FlightScheduleExistException, FlightDoesNotExistException;
 
+    public void addNewFlightSchedule(GregorianCalendar departureDateTime, FlightSchedulePlanEntity fsp) throws FlightSchedulePlanDoesNotExistException, FlightScheduleExistException;
+
+    public FlightScheduleEntity getFlightScheduleUsingID(Long fsId) throws FlightScheduleDoesNotExistException;
+
+    public void deleteFlightSchedule(Long fsId) throws FlightScheduleDoesNotExistException;
+
+    public FareEntity retrieveFare(Long fareId) throws FareDoesNotExistException;
+
+    public void mergeFare(FareEntity fare) throws FareDoesNotExistException;
+
+    public void deleteFare(Long fareId, FlightSchedulePlanEntity fsp) throws FareDoesNotExistException, FlightSchedulePlanDoesNotExistException, FareCannotBeDeletedException;
+    
+    public void updateRecurrentFSP(String flightNumber, GregorianCalendar departureDateTime, GregorianCalendar endDate, Integer flightDuration, Integer recurrency, FlightSchedulePlanEntity currentFsp) throws FlightDoesNotExistException, FlightScheduleExistException, FlightSchedulePlanDoesNotExistException;
+    
+    
 }

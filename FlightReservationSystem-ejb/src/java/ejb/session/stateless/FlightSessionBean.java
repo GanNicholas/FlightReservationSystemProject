@@ -208,13 +208,51 @@ public class FlightSessionBean implements FlightSessionBeanRemote, FlightSession
             List<FlightSchedulePlanEntity> listOfFlightSchedulePlan = em.createNamedQuery("queryFSPwithFlightNumber").setParameter("flightNum", flightNumber).getResultList();
 
             if (listOfFlightSchedulePlan.isEmpty()) {
-                flight.setReturnFlight(null);
-                flight.setFlightRoute(null);
-                flight.setAircraftConfig(null);
-                em.remove(flight);
-                return true;
-            } else {
-                flight.setIsDeleted(true);
+                if (flight.isIsMainRoute()) { //delete main route
+                    if (flight.getReturnFlight() != null) {
+                        FlightEntity returnFlight = flight.getReturnFlight();
+                        returnFlight.setIsMainRoute(true);
+                        returnFlight.setReturnFlight(null);
+                    }
+
+                    flight.setReturnFlight(null);
+                    flight.setFlightRoute(null);
+                    flight.setAircraftConfig(null);
+                    em.remove(flight);
+                    return true;
+                } else { // delete return route
+                    if (flight.getReturnFlight() != null) {
+                        FlightEntity mainFlight = flight.getReturnFlight();
+                        mainFlight.setReturnFlight(null);
+                        flight.setReturnFlight(null);
+                    }
+
+                    flight.setFlightRoute(null);
+                    flight.setAircraftConfig(null);
+                    em.remove(flight);
+                    return true;
+                }
+
+            } else { // only can mark as deleted
+                if (flight.isIsMainRoute()) {
+                    flight.setIsDeleted(true);
+                    if (flight.getReturnFlight() != null) {
+                        FlightEntity returnFlight = flight.getReturnFlight();
+                        returnFlight.setIsMainRoute(true);
+                        returnFlight.setReturnFlight(null);
+                    }
+
+                    flight.setReturnFlight(null);
+
+                } else {
+                    flight.setIsDeleted(true);
+                    if (flight.getReturnFlight() != null) {
+                        FlightEntity mainFlight = flight.getReturnFlight();
+                        mainFlight.setReturnFlight(null);
+                    }
+                    flight.setReturnFlight(null);
+                }
+
                 return false;
             }
         } catch (NoResultException ex) {
