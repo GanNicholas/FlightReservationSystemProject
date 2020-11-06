@@ -35,7 +35,7 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
     @Override
     public Long createFlightRoute(String oIATA, String dIATA, String returnFlight) throws FlightRouteODPairExistException, AirportODPairNotFoundException {
         FlightRouteEntity flightRoute = new FlightRouteEntity();
-        System.out.println("-------------------------O:" + oIATA + "---------------dIATA  : " + dIATA);
+
         try {
             boolean frExistInDB = checkFlightRouteOD(oIATA, dIATA);
             //check origin exist in airportentity
@@ -43,10 +43,10 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
 
                 Query oQuery = em.createQuery("SELECT a FROM AirportEntity a where a.iataAirportCode=:origin").setParameter("origin", oIATA);
                 AirportEntity oAirport = (AirportEntity) oQuery.getSingleResult();
-                System.out.println("-----------------OAir:" + oAirport.getAirportId());
+                //System.out.println("-----------------OAir:" + oAirport.getAirportId());
                 Query dQuery = em.createQuery("SELECT a FROM AirportEntity a where a.iataAirportCode=:origin").setParameter("origin", dIATA);
                 AirportEntity dAirport = (AirportEntity) dQuery.getSingleResult();
-                System.out.println("-----------------OAir:" + dAirport.getAirportId());
+                //System.out.println("-----------------OAir:" + dAirport.getAirportId());
                 flightRoute.setOriginLocation(oAirport);
                 flightRoute.setDestinationLocation(dAirport);
                 flightRoute.setIsDeleted(false);
@@ -99,11 +99,11 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
 
     public boolean checkFlightRouteUsedByOthers(Long id) {
 
-        try {
-            Query query = em.createQuery("SELECT f FROM FlightEntity f where f.flightRoute.flightRouteId = :flightRouteId").setParameter("flightRouteId", id);
-            FlightEntity flight = (FlightEntity) query.getSingleResult();
+        Query query = em.createQuery("SELECT f FROM FlightEntity f where f.flightRoute.flightRouteId = :flightRouteId").setParameter("flightRouteId", id);
+        List<FlightEntity> flight = query.getResultList();
+        if (!flight.isEmpty()) {
             return true;
-        } catch (NoResultException ex) {
+        } else {
             return false;
         }
 

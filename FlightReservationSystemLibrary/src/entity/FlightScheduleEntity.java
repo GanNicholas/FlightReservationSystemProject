@@ -36,7 +36,6 @@ public class FlightScheduleEntity implements Serializable {
 
     @Future
     private GregorianCalendar departureDateTime;
-
     @Future
     private GregorianCalendar arrivalDateTime;
 
@@ -61,6 +60,7 @@ public class FlightScheduleEntity implements Serializable {
         this.flightDuration = flightDuration;
         this.flightSchedulePlan = flightSchedulePlan;
         this.arrivalDateTime = arrivalDateTime;
+
     }
 
     public FlightScheduleEntity(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity flightSchedulePlan, List<SeatEntity> seatingPlan, GregorianCalendar arrivalDateTime) {
@@ -69,10 +69,6 @@ public class FlightScheduleEntity implements Serializable {
         this.flightSchedulePlan = flightSchedulePlan;
         this.seatingPlan = seatingPlan;
         this.arrivalDateTime = arrivalDateTime;
-    }
-
-    public FlightScheduleEntity(GregorianCalendar departureDateTime) {
-        this.departureDateTime = departureDateTime;
     }
 
     public Long getFlightScheduleId() {

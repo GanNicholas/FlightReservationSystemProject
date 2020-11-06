@@ -8,6 +8,8 @@ package ejb.session.stateless;
 import entity.AircraftConfigurationEntity;
 import entity.FlightEntity;
 import entity.FlightRouteEntity;
+import entity.FlightScheduleEntity;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.AircraftConfigurationNotExistException;
@@ -37,7 +39,6 @@ public interface FlightSessionBeanRemote {
 
     public boolean deleteFlight(String flightNumber) throws FlightDoesNotExistException;
 
-    public List<FlightEntity> listOfFlightRecords(String tripType, String departureAirport, String destinationAirport, String departureDate, String returnDate, String passenger);
-
     public FlightEntity viewActiveFlight(String flightNumber) throws FlightIsDeletedException;
+
 }

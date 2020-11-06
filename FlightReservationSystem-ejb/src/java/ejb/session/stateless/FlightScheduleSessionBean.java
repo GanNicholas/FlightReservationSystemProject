@@ -7,10 +7,14 @@ package ejb.session.stateless;
 
 import entity.AirportEntity;
 import entity.FlightEntity;
+import entity.FlightRouteEntity;
 import entity.FlightScheduleEntity;
 import entity.FlightSchedulePlanEntity;
 import entity.SeatEntity;
+import entity.SingleFlightScheduleEntity;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import javax.annotation.Resource;
@@ -18,6 +22,8 @@ import javax.ejb.EJBContext;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TemporalType;
 import util.exception.FlightScheduleExistException;
 
 /**
@@ -87,7 +93,6 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
                 boolean newDepartureBeforeOldDepart = tempFSPDepartureDate.after(departureDateTime);
                 boolean newArriveAfterOldArrive = tempFSPArrivalDate.before(arrivalDateTime);
                 boolean newDepartAfterOldArrive = tempFSPArrivalDate.before(departureDateTime);
-
                 if (!((newArriveBeforeOldDepart && newDepartureBeforeOldDepart) || (newArriveAfterOldArrive && newDepartAfterOldArrive))) {
                     eJBContext.setRollbackOnly();
                     throw new FlightScheduleExistException("Flight Schedule has conflict with existing flight schedule!");
@@ -107,6 +112,33 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
             }
         }
         return true;
+    }
+
+    @Override
+    public List<FlightSchedulePlanEntity> listOfConnectingFlightRecords(Date departureDate, Date endDate) {
+        GregorianCalendar gDepart = new GregorianCalendar();
+        gDepart.setTime(departureDate);
+
+        GregorianCalendar gEndDate = new GregorianCalendar();
+        gEndDate.setTime(endDate);
+        gEndDate.add(GregorianCalendar.HOUR_OF_DAY, 23);
+
+        //Query query = em.createQuery("SELECT f FROM FlightScheduleEntity f WHERE f.departureDateTime BETWEEN :startDate AND :endDate ORDER BY f.departureDateTime ASC").setParameter("startDate", gDepart).setParameter("endDate", gEndDate);
+        Query query = em.createQuery("SELECT s FROM FlightSchedulePlanEntity s, IN(s.listOfFlightSchedule) f  WHERE f.departureDateTime BETWEEN :startDate AND :endDate ORDER BY f.departureDateTime ASC").setParameter("startDate", gDepart).setParameter("endDate", gEndDate);
+
+        List<FlightSchedulePlanEntity> listOfFlightRecord = query.getResultList();
+        listOfFlightRecord.size();
+        for (int i = 0; i < listOfFlightRecord.size(); i++) {
+            listOfFlightRecord.get(i).getListOfFlightSchedule().size();
+            for (int j = 0; j < listOfFlightRecord.get(i).getListOfFlightSchedule().size(); j++) {
+                listOfFlightRecord.get(i).getListOfFlightSchedule().get(j).getSeatingPlan().size();
+                listOfFlightRecord.get(i).getListOfFare().size();
+                listOfFlightRecord.get(i).getListOfFlightSchedule().get(j).getFlightSchedulePlan();
+            }
+        }
+
+        System.out.println("*********************listOfFlightRecord.size():*****************************" + listOfFlightRecord.size());
+        return listOfFlightRecord;
     }
 
     @Override
@@ -164,8 +196,7 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         }
 
     }
-    
-    
+
     @Override
     public FlightScheduleEntity updateReccurentFlightSchedule(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight) throws FlightScheduleExistException {
         String flightNumber = flight.getFlightNumber();
@@ -194,17 +225,14 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
 
         return flightSchedule;
     }
-    
-    
-    
 
     private void checkUpdateRecurrentSchedules(Calendar arrivalDateTime, Calendar departureDateTime, String flightNumber, FlightSchedulePlanEntity currentFsp) throws FlightScheduleExistException {
 
         List<FlightSchedulePlanEntity> listOfFlightSchedulePlan = em.createQuery("SELECT c FROM FlightSchedulePlanEntity c WHERE c.flightNumber =:flightNum AND c.isDeleted = FALSE").setParameter("flightNum", flightNumber).getResultList();
         for (FlightSchedulePlanEntity tempFSP : listOfFlightSchedulePlan) {
-            
+
             if (!tempFSP.getFlightSchedulePlanId().equals(currentFsp.getFlightSchedulePlanId())) {
-                
+
                 List<FlightScheduleEntity> tempFlight = tempFSP.getListOfFlightSchedule();
                 for (FlightScheduleEntity tempFlightSchedule : tempFlight) {
 

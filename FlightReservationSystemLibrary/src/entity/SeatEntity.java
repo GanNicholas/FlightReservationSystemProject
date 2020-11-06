@@ -30,31 +30,35 @@ public class SeatEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seatId;
-    
+
     @NotEmpty(message = "Seat Number cannot be empty!")
     @Size(min = 1, max = 6, message = "Seat number cannot exceed 6 characters long!")
     @Column(nullable = false, length = 6)
     private String seatNumber;
-    
+
     private boolean reserved;
-    
+
     @OneToOne
     private PassengerEntity passenger;
-    
+
     @OneToOne
     private FareEntity fare;
-    
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private CabinClassType cabinType;
 
     public SeatEntity() {
     }
 
     //initial state when seat is free
-    public SeatEntity(String seatNumber) {
+    public SeatEntity(String seatNumber, CabinClassType cabinType) {
         this.seatNumber = seatNumber;
         this.reserved = false;
         this.passenger = null;
         this.fare = null;
-        
+        this.cabinType = cabinType;
+
     }
 
     //when seat is reserved
@@ -66,7 +70,7 @@ public class SeatEntity implements Serializable {
     }
 
     public Long getSeatId() {
-        return seatId; 
+        return seatId;
     }
 
     public void setSeatId(Long seatId) {
@@ -96,6 +100,14 @@ public class SeatEntity implements Serializable {
     @Override
     public String toString() {
         return "entity.Seat[ id=" + seatId + " ]";
+    }
+
+    public CabinClassType getCabinType() {
+        return cabinType;
+    }
+
+    public void setCabinType(CabinClassType cabinType) {
+        this.cabinType = cabinType;
     }
 
     public String getSeatNumber() {
@@ -129,6 +141,5 @@ public class SeatEntity implements Serializable {
     public void setFare(FareEntity fare) {
         this.fare = fare;
     }
-
 
 }

@@ -9,7 +9,9 @@ import entity.FlightEntity;
 import entity.FlightScheduleEntity;
 import entity.FlightSchedulePlanEntity;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import javax.ejb.Remote;
 import util.exception.FlightScheduleExistException;
 
@@ -23,10 +25,10 @@ public interface FlightScheduleSessionBeanRemote {
     public FlightScheduleEntity createFlightSchedule(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight) throws FlightScheduleExistException;
 
     public boolean checkFlightScheduleSeats(FlightScheduleEntity fs);
-    
+
     public FlightScheduleEntity updateFlightSchedule(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight, FlightScheduleEntity currentFs) throws FlightScheduleExistException;
-    
+
     public FlightScheduleEntity updateReccurentFlightSchedule(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight) throws FlightScheduleExistException;
-    
-    
+
+    public List<FlightSchedulePlanEntity> listOfConnectingFlightRecords(Date departureDate, Date endDate);
 }

@@ -18,5 +18,6 @@ import util.exception.CustomerLoginInvalid;
 public interface CustomerSessionBeanLocal {
 
     public Long registerCustomer(CustomerEntity c) throws CustomerExistException;
+
     public CustomerEntity customerLogin(String username, String password) throws CustomerLoginInvalid;
 }

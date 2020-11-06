@@ -159,8 +159,10 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
     public String createRecurrentFlightSchedulePlan(String flightNumber, GregorianCalendar departureDateTime, GregorianCalendar endDate, Integer flightDuration, boolean createReturnFlightSchedule, List<FareEntity> listOfFares, Integer layover, Integer recurrency) throws FlightDoesNotExistException, FlightScheduleExistException {
         FlightEntity flight;
         try {
+            System.out.println("*******flightNumber******" + flightNumber);
             flight = (FlightEntity) em.createNamedQuery("retrieveFlightUsingFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
         } catch (NoResultException ex) {
+            System.out.println("*******error at top flightNumber******" + flightNumber);
             throw new FlightDoesNotExistException("Flight with flight number does not exist!");
         }
 
@@ -184,6 +186,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
                 //link flight schedule to FSP
                 fsp.getListOfFlightSchedule().add(fe1);
             } catch (FlightScheduleExistException ex) {
+                System.out.println("*******in while flightNumber******" + flightNumber);
                 throw new FlightScheduleExistException(ex.getMessage());
             }
 
@@ -207,9 +210,11 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             AirportEntity origin = flight.getFlightRoute().getDestinationLocation();
             AirportEntity destination = flight.getFlightRoute().getOriginLocation();
             try {
+                System.out.println("*********airport id :" + origin);
                 FlightRouteEntity returnFlightRoute = (FlightRouteEntity) em.createNamedQuery("findFlightRoute").setParameter("origin", origin).setParameter("destination", destination).getSingleResult();
                 returnFlight = (FlightEntity) em.createNamedQuery("retrieveReturnFlightUsingMainFlightNumber").setParameter("flightNum", flightNumber).getSingleResult();
             } catch (NoResultException ex) {
+                System.out.println("*********Error at return flight origin :" + origin);
                 throw new FlightDoesNotExistException("Flight does not exist!");
             }
 
