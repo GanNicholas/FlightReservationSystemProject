@@ -52,8 +52,11 @@ public interface FlightSchedulePlanSessionBeanRemote {
     public void mergeFare(FareEntity fare) throws FareDoesNotExistException;
 
     public void deleteFare(Long fareId, FlightSchedulePlanEntity fsp) throws FareDoesNotExistException, FlightSchedulePlanDoesNotExistException, FareCannotBeDeletedException;
-    
+
     public void updateRecurrentFSP(String flightNumber, GregorianCalendar departureDateTime, GregorianCalendar endDate, Integer flightDuration, Integer recurrency, FlightSchedulePlanEntity currentFsp) throws FlightDoesNotExistException, FlightScheduleExistException, FlightSchedulePlanDoesNotExistException;
-    
-    
+
+    public String deleteFsp(Long fspId) throws FlightSchedulePlanDoesNotExistException, FareDoesNotExistException, FareCannotBeDeletedException;
+
+    public List<FlightSchedulePlanEntity> getFlightSchedulePlanForFlight(String flightNumber) throws FlightSchedulePlanIsEmptyException;
+
 }

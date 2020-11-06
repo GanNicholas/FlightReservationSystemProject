@@ -118,14 +118,14 @@ public class FlightSchedulePlan {
                 } else if (choice == 9) {
                     updateFsp(sc);
                 } else if (choice == 10) {
-
+                    deleteFsp(sc);
                 } else if (choice == 0) {
                     System.out.println("Goodbye!");
                     break;
                 }
             } catch (InputMismatchException ex) {
                 System.out.println(ex.getMessage());
-                sc.reset();
+                sc.next();;
             }
         }
 
@@ -226,7 +226,7 @@ public class FlightSchedulePlan {
                     }
                 } catch (FlightDoesNotExistException | InputMismatchException ex) {
                     System.out.println(ex.getMessage());
-                    sc.reset();
+                    sc.next();;
                     reenter = true;
                 }
 
@@ -258,7 +258,7 @@ public class FlightSchedulePlan {
                 }
             } catch (InputMismatchException ex) {
                 System.out.println(ex.getMessage());
-                sc.reset();
+                sc.next();;
             }
         }
     }
@@ -324,7 +324,7 @@ public class FlightSchedulePlan {
                 }
             } catch (FlightDoesNotExistException | InputMismatchException ex) {
                 System.out.println(ex.getMessage());
-                sc.reset();
+                sc.next();;
                 reenter = true;
             }
 
@@ -457,7 +457,7 @@ public class FlightSchedulePlan {
                 return listOfFares;
             } catch (InputMismatchException ex) {
                 System.out.println(ex.getMessage());
-                sc.reset();
+                sc.next();;
             }
         }
 
@@ -578,7 +578,7 @@ public class FlightSchedulePlan {
             System.out.println();
         } catch (FlightSchedulePlanDoesNotExistException | FlightSchedulePlanIsEmptyException | InputMismatchException ex) {
             System.out.println(ex.getMessage());
-            sc.reset();
+            sc.next();
         }
     }
 
@@ -639,7 +639,7 @@ public class FlightSchedulePlan {
                 break;
             } catch (FlightRouteDoesNotExistException | AircraftConfigurationNotExistException | FlightExistsException | FlightDoesNotExistException | FlightRouteIsNotMainRouteException | InputMismatchException ex) {
                 System.out.println(ex.getMessage());
-                sc.reset();
+                sc.next();;
             }
         }
     }
@@ -762,7 +762,7 @@ public class FlightSchedulePlan {
                 }
             } catch (FlightDoesNotExistException | FlightRouteDoesNotExistException | AircraftConfigurationNotExistException | InputMismatchException | FlightHasFlightSchedulePlanException | FlightIsDeletedException ex) {
                 System.out.println(ex.getMessage());
-                sc.reset();
+                sc.next();;
                 counter++;
             }
 
@@ -1048,7 +1048,7 @@ public class FlightSchedulePlan {
                                             }
                                         } catch (FlightScheduleExistException | FlightDoesNotExistException | IncorrectFormatException | FlightSchedulePlanDoesNotExistException | InputMismatchException ex) {
                                             System.out.println(ex.getMessage());
-                                            sc.reset();
+                                            sc.next();;
                                         }
                                     } else { // NEW ADDITION TO CHECK
                                         System.out.println("Do you want to edit anymore flight schedules for flight schedule plan? (1 for yes, 2 for no)");
@@ -1248,7 +1248,7 @@ public class FlightSchedulePlan {
                         List<FareEntity> listOfFare = fsp.getListOfFare();
                         System.out.println("-----Fares for Flight Schedule Plan-----");
                         for (FareEntity fare : fsp.getListOfFare()) {
-                            System.out.printf("%-20s%-20s%-15s%-15s", "Fare ID","Fare basis code", "Fare amount", "Fare cabin type");
+                            System.out.printf("%-20s%-20s%-15s%-15s", "Fare ID", "Fare basis code", "Fare amount", "Fare cabin type");
                             System.out.println();
                             System.out.printf("%-20s%-20s%-15.2f%-15s", fare.getFareId(), fare.getFareBasisCode(), fare.getFareAmount(), fare.getCabinType());
                             System.out.println();
@@ -1286,7 +1286,7 @@ public class FlightSchedulePlan {
                         List<FareEntity> listOfFare = fsp.getListOfFare();
                         System.out.println("-----Fares for Flight Schedule Plan-----");
                         for (FareEntity fare : fsp.getListOfFare()) {
-                            System.out.printf("%-20s%-20s%-15s%-15s", "Fare ID" ,"Fare basis code", "Fare amount", "Fare cabin type");
+                            System.out.printf("%-20s%-20s%-15s%-15s", "Fare ID", "Fare basis code", "Fare amount", "Fare cabin type");
                             System.out.println();
                             System.out.printf("%-20s%-20s%-15.2f%-15s", fare.getFareId(), fare.getFareBasisCode(), fare.getFareAmount(), fare.getCabinType());
                             System.out.println();
@@ -1299,7 +1299,7 @@ public class FlightSchedulePlan {
                         flightSchedulePlanSessionBean.deleteFare(fareId, fsp);
                         System.out.println("Fare " + fareId + " has been deleted for flight " + fsp.getFlightNumber());
 
-                    } 
+                    }
                 }
 
             } else {
@@ -1308,11 +1308,36 @@ public class FlightSchedulePlan {
 
         } catch (InputMismatchException ex) {
             System.out.println("Wrong input for FSP ID!");
-            sc.reset();
+            sc.next();;
         } catch (FlightSchedulePlanDoesNotExistException | FlightScheduleDoesNotExistException | FareDoesNotExistException | FareCannotBeDeletedException | FlightDoesNotExistException | FlightScheduleExistException ex) {
             System.out.println(ex.getMessage());
         }
 
     }
 
+    public void deleteFsp(Scanner sc) {
+
+        viewSpecificFsp(sc);
+        System.out.print("Please enter ID of Flight Schedule Plan you wish to delete: ");
+        Long fspId = sc.nextLong();
+        sc.nextLine();
+        try {
+            FlightSchedulePlanEntity fsp = flightSchedulePlanSessionBean.viewFlightSchedulePlan(fspId);
+            System.out.println("Are you sure you wish to delete Flight Schedule Plan for flight " + fsp.getFlightNumber() + " (1 for yes, 2 for no)");
+            int choice = sc.nextInt();
+            sc.nextLine();
+
+            if (choice == 1) {
+               String message =  flightSchedulePlanSessionBean.deleteFsp(fspId);
+                System.out.println(message);
+            } else if (choice == 2) {
+                return;
+            } else {
+                System.out.println("Invalid choice for deleting Flight Schedule Plan");
+            }
+
+        } catch (FlightSchedulePlanDoesNotExistException | FareCannotBeDeletedException | FareDoesNotExistException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
 }

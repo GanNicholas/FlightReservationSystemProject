@@ -141,8 +141,8 @@ public class RunApp {
                 } else if (choice == 3) {
                     try {
                         if (employeeSessionBean.getEmployeeRole(userId).equals(UserRole.SALESMANAGER)) {
-//                        FlightSchedulePlan fsp = new FlightSchedulePlan(flightSchedulePlanSessionBean, flightSessionBean);
-//                        fsp.runFSP();
+                            SalesManagement salesManagement = new SalesManagement(flightSessionBean,flightSchedulePlanSessionBean);
+                            salesManagement.runApp();
                         } else {
                             System.out.println("Sorry, you do not have the access right. Please try again!");
                             counter++;

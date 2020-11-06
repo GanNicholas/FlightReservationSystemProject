@@ -101,12 +101,10 @@ public class DataInitSessionBean {
 
         AirportEntity airport = em.find(AirportEntity.class, 1L);
         if (airport == null) {
-//            String airportName, String iataAirportCode, String state, String country, Integer timeZoneHour, Integer timezoneMin, String city
             AirportEntity a1 = new AirportEntity("Singapore Changi Airport", "SIN", "Singapore", "Singapore", 8, 0, "Singapore");
             em.persist(a1);
             AirportEntity a2 = new AirportEntity("Narita Airport", "NRT", "Chiba", "Japan", 9, 0, "Narita");
             em.persist(a2);
-            //check if minutes is displayd how
             AirportEntity a3 = new AirportEntity("Darwin International Airport", "DRW", "Northern Territory", "Australia", 9, 30, "Eaton");
             em.persist(a3);
             AirportEntity a4 = new AirportEntity("Perth Airport", "PER", "Western Australia", "Australia", 8, 0, "Perth");

@@ -514,6 +514,8 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             fsp.getListOfFlightSchedule().size();
             fsp.getFlightEntity();
             fs.getSeatingPlan().size();
+            fs.getFlightSchedulePlan().getFlightEntity().getAircraftConfig();
+            fs.getFlightSchedulePlan().getFlightEntity().getAircraftConfig().getCabinClasses().size();
             return fs;
         }
     }
@@ -638,6 +640,78 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             departureDateTime = (GregorianCalendar) departureDateTime.clone();
             departureDateTime.add(GregorianCalendar.DAY_OF_MONTH, recurrency);
             departBeforeEndDate = departureDateTime.before(endDate);
+        }
+
+    }
+
+    @Override
+    public String deleteFsp(Long fspId) throws FlightSchedulePlanDoesNotExistException, FareDoesNotExistException, FareCannotBeDeletedException {
+
+        FlightSchedulePlanEntity fsp = em.find(FlightSchedulePlanEntity.class, fspId);
+
+        if (fsp == null) {
+            throw new FlightSchedulePlanDoesNotExistException("Flight Schedule Plan does not exists!");
+        }
+
+        String message = "";
+
+        boolean canDelete = false;
+        //check if fsp has sold seats - use flightschedule session bean 
+        for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
+            canDelete = flightScheduleSessionBean.checkFlightScheduleSeats(fs);
+        }
+
+        if (canDelete == false) { // cannot delete
+            fsp.setIsDeleted(true);
+            message = "Flight Schedule Plan has existing flight schedules on going. Flight Schedule Plan marked as deleted";
+        } else {
+            FlightEntity flight = fsp.getFlightEntity();
+            flight.getListOfFlightSchedulePlan().remove(fsp);
+            for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
+                fs.getSeatingPlan().clear();
+                em.remove(fs);
+            }
+
+            for (FareEntity fare : fsp.getListOfFare()) {
+                deleteFare(fare.getFareId(), fsp);
+            }
+
+            em.remove(fsp);
+            message = "Flight Schedule Plan for flight has been sucessfully deleted!";
+        }
+
+        return message;
+    }
+
+    @Override
+    public List<FlightSchedulePlanEntity> getFlightSchedulePlanForFlight(String flightNumber) throws FlightSchedulePlanIsEmptyException {
+        List<FlightSchedulePlanEntity> listOfFlightSchedulePlan = em.createNamedQuery("queryFSPwithFlightNumber").setParameter("flightNum", flightNumber).getResultList();
+        if (listOfFlightSchedulePlan.isEmpty()) {
+            throw new FlightSchedulePlanIsEmptyException("Flight Schedule Plan is empty!");
+        } else {
+            for (FlightSchedulePlanEntity fsp : listOfFlightSchedulePlan) {
+
+                fsp.getListOfFlightSchedule().size();
+                fsp.getListOfFare().size();
+
+                for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
+                    fs.getSeatingPlan().size();
+                }
+
+                if (fsp.getReturnFlightSchedulePlan() != null) {
+                    FlightSchedulePlanEntity returnFsp = fsp.getReturnFlightSchedulePlan();
+                    returnFsp.getListOfFlightSchedule().size();
+                    for (FlightScheduleEntity fs : returnFsp.getListOfFlightSchedule()) {
+                        fs.getSeatingPlan().size();
+                    }
+                }
+
+                fsp.getFlightEntity();
+                fsp.getFlightEntity().getFlightRoute().getOriginLocation();
+                fsp.getFlightEntity().getFlightRoute().getDestinationLocation();
+            }
+            
+            return listOfFlightSchedulePlan;
         }
 
     }
