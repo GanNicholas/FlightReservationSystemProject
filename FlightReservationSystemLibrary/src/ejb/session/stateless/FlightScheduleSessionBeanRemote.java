@@ -26,7 +26,5 @@ public interface FlightScheduleSessionBeanRemote {
 
     public boolean checkFlightScheduleSeats(FlightScheduleEntity fs);
 
-    public List<FlightScheduleEntity> listOfODQuery(String origin, String destination, Date departureDate, Date endDate);
-
-    public List<FlightScheduleEntity> listOfConnectingFlightRecords(Date departureDate, Date endDate);
+    public List<FlightSchedulePlanEntity> listOfConnectingFlightRecords(Date departureDate, Date endDate);
 }

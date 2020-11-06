@@ -23,8 +23,10 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import static java.util.Calendar.MINUTE;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -32,6 +34,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.enumeration.CabinClassType;
 import util.enumeration.UserRole;
 import util.exception.CustomerExistException;
 import util.exception.CustomerLoginInvalid;
@@ -155,137 +158,160 @@ public class Customer {
 
     public void searchFlight() { // no validation yet
         Scanner sc = new Scanner(System.in);
-        System.out.println("Enter trip type:");
-        String tripType = sc.nextLine();
-        System.out.println("Enter departure airport:");
-        String departureAirport = sc.nextLine();
-        System.out.println("Enter destination airport:");
-        String destinationAirport = sc.nextLine();
-        System.out.println("Enter depature date:(dd/mm/yyyy)");
-        String departureDate = sc.nextLine();
-        System.out.println("Enter return date:(dd/mm/yyyy)");
-        String returnDate = sc.nextLine();
-        System.out.println("Enter number of passenger:");
-        String passenger = sc.nextLine();
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        LocalDate searchDate = null;
-        String[] splitDepartDate = departureDate.split("/");
-        if (splitDepartDate.length == 3) {
-            searchDate = LocalDate.of(Integer.valueOf(splitDepartDate[2]), Integer.valueOf(splitDepartDate[1]), Integer.valueOf(splitDepartDate[0]));
-        } else {
-            System.out.println("You have invalid input");
-        }
+        while (true) {
+            try {
 
-        LocalDate threeDayBeforeSearchDate = searchDate.minusDays(3);
-        LocalDate threeDayAftSearchDate = searchDate.plusDays(3);
-        Date dateThreeDateBefore = Date.from(threeDayBeforeSearchDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        Date dateThreeDateAfter = Date.from(threeDayAftSearchDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        List<FlightScheduleEntity> listOfFlightSchedules = flightScheduleSessionBean.listOfConnectingFlightRecords(dateThreeDateBefore, dateThreeDateAfter);
-        List<FlightScheduleEntity> listOfSearchFlight = new ArrayList<FlightScheduleEntity>();
-        for (int i = 0; i < listOfFlightSchedules.size(); i++) {
-            for (int j = 0; j < listOfFlightSchedules.size(); j++) {
-                FlightSchedulePlanEntity iFsp = listOfFlightSchedules.get(i).getFlightSchedulePlan();
-                FlightSchedulePlanEntity jFsp = listOfFlightSchedules.get(j).getFlightSchedulePlan();
+                System.out.println("Enter trip type:");
+                System.out.println("1. One Way");
+                System.out.println("2. Two ways");
+                String tripType = sc.nextLine().trim();
+                while (!tripType.equals("1") && !tripType.equals("2")) {
+                    System.out.println("Invalid input");
+                    System.out.println("Enter trip type:");
+                    System.out.println("1. One Way");
+                    System.out.println("2. Two ways");
+                    tripType = sc.nextLine().trim();
+                }
 
-                if (iFsp.getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode().equalsIgnoreCase(departureAirport)
-                        && iFsp.getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode().equalsIgnoreCase(jFsp.getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode())
-                        && jFsp.getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode().equalsIgnoreCase(destinationAirport)) {
-                    GregorianCalendar firstFlightArrTime = (GregorianCalendar) listOfFlightSchedules.get(i).getArrivalDateTime().clone();
-                    GregorianCalendar secFlightDepartTime = (GregorianCalendar) listOfFlightSchedules.get(j).getDepartureDateTime().clone();
-                    firstFlightArrTime.add(GregorianCalendar.MINUTE, 120);// 2h buffer time
-                    if (firstFlightArrTime.before(secFlightDepartTime)) {
-                        int maxWaitingConnectingFlight = 22 * 60; // max conencting flight 24hr - 2 hr (buffer) - convert to mins
-                        firstFlightArrTime.add(GregorianCalendar.MINUTE, maxWaitingConnectingFlight);
-                        if (firstFlightArrTime.before(listOfFlightSchedules.get(j).getDepartureDateTime())) {
+                System.out.println("Please choose one of the following:");
+                System.out.println("1. Connecting Flight");
+                System.out.println("2. Direct Flight");
+                System.out.println("3. Both Connecting and Direct Flight ");
+                String indictatorConnectFlightOrNot = sc.nextLine().trim();
+                while (!indictatorConnectFlightOrNot.equals("1") && !indictatorConnectFlightOrNot.equals("2") && !indictatorConnectFlightOrNot.equals("3")) {
+                    System.out.println("Invalid input");
+                    System.out.println("Please choose one of the following:");
+                    System.out.println("1. Connecting Flight");
+                    System.out.println("2. Direct Flight");
+                    System.out.println("3. Both Connecting and Direct Flight ");
+                    indictatorConnectFlightOrNot = sc.nextLine().trim();
+                }
 
-                            listOfSearchFlight.add(listOfFlightSchedules.get(i));
-                            listOfSearchFlight.add(listOfFlightSchedules.get(j));
-                        }
+                System.out.println("Please enter the cabin type:");
+                System.out.println("1. First class.");
+                System.out.println("2. Business class");
+                System.out.println("3. Premium economy class");
+                System.out.println("4. Economy class");
+                String strCabinType = sc.nextLine().trim();
+                while (Integer.parseInt(strCabinType) > 4 && Integer.parseInt(strCabinType) <= 0) {
+                    System.out.println("Invalid cabin class type.");
+                    System.out.println("Please enter the cabin type:");
+                    System.out.println("1. First class.");
+                    System.out.println("2. Business class");
+                    System.out.println("3. Premium economy class");
+                    System.out.println("4. Economy class");
+                    strCabinType = sc.nextLine().trim();
+                }
+                CabinClassType cabinType = null;
+                if (strCabinType.equalsIgnoreCase("1")) {
+                    cabinType = CabinClassType.F;
+                } else if (strCabinType.equalsIgnoreCase("2")) {
+                    cabinType = CabinClassType.J;
+                } else if (strCabinType.equalsIgnoreCase("3")) {
+                    cabinType = CabinClassType.W;
+                } else if (strCabinType.equalsIgnoreCase("4")) {
+                    cabinType = CabinClassType.Y;
+                }
+
+                System.out.print("Enter departure airport: ");
+                String departureAirport = sc.nextLine().trim();
+
+                System.out.print("Enter destination airport: ");
+                String destinationAirport = sc.nextLine().trim();
+
+                System.out.print("Enter depature date:(dd/mm/yyyy) ");
+                String departureDate = sc.nextLine().trim();
+                LocalDate searchDateFO = null;
+                String[] splitDepartDate = departureDate.trim().split("/");
+                if (splitDepartDate.length == 3) {
+                    searchDateFO = LocalDate.of(Integer.valueOf(splitDepartDate[2]), Integer.valueOf(splitDepartDate[1]), Integer.valueOf(splitDepartDate[0]));
+                } else {
+                    System.out.println("You have invalid date input for departure date. Please be in 'dd/mm/yyyy' format");
+                    //   throw new DateInvalidException("You have invalid date input for departure flight date. Please be in 'dd/mm/yyyy' format");
+                }
+
+                LocalDate threeDayBeforeSearchDateFO = searchDateFO.minusDays(3);
+                LocalDate threeDayAftSearchDateFO = searchDateFO.plusDays(3);
+                Date dateThreeDateBeforeFO = Date.from(threeDayBeforeSearchDateFO.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                Date dateThreeDateAfterFO = Date.from(threeDayAftSearchDateFO.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+                String returnDate = "";
+                if (tripType.equals("2")) {
+                    System.out.print("Enter return date:(dd/mm/yyyy) ");
+                    returnDate = sc.nextLine().trim();
+                }
+                //convert return time (if exist) to 3 days before and 3 days after
+                LocalDate searchDateReturn = null;
+                LocalDate threeDayBeforeSearchDateReturn = null;
+                LocalDate threeDayAftSearchDateReturn = null;
+                Date dateThreeDateBeforeReturn = null;
+                Date dateThreeDateAfterReturn = null;
+                String[] splitDepartDateReturn;
+
+                if (tripType.equals("2")) {
+                    splitDepartDateReturn = returnDate.trim().split("/");
+                    if (splitDepartDateReturn.length == 3) {
+                        searchDateReturn = LocalDate.of(Integer.valueOf(splitDepartDateReturn[2]), Integer.valueOf(splitDepartDateReturn[1]), Integer.valueOf(splitDepartDateReturn[0]));
+                        threeDayBeforeSearchDateReturn = searchDateReturn.minusDays(3);
+                        threeDayAftSearchDateReturn = searchDateReturn.plusDays(3);
+                        dateThreeDateBeforeReturn = Date.from(threeDayBeforeSearchDateReturn.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                        dateThreeDateAfterReturn = Date.from(threeDayAftSearchDateReturn.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                    } else {
+                        System.out.println("You have invalid date input for return flight date. Please be in 'dd/mm/yyyy' format");
+                        //throw new DateInvalidException("You have invalid date input for return flight date. Please be in 'dd/mm/yyyy' format");
                     }
                 }
+
+                System.out.print("Enter number of passenger: ");
+                String passenger = sc.nextLine().trim();
+                int noOfPassenger = Integer.parseInt(passenger);
+
+                // start calling searh flight with respectively to (1. one way 2. two ways -> inside of each, see if they want (a)connecting flight, (b)direct flight or (c)borth)
+                if (tripType.equals("1")) {// one way
+                    if (indictatorConnectFlightOrNot.equals("1")) {// connecting flight
+                        getConnectingFlight(dateThreeDateBeforeFO, dateThreeDateAfterFO, cabinType, noOfPassenger, departureAirport, destinationAirport);
+                    } else if (indictatorConnectFlightOrNot.equals("2")) {//direct flight
+                        getDirectFlight(departureAirport, destinationAirport, dateThreeDateBeforeFO, dateThreeDateAfterFO, cabinType, noOfPassenger);
+                    } else if (indictatorConnectFlightOrNot.equals("3")) {//both
+
+                    }
+                } else {// two ways
+                    if (indictatorConnectFlightOrNot.equals("1")) {
+                        getConnectingFlight(dateThreeDateBeforeFO, dateThreeDateAfterFO, cabinType, noOfPassenger, departureAirport, destinationAirport);
+                        getConnectingFlight(dateThreeDateBeforeReturn, dateThreeDateAfterReturn, cabinType, noOfPassenger, departureAirport, destinationAirport);
+                    } else if (indictatorConnectFlightOrNot.equals("2")) {
+                        getDirectFlight(departureAirport, destinationAirport, dateThreeDateBeforeFO, dateThreeDateAfterFO, cabinType, noOfPassenger);
+                        getDirectFlight(destinationAirport, departureAirport, dateThreeDateBeforeReturn, dateThreeDateAfterReturn, cabinType, noOfPassenger);
+                    } else if (indictatorConnectFlightOrNot.equals("3")) {
+
+                    }
+                }
+            } catch (NumberFormatException ex) {
+                System.out.println("You have invalid input");
+                searchFlight();
+            }
+            /*catch (DateInvalidException ex) {
+            searchFlight();
+        }*/
+            System.out.println("Enter '1' to continue or any key to exit");
+            String exitOrContinue = sc.nextLine();
+            if (!exitOrContinue.equals("1")) {
+                break;
             }
         }
 
-        /*test print
-        for (int i = 0; i < listOfFlightSchedules.size(); i += 2) {
+    }
 
-            FlightSchedulePlanEntity fsp = listOfFlightSchedules.get(i).getFlightSchedulePlan();
-            System.out.println("fsp flight number: " + fsp.getFlightNumber());
-
-            System.out.println(" O - D : " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode() + ":D:" + fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode());
-            SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-            String departDate = format.format(listOfFlightSchedules.get(i).getDepartureDateTime().getTime());
-            String arrivalDate = format.format(listOfFlightSchedules.get(i).getArrivalDateTime().getTime());
-            System.out.println("Depart" + departDate + ": Arrival" + arrivalDate);
-        }*/
-
- /*for (int i = 0; i < listOfFlight.size(); i++) {
-            for (int j = 0; j < listOfFlight.size(); j++) {
-                //if(listOfFlight.get(j).getFlightRoute().getDestinationLocation().equalsIgnoreCase(departureAirport) && listOfFlight.get(i).getFlightRoute().getOriginLocation().equals(listOfFlight.get(j).getFlightRoute().get)){
-                if (listOfFlight.get(i).getFlightRoute().getOriginLocation().equals(departureAirport) && listOfFlight.get(i).getFlightRoute().getDestinationLocation().equals(listOfFlight.get(j).getFlightRoute().getOriginLocation())
-                        && listOfFlight.get(j).getFlightRoute().getDestinationLocation().equals(destinationAirport)) {
-                    for (int k = 0; k < listOfFlight.get(i).getListOfFlightSchedulePlan().size(); k++) {
-                        if (listOfFlight.get(i).getListOfFlightSchedulePlan().get(k).get) {
-                            
-                        }
-                    }
-
-                }
-            }
-        }*/
-        //Search for departure flight
-        /* List<FlightEntity> listOfConnectingDepartFlights = new ArrayList<FlightEntity>();
-        for (int i = 0; i < listOfFlightSchedules.size(); i++) {
-            for (int j = 0; j < listOfFlightSchedules.size(); j++) {
-                FlightEntity fI = listOfFlightSchedules.get(i).getFlightSchedulePlan().getFlightEntity();
-                FlightEntity fJ = listOfFlightSchedules.get(j).getFlightSchedulePlan().getFlightEntity();
-                if (fI.getFlightRoute().getOriginLocation().getIataAirportCode().equalsIgnoreCase(departureAirport)
-                        && fI.getFlightRoute().getDestinationLocation().getIataAirportCode().equalsIgnoreCase(fJ.getFlightRoute().getOriginLocation().getIataAirportCode())
-                        && fJ.getFlightRoute().getDestinationLocation().getIataAirportCode().equals(destinationAirport)) {
-                    GregorianCalendar firstFlightArrTime = listOfFlightSchedules.get(i).getArrivalDateTime(); //1st flight arrivalTime
-                    GregorianCalendar secondFlightDepart = listOfFlightSchedules.get(j).getDepartureDateTime(); // 2nd flight depart time
-
-                    int departTimeZoneHr = fI.getFlightRoute().getOriginLocation().getTimeZoneHour();
-                    int departTimeZoneMin = fI.getFlightRoute().getOriginLocation().getTimeZoneMin();
-                    int destTimeZoneHr = fJ.getFlightRoute().getOriginLocation().getTimeZoneHour();
-                    int destTimeZoneMin = fJ.getFlightRoute().getOriginLocation().getTimeZoneMin();
-                    //convert depart and dest into min and get the different
-                    int departTimeZoneInMin = 0;
-                    int destTimeZoneInMin = 0;
-                    if (departTimeZoneHr > 0) {
-                        departTimeZoneInMin = departTimeZoneHr * 60;
-                    }
-                    if (destTimeZoneInMin > 0) {
-                        destTimeZoneInMin = destTimeZoneHr * 60;
-                    }
-                    departTimeZoneInMin += departTimeZoneMin;
-                    destTimeZoneInMin += destTimeZoneMin;
-
-                    int diffInTimeZoneInMIn = destTimeZoneInMin - departTimeZoneInMin;
-                    firstFlightArrTime.add(GregorianCalendar.MINUTE, diffInTimeZoneInMIn);
-                    boolean departTimeBeforeArrive = firstFlightArrTime.before(secondFlightDepart);
-                    //check if the depart and destination time within 22hrs time frame since 2 hours buffer already included
-                    firstFlightArrTime.add(GregorianCalendar.HOUR_OF_DAY, 22);
-                    boolean timeWithin22hrsExclude2h = secondFlightDepart.before(firstFlightArrTime);
-                    if (departTimeBeforeArrive && timeWithin22hrsExclude2h) {
-                        //add depart detail into list index (even)
-                        FlightEntity firstFlight = fI;
-                       
-                        listOfConnectingDepartFlights.add(fI);
-                        listOfConnectingDepartFlights.add(fJ);
-                    }
-
-                }
-            }
-        }*/
+    public void printConnectingFlightResult(List<FlightScheduleEntity> listOfSearchFlight) {
         //connecting flight
-        System.out.printf("%-15s %-30s %-30s %-25s %-25s ", "Flight Number ", " Origin Airport ", " Destination Airport ", "Departure Date", "Arriving Time");
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        System.out.printf("%-15s %-45s %-45s %-25s %-25s ", "Flight Number ", " Origin Airport ", " Destination Airport ", "Departure Date", "Arriving Time");
         System.out.println();
         for (int i = 0; i < listOfSearchFlight.size(); i += 2) {
-            System.out.println("====================================================================================================================================");
-            String firstDepartTime = format.format(listOfFlightSchedules.get(i).getArrivalDateTime().getTime());
-            String firstArrTime = format.format(listOfFlightSchedules.get(i).getDepartureDateTime().getTime());
-            System.out.printf("%-15s %-30s %-30s %-25s %-25s ", listOfSearchFlight.get(i).getFlightSchedulePlan().getFlightEntity().getFlightNumber(),
+            System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            String firstDepartTime = format.format(listOfSearchFlight.get(i).getDepartureDateTime().getTime());
+            String firstArrTime = format.format(listOfSearchFlight.get(i).getArrivalDateTime().getTime());
+            System.out.printf("%-15s %-45s %-45s %-25s %-25s ", listOfSearchFlight.get(i).getFlightSchedulePlan().getFlightEntity().getFlightNumber(),
                     listOfSearchFlight.get(i).getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getAirportName(),
                     listOfSearchFlight.get(i).getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName(),
                     firstDepartTime, firstArrTime);
@@ -293,83 +319,173 @@ public class Customer {
             System.out.println();
             System.out.println("Connecting flight: ");
             System.out.println();
+            System.out.printf("%-15s %-45s %-45s %-25s %-25s ", "Flight Number ", " Origin Airport ", " Destination Airport ", "Departure Date", "Arriving Time");
+            String secDepartTime = format.format(listOfSearchFlight.get(i + 1).getDepartureDateTime().getTime());
+            String secArrTime = format.format(listOfSearchFlight.get(i + 1).getArrivalDateTime().getTime());
             System.out.println();
-            String secDepartTime = format.format(listOfFlightSchedules.get(i + 1).getDepartureDateTime().getTime());
-            String secArrTime = format.format(listOfFlightSchedules.get(i + 1).getArrivalDateTime().getTime());
-            System.out.printf("%-15s %-30s %-30s %-15s %-15s ", listOfSearchFlight.get(i + 1).getFlightSchedulePlan().getFlightEntity().getFlightNumber(),
+            System.out.printf("%-15s %-45s %-45s %-25s %-25s ", listOfSearchFlight.get(i + 1).getFlightSchedulePlan().getFlightEntity().getFlightNumber(),
                     listOfSearchFlight.get(i + 1).getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getAirportName(),
                     listOfSearchFlight.get(i + 1).getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName(),
                     secDepartTime, secArrTime);
             System.out.println();
-            System.out.println("========================================================================================================================================");
         }
+        System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
-        //Wrong retrieval  
-        /*  List<FlightSchedulePlanEntity> listOfFSP = null;
-        List<FlightEntity> displayListOfFlight = new ArrayList<FlightEntity>();
-        for (int i = 0; i < listOfFSP.size(); i++) {
-            for (int j = 0; j < listOfFSP.size(); j++) {
-                if (listOfFSP.get(i).getFlightEntity().getFlightRoute().getOriginLocation().equals(departureAirport)
-                        && listOfFSP.get(i).getFlightEntity().getFlightRoute().getDestinationLocation().equals(listOfFSP.get(j).getFlightEntity().getFlightRoute().getOriginLocation())
-                        && listOfFSP.get(j).getFlightEntity().getFlightRoute().getDestinationLocation().equals(destinationAirport)) {
-                    for (int k = 0; k < listOfFSP.size(); k++) {
-                        for (int l = 0; l < listOfFSP.size(); l++) {
-                            GregorianCalendar departTime = listOfFSP.get(i).getListOfFlightSchedule().get(k).getArrivalDateTime();
-                            double flightDuration = listOfFSP.get(i).getListOfFlightSchedule().get(k).getFlightDuration();
-                            int departTimeZoneHr = listOfFSP.get(i).getFlightEntity().getFlightRoute().getOriginLocation().getTimeZoneHour();
-                            int departTimeZoneMin = listOfFSP.get(i).getFlightEntity().getFlightRoute().getDestinationLocation().getTimeZoneMin();
-                            int destTimeZoneHr = listOfFSP.get(j).getFlightEntity().getFlightRoute().getOriginLocation().getTimeZoneHour();
-                            int destTimeZoneMin = listOfFSP.get(j).getFlightEntity().getFlightRoute().getOriginLocation().getTimeZoneMin();
+    }
 
-                            //convert depart and dest into min and get the different
-                            int departTimeZoneInMin = 0;
-                            int destTimeZoneInMin = 0;
-                            if (departTimeZoneHr > 0) {
-                                departTimeZoneInMin = departTimeZoneHr * 60;
-                            }
-                            if (destTimeZoneInMin > 0) {
-                                destTimeZoneInMin = destTimeZoneHr * 60;
-                            }
-                            departTimeZoneInMin += departTimeZoneMin;
-                            destTimeZoneInMin += destTimeZoneMin;
+    public void printDirectFlightResult(List<FlightScheduleEntity> listOfSearchFlight) {
+        //connecting flight
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        System.out.printf("%-15s %-45s %-45s %-25s %-25s ", "Flight Number ", " Origin Airport ", " Destination Airport ", "Departure Date", "Arriving Time");
+        System.out.println();
+        for (int i = 0; i < listOfSearchFlight.size(); i++) {
+            System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
-                            int diffInTimeZoneInMIn = destTimeZoneInMin - departTimeZoneInMin;
-                            int totalDiff = (int) (flightDuration * 60) + diffInTimeZoneInMIn + 120;
-                            departTime.add(GregorianCalendar.MINUTE, totalDiff);
-                            GregorianCalendar arriveTime = listOfFSP.get(j).getListOfFlightSchedule().get(l).getDepartureDateTime();
-                            boolean departTimeBeforeArrive = departTime.before(arriveTime);
-                            //check if the depart and destination time within 22hrs time frame since 2 hours buffer already included
-                            departTime.add(GregorianCalendar.HOUR_OF_DAY, 22);
-                            boolean timeWithin22hrsExclude2h = arriveTime.before(departTime);
+            String firstDepartTime = format.format(listOfSearchFlight.get(i).getDepartureDateTime().getTime());
+            String firstArrTime = format.format(listOfSearchFlight.get(i).getArrivalDateTime().getTime());
+            System.out.printf("%-15s %-45s %-45s %-25s %-25s ", listOfSearchFlight.get(i).getFlightSchedulePlan().getFlightEntity().getFlightNumber(),
+                    listOfSearchFlight.get(i).getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getAirportName(),
+                    listOfSearchFlight.get(i).getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName(),
+                    firstDepartTime, firstArrTime);
+            System.out.println();
+            System.out.println();
+        }
+        System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
-                            if (departTimeBeforeArrive && timeWithin22hrsExclude2h) {
-                                //add depart detail into list index (even)
-                                FlightEntity departFlight = listOfFSP.get(i).getFlightEntity();
-                                FlightRouteEntity dFr = listOfFSP.get(i).getFlightEntity().getFlightRoute();
-                                FlightScheduleEntity dFs = listOfFSP.get(i).getListOfFlightSchedule().get(k);
-                                FlightSchedulePlanEntity dFsp = listOfFSP.get(i).getListOfFlightSchedule().get(k).getFlightSchedulePlan();
-                                dFsp.getListOfFlightSchedule().add(dFs);
+    }
 
-                                departFlight.setFlightRoute(dFr);
-                                departFlight.getListOfFlightSchedulePlan().add(dFsp);
-                                listOfFlight.add(departFlight);
-                                // add depart detail into list index (odd)
-                                FlightEntity destFlight = listOfFSP.get(j).getFlightEntity();
-                                FlightRouteEntity desFr = listOfFSP.get(j).getFlightEntity().getFlightRoute();
-                                FlightScheduleEntity desFs = listOfFSP.get(j).getListOfFlightSchedule().get(l);
-                                FlightSchedulePlanEntity desFsp = listOfFSP.get(j).getListOfFlightSchedule().get(l).getFlightSchedulePlan();
-                                desFsp.getListOfFlightSchedule().add(desFs);
+    public void getConnectingFlight(Date dateThreeDateBefore, Date dateThreeDateAfter, CabinClassType cabinType, int noOfPassenger, String departureAirport, String destinationAirport) {
+        System.out.println("Came connecting flight");
+        GregorianCalendar gDepart = new GregorianCalendar();
+        gDepart.setTime(dateThreeDateBefore);
 
-                                destFlight.setFlightRoute(desFr);
-                                destFlight.getListOfFlightSchedulePlan().add(desFsp);
-                                listOfFlight.add(destFlight);
+        GregorianCalendar gEndDate = new GregorianCalendar();
+        gEndDate.setTime(dateThreeDateAfter);
+        gEndDate.add(GregorianCalendar.HOUR_OF_DAY, 23);
+        gEndDate.add(GregorianCalendar.MINUTE, 59);
+        gEndDate.add(GregorianCalendar.SECOND, 59);
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        HashMap<Long, FlightScheduleEntity> hm = new HashMap<>();
+        List<FlightSchedulePlanEntity> listOfFlightSchedules = flightScheduleSessionBean.listOfConnectingFlightRecords(dateThreeDateBefore, dateThreeDateAfter);
+        List<FlightScheduleEntity> listOfSearchFlight = new ArrayList<FlightScheduleEntity>();
+        for (int i = 0; i < listOfFlightSchedules.size(); i++) {
+            for (int j = 0; j < listOfFlightSchedules.size() - i; j++) {
+                FlightSchedulePlanEntity fsp1 = listOfFlightSchedules.get(i);
+                FlightSchedulePlanEntity fsp2 = listOfFlightSchedules.get(j);
+                for (int k = 0; k < fsp1.getListOfFlightSchedule().size(); k++) {
+                    FlightScheduleEntity fs1 = fsp1.getListOfFlightSchedule().get(k);
+                    for (int l = 0; l < fsp2.getListOfFlightSchedule().size(); l++) {
+
+                        FlightScheduleEntity fs2 = fsp2.getListOfFlightSchedule().get(l);
+
+                        if ((hm.get(fs1.getFlightScheduleId()) == null || ((hm.get(fs1.getFlightScheduleId())) != null && !hm.get(fs1.getFlightScheduleId()).equals(fs1)))
+                                && (hm.get(fs2.getFlightScheduleId()) == null || ((hm.get(fs2.getFlightScheduleId())) != null && !hm.get(fs2.getFlightScheduleId()).equals(fs2)))
+                                && fs1.getDepartureDateTime().after(gDepart) && fs2.getArrivalDateTime().before(gEndDate)
+                                && fs1.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode().equals(departureAirport)
+                                && fs1.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode()
+                                        .equals(fs2.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode())
+                                && fs2.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode().equals(destinationAirport)) {
+
+                            GregorianCalendar firstFlightArrivalTime = (GregorianCalendar) fs1.getArrivalDateTime().clone();
+                            GregorianCalendar secondFlightDepartTime = (GregorianCalendar) fs2.getDepartureDateTime().clone();
+                            int twoHoursBuffer = 60 * 2;
+                            firstFlightArrivalTime.add(GregorianCalendar.MINUTE, twoHoursBuffer);
+                            if (firstFlightArrivalTime.before(secondFlightDepartTime)) {
+                                {
+
+                                    int twentyTwoHours = 22 * 60;
+                                    firstFlightArrivalTime.add(GregorianCalendar.MINUTE, twentyTwoHours);
+                                    if (firstFlightArrivalTime.after(secondFlightDepartTime)) {
+                                        listOfSearchFlight.add(fs1);
+                                        listOfSearchFlight.add(fs2);
+                                        hm.put(fs1.getFlightScheduleId(), fs1);
+                                        hm.put(fs2.getFlightScheduleId(), fs2);
+                                        System.out.println("hm.get(fs1.getFlightScheduleId())" + hm.get(fs1.getFlightScheduleId()));
+                                    }
+                                }
+
                             }
                         }
-
                     }
 
                 }
             }
-        }*/
+        }
+
+        // Comparator<FlightScheduleEntity> sortFlightScheduleId = (FlightScheduleEntity p1, FlightScheduleEntity p2) -> Integer.valueOf(p1.getFlightScheduleId().intValue() - p2.getFlightScheduleId().intValue());
+        //System.out.println("listOfSearchFlight" + listOfSearchFlight.size());
+        //listOfSearchFlight.sort(sortFlightScheduleId);
+        List<FlightScheduleEntity> flightResult = new ArrayList<FlightScheduleEntity>();
+
+        flightResult = processListGetCabinClassAndSeatAva(listOfSearchFlight, cabinType, noOfPassenger, "Connecting");
+
+        printConnectingFlightResult(flightResult);
+    }
+
+    public void getDirectFlight(String originIATA, String desIATA, Date dateThreeDateBefore, Date dateThreeDateAfter, CabinClassType cabinType, int noOfPassenger) {
+        List<FlightSchedulePlanEntity> listOfODQuery = flightScheduleSessionBean.listOfConnectingFlightRecords(dateThreeDateAfter, dateThreeDateAfter);
+        List<FlightScheduleEntity> listOfUnprocessDirectFlight = new ArrayList<FlightScheduleEntity>();
+        GregorianCalendar gDepart = new GregorianCalendar();
+        gDepart.setTime(dateThreeDateBefore);
+
+        GregorianCalendar gEndDate = new GregorianCalendar();
+        gEndDate.setTime(dateThreeDateAfter);
+        gEndDate.add(GregorianCalendar.HOUR_OF_DAY, 23);
+        gEndDate.add(GregorianCalendar.MINUTE, 59);
+        gEndDate.add(GregorianCalendar.SECOND, 59);
+        for (int h = 0; h < listOfODQuery.size(); h++) {
+            FlightSchedulePlanEntity fsp = listOfODQuery.get(h);
+            for (int i = 0; i < fsp.getListOfFlightSchedule().size(); i++) {
+
+                String queryOrigin = fsp.getListOfFlightSchedule().get(i).getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode();
+                String queryDes = fsp.getListOfFlightSchedule().get(i).getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode();
+                if (fsp.getListOfFlightSchedule().get(i).getDepartureDateTime().after(gDepart) && fsp.getListOfFlightSchedule().get(i).getArrivalDateTime().before(gEndDate)
+                        && queryOrigin.equalsIgnoreCase(originIATA) && queryDes.equalsIgnoreCase(desIATA)) {
+                    listOfUnprocessDirectFlight.add(fsp.getListOfFlightSchedule().get(i));
+                }
+            }
+            List<FlightScheduleEntity> odResult = processListGetCabinClassAndSeatAva(listOfUnprocessDirectFlight, cabinType, noOfPassenger, "Direct");
+            Comparator<FlightScheduleEntity> sortFlightScheduleId = (FlightScheduleEntity p1, FlightScheduleEntity p2) -> ((int) p1.getDepartureDateTime().getTime().getTime() - (int) p2.getDepartureDateTime().getTime().getTime());
+
+            odResult.sort(sortFlightScheduleId);
+            printDirectFlightResult(odResult);
+
+        }
+    }
+
+    public List<FlightScheduleEntity> processListGetCabinClassAndSeatAva(List<FlightScheduleEntity> listOfODQuery, CabinClassType cabinType, int noOfPassenger, String typeOfFlight) {
+
+        List<FlightScheduleEntity> tempList = new ArrayList<FlightScheduleEntity>();
+        if (typeOfFlight.equals("Connecting")) {
+
+            for (int i = 0; i < listOfODQuery.size(); i += 2) {
+                if (checkSeatGreaterThanPassenger(listOfODQuery.get(i), cabinType, noOfPassenger) && checkSeatGreaterThanPassenger(listOfODQuery.get(i + 1), cabinType, noOfPassenger)) {
+                    tempList.add(listOfODQuery.get(i));
+                    tempList.add(listOfODQuery.get(i + 1));
+                }
+            }
+        } else {
+            for (int i = 0; i < listOfODQuery.size(); i++) {
+                if (checkSeatGreaterThanPassenger(listOfODQuery.get(i), cabinType, noOfPassenger)) {
+                    tempList.add(listOfODQuery.get(i));
+                }
+            }
+        }
+
+        return tempList;
+    }
+
+    public boolean checkSeatGreaterThanPassenger(FlightScheduleEntity fs1, CabinClassType cabinType, int noOfPassenger) {
+        int countNoOfSeatFirstFlight = 0;
+        for (int j = 0; j < fs1.getSeatingPlan().size(); j++) {
+            System.out.println("Seating reserved" + fs1.getSeatingPlan().get(j).isReserved());
+            if (fs1.getSeatingPlan().get(j).getCabinType().equals(cabinType) && !fs1.getSeatingPlan().get(j).isReserved()) {
+                countNoOfSeatFirstFlight++;
+                if (countNoOfSeatFirstFlight == noOfPassenger) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

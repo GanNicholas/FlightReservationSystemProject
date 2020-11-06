@@ -7,9 +7,11 @@ package ejb.session.stateless;
 
 import entity.AirportEntity;
 import entity.FlightEntity;
+import entity.FlightRouteEntity;
 import entity.FlightScheduleEntity;
 import entity.FlightSchedulePlanEntity;
 import entity.SeatEntity;
+import entity.SingleFlightScheduleEntity;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -112,7 +114,7 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         return true;
     }
 
-    public List<FlightScheduleEntity> listOfConnectingFlightRecords(Date departureDate, Date endDate) {
+    public List<FlightSchedulePlanEntity> listOfConnectingFlightRecords(Date departureDate, Date endDate) {
         GregorianCalendar gDepart = new GregorianCalendar();
         gDepart.setTime(departureDate);
 
@@ -120,26 +122,21 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         gEndDate.setTime(endDate);
         gEndDate.add(GregorianCalendar.HOUR_OF_DAY, 23);
 
+        //Query query = em.createQuery("SELECT f FROM FlightScheduleEntity f WHERE f.departureDateTime BETWEEN :startDate AND :endDate ORDER BY f.departureDateTime ASC").setParameter("startDate", gDepart).setParameter("endDate", gEndDate);
+        Query query = em.createQuery("SELECT s FROM FlightSchedulePlanEntity s, IN(s.listOfFlightSchedule) f  WHERE f.departureDateTime BETWEEN :startDate AND :endDate ORDER BY f.departureDateTime ASC").setParameter("startDate", gDepart).setParameter("endDate", gEndDate);
 
-        /* SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        String strEndDate = format.format(gEndDate.getTime());
-       System.out.println("**************strEndDate *********** = " + strEndDate);
-        String strDepart = format.format(gDepart.getTime());
-        System.out.println("strDepart = " + strDepart);
-        System.out.println("**************Came into List of connectin **********");*/
-        Query query = em.createQuery("SELECT f FROM FlightScheduleEntity f WHERE f.departureDateTime BETWEEN :startDate AND :endDate").setParameter("startDate", gDepart).setParameter("endDate", gEndDate);
-        //+ "BETWEEN :=departureDate AND :=endDate").setParameter("departureDate", departureDate).setParameter("endDate", returnDate);
-        List<FlightScheduleEntity> listOfFlightRecord = query.getResultList();
+        List<FlightSchedulePlanEntity> listOfFlightRecord = query.getResultList();
         listOfFlightRecord.size();
-        System.out.println("*********************listOfFlightRecord.size():*****************************" + listOfFlightRecord.size());
-        return listOfFlightRecord;
-    }
+        for (int i = 0; i < listOfFlightRecord.size(); i++) {
+            listOfFlightRecord.get(i).getListOfFlightSchedule().size();
+            for (int j = 0; j < listOfFlightRecord.get(i).getListOfFlightSchedule().size(); j++) {
+                listOfFlightRecord.get(i).getListOfFlightSchedule().get(j).getSeatingPlan().size();
+                listOfFlightRecord.get(i).getListOfFare().size();
+                listOfFlightRecord.get(i).getListOfFlightSchedule().get(j).getFlightSchedulePlan();
+            }
+        }
 
-    public List<FlightScheduleEntity> listOfODQuery(String origin, String destination, Date departureDate, Date endDate) {
-        Query query = em.createQuery("SELECT f FROM FlightScheduleEntity f WHERE f.departureDateTime BETWEEN :startDate AND :endDate AND f.flightSchedulePlan.flightEntity.flightRoute.originLocation.iataAirportCode=:originIATA AND f.flightSchedulePlan.flightEntity.flightRoute.destinationLocation=:desIATA")
-                .setParameter("startDate", departureDate).setParameter("endDate", endDate).setParameter("originIATA", origin).setParameter("desIATA", destination);
-        //+ "BETWEEN :=departureDate AND :=endDate").setParameter("departureDate", departureDate).setParameter("endDate", returnDate);
-        List<FlightScheduleEntity> listOfFlightRecord = query.getResultList();
+        System.out.println("*********************listOfFlightRecord.size():*****************************" + listOfFlightRecord.size());
         return listOfFlightRecord;
     }
 

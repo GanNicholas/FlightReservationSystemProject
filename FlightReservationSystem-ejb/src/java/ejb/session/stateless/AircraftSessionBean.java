@@ -76,18 +76,18 @@ public class AircraftSessionBean implements AircraftSessionBeanRemote, AircraftS
 
             String[] getSeatingPerRow = cabin.getSeatingConfig().split("-");
             int numPplPerRow = 0;
+
             for (int i = 0; i < getSeatingPerRow.length; i++) {
                 numPplPerRow += Integer.parseInt(getSeatingPerRow[i]);
 
             }
-            // System.out.println("num ppl in row: " + numPplPerRow);
+
             for (int noOfRow = 0; noOfRow < cabin.getNumRows(); noOfRow++) {
                 for (int col = 0; col < numPplPerRow; col++) {
                     s = new SeatEntity();
                     s.setSeatNumber((seatNumber) + "" + cabinCol.charAt(col));
-                    // System.out.println("Seat : " + s.getSeatNumber());
                     s.setReserved(false);
-                    //s.(cabin.getCabinclassType());
+                    s.setCabinType(cabin.getCabinclassType());
                     em.persist(s);
                     em.flush();
                     aircraftConfigurationEntity.getSeatingPlan().add(s);
@@ -98,9 +98,6 @@ public class AircraftSessionBean implements AircraftSessionBeanRemote, AircraftS
         }
         return aircraftConfigurationEntity.getAircraftConfigId();
     }
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
-
     public List<AircraftConfigurationEntity> viewAircraftConfiguration() {
         Query query = em.createQuery("SELECT a FROM AircraftConfigurationEntity AS a ORDER BY a.aircraftType.aircraftTypeName asc, a.aircraftName asc");
         List<AircraftConfigurationEntity> aircraftConfiguration = query.getResultList();
