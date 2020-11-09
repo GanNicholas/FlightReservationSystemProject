@@ -568,6 +568,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             for (FareEntity fareInList : fsp.getListOfFare()) {
                 if (fareInList.getCabinType().equals(fare.getCabinType())) {
                     fsp.getListOfFare().remove(fare);
+                    
                     if (fsp.getReturnFlightSchedulePlan() != null) {
                         fsp.getReturnFlightSchedulePlan().getListOfFare().remove(fare);
                     }
@@ -673,7 +674,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             }
 
             for (FareEntity fare : fsp.getListOfFare()) {
-                deleteFare(fare.getFareId(), fsp);
+                em.remove(fare);
             }
 
             em.remove(fsp);

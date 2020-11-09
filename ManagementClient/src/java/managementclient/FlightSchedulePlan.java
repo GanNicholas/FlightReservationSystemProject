@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.logging.Level;
@@ -254,6 +255,7 @@ public class FlightSchedulePlan {
                         break;
                     } catch (FlightDoesNotExistException | FlightScheduleExistException ex) {
                         System.out.println(ex.getMessage());
+                        break;
                     }
                 }
             } catch (InputMismatchException ex) {
@@ -352,6 +354,7 @@ public class FlightSchedulePlan {
                     break;
                 } catch (FlightDoesNotExistException | FlightScheduleExistException ex) {
                     System.out.println(ex.getMessage());
+                    break;
                 }
             }
 
@@ -586,14 +589,20 @@ public class FlightSchedulePlan {
         String choice = "";
         while (true) {
             System.out.print("Please enter Flight Number: ");
+            String returnRouteStr = "";
             String flightNumber = sc.nextLine().trim();
-            List<FlightRouteEntity> listOfRoute = flightRouteSessionBean.viewListOfFlightRoute();
+            List<FlightRouteEntity> listOfRoute = flightRouteSessionBean.viewListOfAllFlightRoute();
             for (FlightRouteEntity fr : listOfRoute) {
-                if (fr.isMainRoute() && !fr.isIsDeleted()) {
+                if (!fr.isIsDeleted()) {
                     System.out.println("=======Flight Route======");
                     System.out.printf("%-20s%-45s%-45s%-30s", "Flight Route ID", "Origin Location", "Destination Location", "Return Route");
                     System.out.println();
-                    System.out.printf("%-20d%-45s%-45s%-30b", fr.getFlightRouteId(), fr.getOriginLocation().getAirportName(), fr.getDestinationLocation().getAirportName(), fr.getReturnRoute());
+                    if(fr.isMainRoute() && fr.getReturnRoute() != null){
+                        returnRouteStr = "Return route exists";
+                    } else{
+                        returnRouteStr = "Return route does not exists";
+                    }
+                    System.out.printf("%-20d%-45s%-45s%-30s", fr.getFlightRouteId(), fr.getOriginLocation().getAirportName(), fr.getDestinationLocation().getAirportName(), returnRouteStr);
                     System.out.println();
                 }
             }
@@ -602,7 +611,7 @@ public class FlightSchedulePlan {
             sc.nextLine();
             System.out.println();
             try {
-                FlightRouteEntity flightRoute = flightRouteSessionBean.getMainFlightRoute(flightRouteId);
+                FlightRouteEntity flightRoute = flightRouteSessionBean.getFlightRoute(flightRouteId);
                 List<AircraftConfigurationEntity> listOfAircraftConfig = aircraftSessionBeanRemote.viewAircraftConfiguration();
                 System.out.printf("%-35s %-35s %-35s %-51s", "Aircraft Configuration Id", "Aircraft Configuration Name", "Aircraft Type Name", "Aircraft Configuration Maximum Seating Capacity");
                 System.out.println();
@@ -619,8 +628,9 @@ public class FlightSchedulePlan {
 
                 FlightEntity flight = flightSessionBean.createFlightWithoutReturnFlight(flightNumber, flightRoute, aircraftConfig);
                 System.out.println("A new flight " + flight.getFlightNumber() + " has been created!");
+                System.out.println();
 
-                if (flightRoute.getReturnRoute() != null) {
+                if (flightRoute.getReturnRoute() != null && flightRoute.isMainRoute()) {
                     System.out.println("There is a return route for this flight route.");
                     System.out.println("Woud you like to create a return flight? (y/n)");
                     System.out.print("Please enter choice: ");
@@ -628,6 +638,7 @@ public class FlightSchedulePlan {
                     if (choice.toLowerCase().equals("y")) {
                         System.out.println("Please enter the return flight number: ");
                         String returnFlightNumber = sc.nextLine().trim();
+                        System.out.println();
                         FlightRouteEntity returnRoute = flightRoute.getReturnRoute();
                         FlightEntity returnFlight = flightSessionBean.createFlightWithReturnFlight(returnFlightNumber, returnRoute, aircraftConfig, flightNumber);
                         System.out.println("A return flight " + returnFlight.getFlightNumber() + " for flight " + flight.getFlightNumber() + " has been created!");
@@ -637,9 +648,10 @@ public class FlightSchedulePlan {
                     break;
                 }
                 break;
-            } catch (FlightRouteDoesNotExistException | AircraftConfigurationNotExistException | FlightExistsException | FlightDoesNotExistException | FlightRouteIsNotMainRouteException | InputMismatchException ex) {
+            } catch (FlightRouteDoesNotExistException | AircraftConfigurationNotExistException | FlightExistsException | FlightDoesNotExistException | InputMismatchException ex) {
                 System.out.println(ex.getMessage());
-                sc.next();;
+                sc.next();
+                break;
             }
         }
     }
@@ -662,9 +674,9 @@ public class FlightSchedulePlan {
                 System.out.println();
                 if (choice == 1) {
                     counter = 0;
-                    List<FlightRouteEntity> listOfRoute = flightRouteSessionBean.viewListOfFlightRoute();
+                    List<FlightRouteEntity> listOfRoute = flightRouteSessionBean.viewListOfAllFlightRoute();
                     for (FlightRouteEntity fr : listOfRoute) {
-                        if (fr.isMainRoute() && !fr.isIsDeleted()) {
+                        if (!fr.isIsDeleted()) {
                             System.out.println("=======Flight Route======");
                             System.out.printf("%-20s%-45s%-45s%-30s", "Flight Route ID", "Origin Location", "Destination Location", "Return Route");
                             System.out.println();
@@ -680,16 +692,11 @@ public class FlightSchedulePlan {
                         break;
                     }
                     FlightRouteEntity flightRoute = flightRouteSessionBean.getFlightRoute(flightRouteId);
-                    if (flightRoute.isIsDeleted() || !flightRoute.isMainRoute()) {
-                        if (flightRoute.isIsDeleted()) {
+                    if (flightRoute.isIsDeleted()) {
                             System.out.println("Unable to update flight! Flight route chosen is deleted!");
                             System.out.println();
-                        } else if (!flightRoute.isMainRoute()) {
-                            System.out.println("Unable to update flight! Flight route chosen is not the main flight route!");
-                            System.out.println();
-                        }
                     } else {
-                        if (flight.getReturnFlight() != null && flightRouteId != flight.getFlightRoute().getFlightRouteId() && flightRouteId != flight.getReturnFlight().getFlightRoute().getFlightRouteId()) {
+                        if (flight.getReturnFlight() != null && !Objects.equals(flightRouteId, flight.getFlightRoute().getFlightRouteId()) && !Objects.equals(flightRouteId, flight.getReturnFlight().getFlightRoute().getFlightRouteId())) {
                             System.out.println("Return flight detected. Would you like to change the flight route for the return flight as well? ");
                             System.out.print("Please enter choice (y/n) : ");
                             String decision = sc.nextLine().trim();
@@ -709,7 +716,7 @@ public class FlightSchedulePlan {
                                 System.out.println();
                             }
 
-                        } else if (flightRouteId != flight.getFlightRoute().getFlightRouteId()) {
+                        } else if (!Objects.equals(flightRouteId, flight.getFlightRoute().getFlightRouteId())) {
                             flight.setFlightRoute(flightRoute);
                             flightSessionBean.updateFlight(flight);
                             System.out.println("Flight routes have been updated for flight " + flight.getFlightNumber());
@@ -762,7 +769,10 @@ public class FlightSchedulePlan {
                 }
             } catch (FlightDoesNotExistException | FlightRouteDoesNotExistException | AircraftConfigurationNotExistException | InputMismatchException | FlightHasFlightSchedulePlanException | FlightIsDeletedException ex) {
                 System.out.println(ex.getMessage());
-                sc.next();;
+                if (ex instanceof InputMismatchException) {
+                    sc.next();
+                }
+                System.out.println();
                 counter++;
             }
 
@@ -796,6 +806,8 @@ public class FlightSchedulePlan {
     }
 
     public void viewSpecificFlight(Scanner sc) {
+        String returnFlight = "";
+        
         System.out.print("Please enter the flight number : ");
         String flightNumber = sc.nextLine().trim();
         try {
@@ -805,9 +817,14 @@ public class FlightSchedulePlan {
             FlightRouteEntity fr = flight.getFlightRoute();
             String originLocation = flight.getFlightRoute().getOriginLocation().getAirportName() + " in " + flight.getFlightRoute().getOriginLocation().getCountry() + ", " + flight.getFlightRoute().getOriginLocation().getCity();
             String destinationLocation = flight.getFlightRoute().getDestinationLocation().getAirportName() + " in " + flight.getFlightRoute().getDestinationLocation().getCountry() + ", " + flight.getFlightRoute().getDestinationLocation().getCity();
-            System.out.printf("%-20s%-70s%-70s%-30s", "Flight Route ID", "Origin Location", "Destination Location", "Return Route");
+            System.out.printf("%-20s%-70s%-70s%-30s", "Flight Route ID", "Origin Location", "Destination Location", "Return Flight");
             System.out.println();
-            System.out.printf("%-20d%-70s%-70s%-30B", fr.getFlightRouteId(), originLocation, destinationLocation, fr.getReturnRoute());
+            if(flight.getReturnFlight() != null){
+                returnFlight = "Return flight exists";
+            } else {
+                returnFlight = "No return flight exists";
+            }
+            System.out.printf("%-20d%-70s%-70s%-30s", fr.getFlightRouteId(), originLocation, destinationLocation, returnFlight);
             System.out.println();
             System.out.println();
             List<CabinClassConfigurationEntity> listOfCabinClass = flight.getAircraftConfig().getCabinClasses();
@@ -1328,7 +1345,7 @@ public class FlightSchedulePlan {
             sc.nextLine();
 
             if (choice == 1) {
-               String message =  flightSchedulePlanSessionBean.deleteFsp(fspId);
+                String message = flightSchedulePlanSessionBean.deleteFsp(fspId);
                 System.out.println(message);
             } else if (choice == 2) {
                 return;

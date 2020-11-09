@@ -54,7 +54,7 @@ public class SalesManagement {
             System.out.println("1. View Seats Inventory");
             System.out.println("2. View Flight Reservations");
             System.out.println("3. Exit");
-
+            System.out.print("Please enter choice: ");
             choice = sc.nextInt();
             sc.nextLine();
 
@@ -84,7 +84,7 @@ public class SalesManagement {
 
             FlightSchedulePlanEntity currentFsp = flightSchedulePlanSessionBean.viewFlightSchedulePlan(fspId);
             viewSpecificFsp(currentFsp);
-            System.out.println("Please enter the ID of the Flight Schedule you wish to view: ");
+            System.out.print("Please enter the ID of the Flight Schedule you wish to view: ");
             Long fsId = sc.nextLong();
             sc.nextLine();
 
@@ -230,7 +230,7 @@ public class SalesManagement {
 
             FlightSchedulePlanEntity currentFsp = flightSchedulePlanSessionBean.viewFlightSchedulePlan(fspId);
             viewSpecificFsp(currentFsp);
-            System.out.println("Please enter the ID of the Flight Schedule you wish to view: ");
+            System.out.print("Please enter the ID of the Flight Schedule you wish to view: ");
             Long fsId = sc.nextLong();
             sc.nextLine();
 
@@ -242,6 +242,9 @@ public class SalesManagement {
             
             for(SeatEntity seat : listOfAllReservedSeats){
                 System.out.printf("%-30s%-40s%-20s", "Seating Number", "Passenger Name", "Fare Basis Code");
+                System.out.println();
+                String passsengerName = seat.getPassenger().getFirstName() + " " + seat.getPassenger().getLastName();
+                System.out.printf("%-30s%-40s%-20s", seat.getSeatNumber(),passsengerName, seat.getFare().getFareBasisCode());
                 System.out.println();
             }
             

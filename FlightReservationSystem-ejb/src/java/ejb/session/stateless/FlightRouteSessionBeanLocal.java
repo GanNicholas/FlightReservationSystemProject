@@ -36,4 +36,5 @@ public interface FlightRouteSessionBeanLocal {
 
     public FlightRouteEntity getMainFlightRoute(Long id) throws FlightRouteDoesNotExistException, FlightRouteIsNotMainRouteException;
 
+    public List<FlightRouteEntity> viewListOfAllFlightRoute();
 }

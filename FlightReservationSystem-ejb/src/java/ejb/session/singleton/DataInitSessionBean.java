@@ -174,277 +174,271 @@ public class DataInitSessionBean {
 
         em.flush();
 
-        //To test search flight
-        for (int i = 0; i < 1; i++) { //aircraft config and aircraft type
-            AircraftConfigurationEntity ac1 = new AircraftConfigurationEntity();
-            String type = "type" + i;
-            AircraftTypeEntity at1 = new AircraftTypeEntity(type);
-            em.persist(at1);
-            ac1.setAircraftName("name" + i);
-            ac1.setMaxSeatingCapacity(250);
-
-            List<CabinClassConfigurationEntity> cabinList = new ArrayList<CabinClassConfigurationEntity>();
-            CabinClassConfigurationEntity ccc1 = new CabinClassConfigurationEntity();
-            ccc1.setNumAisles(2);
-            ccc1.setSeatingConfig("3-4-3");
-            ccc1.setCabinclassType(CabinClassType.Y);
-            ccc1.setNumRows(10);
-            cabinList.add(ccc1);
-            ccc1 = new CabinClassConfigurationEntity();
-            ccc1.setNumAisles(1);
-            ccc1.setSeatingConfig("5-5");
-            ccc1.setCabinclassType(CabinClassType.W);
-            ccc1.setNumRows(5);
-            cabinList.add(ccc1);
-            aircraftSessionBean.createAircraftConfiguration(ac1, at1, cabinList);
-
-        }
-        try { //flight route
-            flightRouteSessionBean.createFlightRoute("SIN", "KUL", "Yes");
-            flightRouteSessionBean.createFlightRoute("SIN", "BNE", "Yes");
-            flightRouteSessionBean.createFlightRoute("SIN", "ASP", "Yes");
-            flightRouteSessionBean.createFlightRoute("ASP", "DRW", "Yes");
-            flightRouteSessionBean.createFlightRoute("BNE", "DRW", "Yes");
-            flightRouteSessionBean.createFlightRoute("DRW", "CAN", "Yes");
-            flightRouteSessionBean.createFlightRoute("ITM", "SGN", "Yes");
-            flightRouteSessionBean.createFlightRoute("SIN", "USN", "Yes");
-            flightRouteSessionBean.createFlightRoute("USN", "DRW", "Yes");
-            flightRouteSessionBean.createFlightRoute("SIN", "TPE", "Yes");
-            flightRouteSessionBean.createFlightRoute("SIN", "DRW", "Yes");
-
-        } catch (AirportODPairNotFoundException ex) {
-            System.out.println("AirportODPairNotFoundException at flight route record");
-        } catch (FlightRouteODPairExistException ex) {
-            System.out.println("FlightRouteODPairExistException at flight route record");
-        }
-
-        AircraftConfigurationEntity a1 = em.find(AircraftConfigurationEntity.class, 1l); // create FS
-
-        FlightRouteEntity r1 = em.find(FlightRouteEntity.class, 1l);
-        try {
-            r1 = em.find(FlightRouteEntity.class, 1l);
-            flightSessionBean.createFlightWithoutReturnFlight("ML001", r1, a1);
-            flightSessionBean.createFlightWithReturnFlight("ML011", r1, a1, "ML001");
-
-            r1 = em.find(FlightRouteEntity.class, 3l);
-            flightSessionBean.createFlightWithoutReturnFlight("ML002", r1, a1);
-            flightSessionBean.createFlightWithReturnFlight("ML012", r1, a1, "ML002");
-
-            r1 = em.find(FlightRouteEntity.class, 5l);
-            flightSessionBean.createFlightWithoutReturnFlight("ML003", r1, a1);
-            flightSessionBean.createFlightWithReturnFlight("ML013", r1, a1, "ML003");
-
-            r1 = em.find(FlightRouteEntity.class, 7l);
-            flightSessionBean.createFlightWithoutReturnFlight("ML004", r1, a1);
-            flightSessionBean.createFlightWithReturnFlight("ML014", r1, a1, "ML004");
-
-            r1 = em.find(FlightRouteEntity.class, 9l);
-            flightSessionBean.createFlightWithoutReturnFlight("ML005", r1, a1);
-            flightSessionBean.createFlightWithReturnFlight("ML015", r1, a1, "ML005");
-
-            r1 = em.find(FlightRouteEntity.class, 11l);
-            flightSessionBean.createFlightWithoutReturnFlight("ML006", r1, a1);
-            flightSessionBean.createFlightWithReturnFlight("ML016", r1, a1, "ML006");
-
-            r1 = em.find(FlightRouteEntity.class, 13l);
-            flightSessionBean.createFlightWithoutReturnFlight("ML007", r1, a1);
-            flightSessionBean.createFlightWithReturnFlight("ML017", r1, a1, "ML007");
-
-            r1 = em.find(FlightRouteEntity.class, 15l);
-            flightSessionBean.createFlightWithoutReturnFlight("ML008", r1, a1);
-            flightSessionBean.createFlightWithReturnFlight("ML018", r1, a1, "ML008");
-
-            r1 = em.find(FlightRouteEntity.class, 17l);
-            flightSessionBean.createFlightWithoutReturnFlight("ML009", r1, a1);
-            flightSessionBean.createFlightWithReturnFlight("ML019", r1, a1, "ML009");
-
-            r1 = em.find(FlightRouteEntity.class, 21l);
-            flightSessionBean.createFlightWithoutReturnFlight("ML010", r1, a1);
-            flightSessionBean.createFlightWithReturnFlight("ML020", r1, a1, "ML010");
-
-        } catch (FlightExistsException ex) {
-            System.out.println("FlightExistsException went wrong at flight record");
-        } catch (FlightDoesNotExistException ex) {
-            System.out.println("FlightDoesNotExistException went wrong at flight record");
-        } catch (FlightRouteDoesNotExistException ex) {
-            System.out.println("FlightRouteDoesNotExistException went wrong at flight record");
-        } catch (AircraftConfigurationNotExistException ex) {
-            System.out.println("AircraftConfigurationNotExistException went wrong at flight record");
-        }
-        try {
-            int counterForFareBasis = 0;
-            //1
-            GregorianCalendar departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 04, 02, 00, 10, 0);
-            GregorianCalendar endDate = new GregorianCalendar();
-            endDate.set(2021, 05, 16, 00, 10, 0);
-            List<FareEntity> listOfFare = new ArrayList<>();
-            for (int i = 0; i < 2; i++) {
-                FareEntity fe = new FareEntity();
-                fe.setCabinType(CabinClassType.Y);
-                fe.setFareBasisCode("F001" + counterForFareBasis);
-                fe.setFareAmount(new BigDecimal(1500));
-                listOfFare.add(fe);
-                counterForFareBasis++;
-            }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML001", departureDateTime, endDate, 100, false, listOfFare, 600, 2);
-            //2
-            departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 4, 01, 00, 10, 0);
-            endDate = new GregorianCalendar();
-            endDate.set(2021, 5, 02, 00, 10, 0);
-            listOfFare = new ArrayList<>();
-            for (int i = 0; i < 2; i++) {
-                FareEntity fe = new FareEntity();
-                fe.setCabinType(CabinClassType.Y);
-                fe.setFareBasisCode("F001" + counterForFareBasis);
-                fe.setFareAmount(new BigDecimal(1500));
-                listOfFare.add(fe);
-                counterForFareBasis++;
-            }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML002", departureDateTime, endDate, 400, false, listOfFare, 120, 3);
-            //3
-            /*  departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 04, 01, 00, 10, 0);
-            endDate = new GregorianCalendar();
-            endDate.set(2021, 06, 02, 00, 10, 0);
-            listOfFare = new ArrayList<>();
-            for (int i = 0; i < 2; i++) {
-                FareEntity fe = new FareEntity();
-                fe.setCabinType(CabinClassType.Y);
-                fe.setFareBasisCode("F001" + counterForFareBasis);
-                fe.setFareAmount(new BigDecimal(1500));
-                listOfFare.add(fe);
-                counterForFareBasis++;
-            }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML003", departureDateTime, endDate, 420, false, listOfFare, 600, 5);*/
-
-            //4
-            /* departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 04, 02, 00, 10, 0);
-            endDate = new GregorianCalendar();
-            endDate.set(2021, 04, 03, 16, 00, 0);
-            listOfFare = new ArrayList<>();
-            for (int i = 0; i < 2; i++) {
-                FareEntity fe = new FareEntity();
-                fe.setCabinType(CabinClassType.Y);
-                fe.setFareBasisCode("F001" + counterForFareBasis);
-                fe.setFareAmount(new BigDecimal(1500));
-                listOfFare.add(fe);
-                counterForFareBasis++;
-            }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML004", departureDateTime, endDate, 450, false, listOfFare, 240, 1); */
-            //5
-            departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 4, 01, 15, 10, 0);
-            endDate = new GregorianCalendar();
-            endDate.set(2021, 7, 01, 00, 10, 0);
-            listOfFare = new ArrayList<>();
-            for (int i = 0; i < 2; i++) {
-                FareEntity fe = new FareEntity();
-                fe.setCabinType(CabinClassType.Y);
-                fe.setFareBasisCode("F001" + counterForFareBasis);
-                fe.setFareAmount(new BigDecimal(1500));
-                listOfFare.add(fe);
-                counterForFareBasis++;
-            }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML005", departureDateTime, endDate, 120, false, listOfFare, 700, 3);
-
-            //6
-            /* departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 04, 01, 00, 10, 0);
-            endDate = new GregorianCalendar();
-            endDate.set(2021, 04, 14, 00, 10, 0);
-            listOfFare = new ArrayList<>();
-            for (int i = 0; i < 2; i++) {
-                FareEntity fe = new FareEntity();
-                fe.setCabinType(CabinClassType.Y);
-                fe.setFareBasisCode("F001" + counterForFareBasis);
-                fe.setFareAmount(new BigDecimal(1500));
-                listOfFare.add(fe);
-                counterForFareBasis++;
-            }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML006", departureDateTime, endDate, 470, false, listOfFare, 700, 1);*/
-            //7
-            /* departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 04, 05, 00, 10, 0);
-            endDate = new GregorianCalendar();
-            endDate.set(2021, 04, 19, 00, 10, 0);
-            listOfFare = new ArrayList<>();
-            for (int i = 0; i < 2; i++) {
-                FareEntity fe = new FareEntity();
-                fe.setCabinType(CabinClassType.Y);
-                fe.setFareBasisCode("F001" + counterForFareBasis);
-                fe.setFareAmount(new BigDecimal(1500));
-                listOfFare.add(fe);
-                counterForFareBasis++;
-            }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML007", departureDateTime, endDate, 300, false, listOfFare, 200, 1);*/
-            //8
-            /*   departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 04, 06, 19, 10, 0);
-            endDate = new GregorianCalendar();
-            endDate.set(2021, 04, 19, 00, 19, 0);
-            listOfFare = new ArrayList<>();
-            for (int i = 0; i < 2; i++) {
-                FareEntity fe = new FareEntity();
-                fe.setCabinType(CabinClassType.Y);
-                fe.setFareBasisCode("F001" + counterForFareBasis);
-                fe.setFareAmount(new BigDecimal(1500));
-                listOfFare.add(fe);
-                counterForFareBasis++;
-            }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML008", departureDateTime, endDate, 420, false, listOfFare, 200, 3); */
-            //9
-            /*     departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 04, 07, 8, 10, 0);
-            endDate = new GregorianCalendar();
-            endDate.set(2021, 04, 21, 00, 19, 0);
-            listOfFare = new ArrayList<>();
-            for (int i = 0; i < 2; i++) {
-                FareEntity fe = new FareEntity();
-                fe.setCabinType(CabinClassType.Y);
-                fe.setFareBasisCode("F001" + counterForFareBasis);
-                fe.setFareAmount(new BigDecimal(1500));
-                listOfFare.add(fe);
-                counterForFareBasis++;
-            }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML009", departureDateTime, endDate, 300, true, listOfFare, 200, 3);
-             */
-            //10 
-            departureDateTime = new GregorianCalendar();
-            departureDateTime.set(2021, 04, 07, 8, 10, 0);
-            endDate = new GregorianCalendar();
-            endDate.set(2021, 04, 21, 00, 19, 0);
-            listOfFare = new ArrayList<>();
-            for (int i = 0; i < 2; i++) {
-                FareEntity fe = new FareEntity();
-                fe.setCabinType(CabinClassType.Y);
-                fe.setFareBasisCode("F001" + counterForFareBasis);
-                fe.setFareAmount(new BigDecimal(1500));
-                listOfFare.add(fe);
-                counterForFareBasis++;
-            }
-            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML010", departureDateTime, endDate, 400, true, listOfFare, 200, 3);
-            CustomerEntity c1 = new FRSCustomerEntity("customer", "password", UserRole.CUSTOMER, "customerFirstName", "customerLastName", "email123@address.com", "91234567", "address123456788");
-            customerSessionBean.registerCustomer(c1);
-        } catch (FlightScheduleExistException ex) {
-            System.out.println("FlightScheduleExistException went wrong at fsp");
-        } catch (FlightDoesNotExistException ex) {
-            System.out.println("FlightDoesNotExistExceptions went wrong at fsp");
-        } catch (CustomerExistException ex) {
-            System.out.println("Customer already exist");
-        }
+//        //To test search flight
+//        for (int i = 0; i < 1; i++) { //aircraft config and aircraft type
+//            AircraftConfigurationEntity ac1 = new AircraftConfigurationEntity();
+//            String type = "type" + i;
+//            AircraftTypeEntity at1 = new AircraftTypeEntity(type);
+//            em.persist(at1);
+//            ac1.setAircraftName("name" + i);
+//            ac1.setMaxSeatingCapacity(250);
+//
+//            List<CabinClassConfigurationEntity> cabinList = new ArrayList<CabinClassConfigurationEntity>();
+//            CabinClassConfigurationEntity ccc1 = new CabinClassConfigurationEntity();
+//            ccc1.setNumAisles(2);
+//            ccc1.setSeatingConfig("3-4-3");
+//            ccc1.setCabinclassType(CabinClassType.Y);
+//            ccc1.setNumRows(10);
+//            cabinList.add(ccc1);
+//            ccc1 = new CabinClassConfigurationEntity();
+//            ccc1.setNumAisles(1);
+//            ccc1.setSeatingConfig("5-5");
+//            ccc1.setCabinclassType(CabinClassType.W);
+//            ccc1.setNumRows(5);
+//            cabinList.add(ccc1);
+//            aircraftSessionBean.createAircraftConfiguration(ac1, at1, cabinList);
+//
+//        }
+//        try { //flight route
+//            flightRouteSessionBean.createFlightRoute("SIN", "KUL", "Yes");
+//            flightRouteSessionBean.createFlightRoute("SIN", "BNE", "Yes");
+//            flightRouteSessionBean.createFlightRoute("SIN", "ASP", "Yes");
+//            flightRouteSessionBean.createFlightRoute("ASP", "DRW", "Yes");
+//            flightRouteSessionBean.createFlightRoute("BNE", "DRW", "Yes");
+//            flightRouteSessionBean.createFlightRoute("DRW", "CAN", "Yes");
+//            flightRouteSessionBean.createFlightRoute("ITM", "SGN", "Yes");
+//            flightRouteSessionBean.createFlightRoute("SIN", "USN", "Yes");
+//            flightRouteSessionBean.createFlightRoute("USN", "DRW", "Yes");
+//            flightRouteSessionBean.createFlightRoute("SIN", "TPE", "Yes");
+//            flightRouteSessionBean.createFlightRoute("SIN", "DRW", "Yes");
+//
+//        } catch (AirportODPairNotFoundException ex) {
+//            System.out.println("AirportODPairNotFoundException at flight route record");
+//        } catch (FlightRouteODPairExistException ex) {
+//            System.out.println("FlightRouteODPairExistException at flight route record");
+//        }
+//
+//        AircraftConfigurationEntity a1 = em.find(AircraftConfigurationEntity.class, 1l); // create FS
+//
+//        FlightRouteEntity r1 = em.find(FlightRouteEntity.class, 1l);
+//        try {
+//            r1 = em.find(FlightRouteEntity.class, 1l);
+//            flightSessionBean.createFlightWithoutReturnFlight("ML001", r1, a1);
+//            flightSessionBean.createFlightWithReturnFlight("ML011", r1, a1, "ML001");
+//
+//            r1 = em.find(FlightRouteEntity.class, 3l);
+//            flightSessionBean.createFlightWithoutReturnFlight("ML002", r1, a1);
+//            flightSessionBean.createFlightWithReturnFlight("ML012", r1, a1, "ML002");
+//
+//            r1 = em.find(FlightRouteEntity.class, 5l);
+//            flightSessionBean.createFlightWithoutReturnFlight("ML003", r1, a1);
+//            flightSessionBean.createFlightWithReturnFlight("ML013", r1, a1, "ML003");
+//
+//            r1 = em.find(FlightRouteEntity.class, 7l);
+//            flightSessionBean.createFlightWithoutReturnFlight("ML004", r1, a1);
+//            flightSessionBean.createFlightWithReturnFlight("ML014", r1, a1, "ML004");
+//
+//            r1 = em.find(FlightRouteEntity.class, 9l);
+//            flightSessionBean.createFlightWithoutReturnFlight("ML005", r1, a1);
+//            flightSessionBean.createFlightWithReturnFlight("ML015", r1, a1, "ML005");
+//
+//            r1 = em.find(FlightRouteEntity.class, 11l);
+//            flightSessionBean.createFlightWithoutReturnFlight("ML006", r1, a1);
+//            flightSessionBean.createFlightWithReturnFlight("ML016", r1, a1, "ML006");
+//
+//            r1 = em.find(FlightRouteEntity.class, 13l);
+//            flightSessionBean.createFlightWithoutReturnFlight("ML007", r1, a1);
+//            flightSessionBean.createFlightWithReturnFlight("ML017", r1, a1, "ML007");
+//
+//            r1 = em.find(FlightRouteEntity.class, 15l);
+//            flightSessionBean.createFlightWithoutReturnFlight("ML008", r1, a1);
+//            flightSessionBean.createFlightWithReturnFlight("ML018", r1, a1, "ML008");
+//
+//            r1 = em.find(FlightRouteEntity.class, 17l);
+//            flightSessionBean.createFlightWithoutReturnFlight("ML009", r1, a1);
+//            flightSessionBean.createFlightWithReturnFlight("ML019", r1, a1, "ML009");
+//
+//            r1 = em.find(FlightRouteEntity.class, 21l);
+//            flightSessionBean.createFlightWithoutReturnFlight("ML010", r1, a1);
+//            flightSessionBean.createFlightWithReturnFlight("ML020", r1, a1, "ML010");
+//
+//        } catch (FlightExistsException ex) {
+//            System.out.println("FlightExistsException went wrong at flight record");
+//        } catch (FlightDoesNotExistException ex) {
+//            System.out.println("FlightDoesNotExistException went wrong at flight record");
+//        } catch (FlightRouteDoesNotExistException ex) {
+//            System.out.println("FlightRouteDoesNotExistException went wrong at flight record");
+//        } catch (AircraftConfigurationNotExistException ex) {
+//            System.out.println("AircraftConfigurationNotExistException went wrong at flight record");
+//        }
+//        try {
+//            int counterForFareBasis = 0;
+//            //1
+//            GregorianCalendar departureDateTime = new GregorianCalendar();
+//            departureDateTime.set(2021, 04, 02, 00, 10, 0);
+//            GregorianCalendar endDate = new GregorianCalendar();
+//            endDate.set(2021, 05, 16, 00, 10, 0);
+//            List<FareEntity> listOfFare = new ArrayList<>();
+//            for (int i = 0; i < 2; i++) {
+//                FareEntity fe = new FareEntity();
+//                fe.setCabinType(CabinClassType.Y);
+//                fe.setFareBasisCode("F001" + counterForFareBasis);
+//                fe.setFareAmount(new BigDecimal(1500));
+//                listOfFare.add(fe);
+//                counterForFareBasis++;
+//            }
+//            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML001", departureDateTime, endDate, 100, false, listOfFare, 600, 2);
+//            //2
+//            departureDateTime = new GregorianCalendar();
+//            departureDateTime.set(2021, 4, 01, 00, 10, 0);
+//            endDate = new GregorianCalendar();
+//            endDate.set(2021, 5, 02, 00, 10, 0);
+//            listOfFare = new ArrayList<>();
+//            for (int i = 0; i < 2; i++) {
+//                FareEntity fe = new FareEntity();
+//                fe.setCabinType(CabinClassType.Y);
+//                fe.setFareBasisCode("F001" + counterForFareBasis);
+//                fe.setFareAmount(new BigDecimal(1500));
+//                listOfFare.add(fe);
+//                counterForFareBasis++;
+//            }
+//            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML002", departureDateTime, endDate, 400, false, listOfFare, 120, 3);
+//            //3
+//            /*  departureDateTime = new GregorianCalendar();
+//            departureDateTime.set(2021, 04, 01, 00, 10, 0);
+//            endDate = new GregorianCalendar();
+//            endDate.set(2021, 06, 02, 00, 10, 0);
+//            listOfFare = new ArrayList<>();
+//            for (int i = 0; i < 2; i++) {
+//                FareEntity fe = new FareEntity();
+//                fe.setCabinType(CabinClassType.Y);
+//                fe.setFareBasisCode("F001" + counterForFareBasis);
+//                fe.setFareAmount(new BigDecimal(1500));
+//                listOfFare.add(fe);
+//                counterForFareBasis++;
+//            }
+//            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML003", departureDateTime, endDate, 420, false, listOfFare, 600, 5);*/
+//
+//            //4
+//            /* departureDateTime = new GregorianCalendar();
+//            departureDateTime.set(2021, 04, 02, 00, 10, 0);
+//            endDate = new GregorianCalendar();
+//            endDate.set(2021, 04, 03, 16, 00, 0);
+//            listOfFare = new ArrayList<>();
+//            for (int i = 0; i < 2; i++) {
+//                FareEntity fe = new FareEntity();
+//                fe.setCabinType(CabinClassType.Y);
+//                fe.setFareBasisCode("F001" + counterForFareBasis);
+//                fe.setFareAmount(new BigDecimal(1500));
+//                listOfFare.add(fe);
+//                counterForFareBasis++;
+//            }
+//            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML004", departureDateTime, endDate, 450, false, listOfFare, 240, 1); */
+//            //5
+//            departureDateTime = new GregorianCalendar();
+//            departureDateTime.set(2021, 4, 01, 15, 10, 0);
+//            endDate = new GregorianCalendar();
+//            endDate.set(2021, 7, 01, 00, 10, 0);
+//            listOfFare = new ArrayList<>();
+//            for (int i = 0; i < 2; i++) {
+//                FareEntity fe = new FareEntity();
+//                fe.setCabinType(CabinClassType.Y);
+//                fe.setFareBasisCode("F001" + counterForFareBasis);
+//                fe.setFareAmount(new BigDecimal(1500));
+//                listOfFare.add(fe);
+//                counterForFareBasis++;
+//            }
+//            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML005", departureDateTime, endDate, 120, false, listOfFare, 700, 3);
+//
+//            //6
+//            /* departureDateTime = new GregorianCalendar();
+//            departureDateTime.set(2021, 04, 01, 00, 10, 0);
+//            endDate = new GregorianCalendar();
+//            endDate.set(2021, 04, 14, 00, 10, 0);
+//            listOfFare = new ArrayList<>();
+//            for (int i = 0; i < 2; i++) {
+//                FareEntity fe = new FareEntity();
+//                fe.setCabinType(CabinClassType.Y);
+//                fe.setFareBasisCode("F001" + counterForFareBasis);
+//                fe.setFareAmount(new BigDecimal(1500));
+//                listOfFare.add(fe);
+//                counterForFareBasis++;
+//            }
+//            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML006", departureDateTime, endDate, 470, false, listOfFare, 700, 1);*/
+//            //7
+//            /* departureDateTime = new GregorianCalendar();
+//            departureDateTime.set(2021, 04, 05, 00, 10, 0);
+//            endDate = new GregorianCalendar();
+//            endDate.set(2021, 04, 19, 00, 10, 0);
+//            listOfFare = new ArrayList<>();
+//            for (int i = 0; i < 2; i++) {
+//                FareEntity fe = new FareEntity();
+//                fe.setCabinType(CabinClassType.Y);
+//                fe.setFareBasisCode("F001" + counterForFareBasis);
+//                fe.setFareAmount(new BigDecimal(1500));
+//                listOfFare.add(fe);
+//                counterForFareBasis++;
+//            }
+//            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML007", departureDateTime, endDate, 300, false, listOfFare, 200, 1);*/
+//            //8
+//            /*   departureDateTime = new GregorianCalendar();
+//            departureDateTime.set(2021, 04, 06, 19, 10, 0);
+//            endDate = new GregorianCalendar();
+//            endDate.set(2021, 04, 19, 00, 19, 0);
+//            listOfFare = new ArrayList<>();
+//            for (int i = 0; i < 2; i++) {
+//                FareEntity fe = new FareEntity();
+//                fe.setCabinType(CabinClassType.Y);
+//                fe.setFareBasisCode("F001" + counterForFareBasis);
+//                fe.setFareAmount(new BigDecimal(1500));
+//                listOfFare.add(fe);
+//                counterForFareBasis++;
+//            }
+//            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML008", departureDateTime, endDate, 420, false, listOfFare, 200, 3); */
+//            //9
+//            /*     departureDateTime = new GregorianCalendar();
+//            departureDateTime.set(2021, 04, 07, 8, 10, 0);
+//            endDate = new GregorianCalendar();
+//            endDate.set(2021, 04, 21, 00, 19, 0);
+//            listOfFare = new ArrayList<>();
+//            for (int i = 0; i < 2; i++) {
+//                FareEntity fe = new FareEntity();
+//                fe.setCabinType(CabinClassType.Y);
+//                fe.setFareBasisCode("F001" + counterForFareBasis);
+//                fe.setFareAmount(new BigDecimal(1500));
+//                listOfFare.add(fe);
+//                counterForFareBasis++;
+//            }
+//            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML009", departureDateTime, endDate, 300, true, listOfFare, 200, 3);
+//             */
+//            //10 
+//            departureDateTime = new GregorianCalendar();
+//            departureDateTime.set(2021, 04, 07, 8, 10, 0);
+//            endDate = new GregorianCalendar();
+//            endDate.set(2021, 04, 21, 00, 19, 0);
+//            listOfFare = new ArrayList<>();
+//            for (int i = 0; i < 2; i++) {
+//                FareEntity fe = new FareEntity();
+//                fe.setCabinType(CabinClassType.Y);
+//                fe.setFareBasisCode("F001" + counterForFareBasis);
+//                fe.setFareAmount(new BigDecimal(1500));
+//                listOfFare.add(fe);
+//                counterForFareBasis++;
+//            }
+//            flightSchedulePlanSessionBean.createRecurrentFlightSchedulePlan("ML010", departureDateTime, endDate, 400, true, listOfFare, 200, 3);
+//            CustomerEntity c1 = new FRSCustomerEntity("customer", "password", UserRole.CUSTOMER, "customerFirstName", "customerLastName", "email123@address.com", "91234567", "address123456788");
+//            customerSessionBean.registerCustomer(c1);
+//        } catch (FlightScheduleExistException ex) {
+//            System.out.println("FlightScheduleExistException went wrong at fsp");
+//        } catch (FlightDoesNotExistException ex) {
+//            System.out.println("FlightDoesNotExistExceptions went wrong at fsp");
+//        } catch (CustomerExistException ex) {
+//            System.out.println("Customer already exist");
+//        }
         //createRecurrentFlightSchedulePlan
 
     }
 
-    public void persist(Object object) {
-        em.persist(object);
-    }
-
-    public void persist1(Object object) {
-        em.persist(object);
-    }
+   
 
 }

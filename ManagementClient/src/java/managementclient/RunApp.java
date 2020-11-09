@@ -108,12 +108,14 @@ public class RunApp {
                             System.out.println("2. Flight Route");
                             String subInput = sc.nextLine().trim();
                             int subChoice = Integer.parseInt(subInput);
-                            if (subChoice == 1) {
+                            if (subChoice == 1 && employeeSessionBean.getEmployeeRole(userId).equals(UserRole.FLEETMANAGER)) {
                                 AircraftConfiguration aircraft = new AircraftConfiguration(aircraftSessionBean);
                                 aircraft.AircraftConfigurationApp();
-                            } else if (subChoice == 2) {
+                            } else if (subChoice == 2 && employeeSessionBean.getEmployeeRole(userId).equals(UserRole.ROUTEPLANNER)) {
                                 FlightRoute fr = new FlightRoute(flightRouteSessionBean);
                                 fr.flightRouteApp();
+                            } else {
+                                System.out.println("Sorry, you do not have the access right. Please try again!");
                             }
 
                             counter = 0;
@@ -141,7 +143,7 @@ public class RunApp {
                 } else if (choice == 3) {
                     try {
                         if (employeeSessionBean.getEmployeeRole(userId).equals(UserRole.SALESMANAGER)) {
-                            SalesManagement salesManagement = new SalesManagement(flightSessionBean,flightSchedulePlanSessionBean);
+                            SalesManagement salesManagement = new SalesManagement(flightSessionBean, flightSchedulePlanSessionBean);
                             salesManagement.runApp();
                         } else {
                             System.out.println("Sorry, you do not have the access right. Please try again!");

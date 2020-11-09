@@ -176,5 +176,15 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
             }
         }
     }
+    
+    @Override
+    public List<FlightRouteEntity> viewListOfAllFlightRoute() {
+
+        Query query = em.createQuery("SELECT f FROM FlightRouteEntity f WHERE f.isDeleted =:isDeleted").setParameter("isDeleted", false);
+        List<FlightRouteEntity> listOfFlightRoute = query.getResultList();
+        listOfFlightRoute.size();
+        return listOfFlightRoute;
+    }
+
 
 }
