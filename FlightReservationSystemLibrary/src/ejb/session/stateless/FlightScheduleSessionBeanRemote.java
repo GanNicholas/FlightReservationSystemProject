@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.FlightBundle;
 import entity.FlightEntity;
 import entity.FlightScheduleEntity;
 import entity.FlightSchedulePlanEntity;
@@ -13,6 +14,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.FlightRouteDoesNotExistException;
 import util.exception.FlightScheduleExistException;
 
 /**
@@ -26,5 +28,11 @@ public interface FlightScheduleSessionBeanRemote {
 
     public boolean checkFlightScheduleSeats(FlightScheduleEntity fs);
 
-    public List<FlightSchedulePlanEntity> listOfConnectingFlightRecords(Date departureDate, Date endDate);
+    public List<FlightBundle> listOfConnectingFlightRecords(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+
+    public List<FlightBundle> listOfConnectingFlightRecordsAftThreeDays(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+
+    public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDays(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+
+    public List<FlightBundle> getDirectFlight(GregorianCalendar actual, GregorianCalendar changeDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
 }

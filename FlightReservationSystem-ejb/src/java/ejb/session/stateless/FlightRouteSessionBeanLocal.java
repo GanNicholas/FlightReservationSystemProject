@@ -36,4 +36,6 @@ public interface FlightRouteSessionBeanLocal {
 
     public FlightRouteEntity getMainFlightRoute(Long id) throws FlightRouteDoesNotExistException, FlightRouteIsNotMainRouteException;
 
+    public void retrieveOD(String oIataCode) throws FlightRouteDoesNotExistException;
+
 }

@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.AirportEntity;
+import entity.FlightBundle;
 import entity.FlightEntity;
 import entity.FlightRouteEntity;
 import entity.FlightScheduleEntity;
@@ -13,17 +14,22 @@ import entity.FlightSchedulePlanEntity;
 import entity.SeatEntity;
 import entity.SingleFlightScheduleEntity;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import javax.annotation.Resource;
+import javax.ejb.EJB;
 import javax.ejb.EJBContext;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
+import sun.util.calendar.Gregorian;
+import util.exception.FlightRouteDoesNotExistException;
 import util.exception.FlightScheduleExistException;
 
 /**
@@ -32,6 +38,9 @@ import util.exception.FlightScheduleExistException;
  */
 @Stateless
 public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemote, FlightScheduleSessionBeanLocal {
+
+    @EJB
+    private FlightRouteSessionBeanLocal flightRouteSessionBean;
 
     @PersistenceContext(unitName = "FlightReservationSystem-ejbPU")
     private EntityManager em;
@@ -114,30 +123,333 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         return true;
     }
 
-    public List<FlightSchedulePlanEntity> listOfConnectingFlightRecords(Date departureDate, Date endDate) {
+    public List<FlightBundle> listOfConnectingFlightRecords(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
+
         GregorianCalendar gDepart = new GregorianCalendar();
         gDepart.setTime(departureDate);
 
-        GregorianCalendar gEndDate = new GregorianCalendar();
-        gEndDate.setTime(endDate);
-        gEndDate.add(GregorianCalendar.HOUR_OF_DAY, 23);
+        GregorianCalendar gEndDate = (GregorianCalendar) gDepart.clone();
+        gEndDate.add(GregorianCalendar.HOUR_OF_DAY, 24);
+        gEndDate.add(GregorianCalendar.SECOND, -1);
+        List<FlightScheduleEntity> listOfFS = null;
 
-        //Query query = em.createQuery("SELECT f FROM FlightScheduleEntity f WHERE f.departureDateTime BETWEEN :startDate AND :endDate ORDER BY f.departureDateTime ASC").setParameter("startDate", gDepart).setParameter("endDate", gEndDate);
-        Query query = em.createQuery("SELECT s FROM FlightSchedulePlanEntity s, IN(s.listOfFlightSchedule) f  WHERE f.departureDateTime BETWEEN :startDate AND :endDate ORDER BY f.departureDateTime ASC").setParameter("startDate", gDepart).setParameter("endDate", gEndDate);
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        String strDepart = format.format(gDepart.getTime());
+        String strEndDate = format.format(gEndDate.getTime());
+        System.out.println("current record:" + strDepart + " strEndDate" + strEndDate);
+        Query query = null;
+        try {
+            flightRouteSessionBean.retrieveOD(departureAirport);
 
-        List<FlightSchedulePlanEntity> listOfFlightRecord = query.getResultList();
-        listOfFlightRecord.size();
-        for (int i = 0; i < listOfFlightRecord.size(); i++) {
-            listOfFlightRecord.get(i).getListOfFlightSchedule().size();
-            for (int j = 0; j < listOfFlightRecord.get(i).getListOfFlightSchedule().size(); j++) {
-                listOfFlightRecord.get(i).getListOfFlightSchedule().get(j).getSeatingPlan().size();
-                listOfFlightRecord.get(i).getListOfFare().size();
-                listOfFlightRecord.get(i).getListOfFlightSchedule().get(j).getFlightSchedulePlan();
+            query = em.createQuery("SELECT fs FROM FlightScheduleEntity fs WHERE  fs.flightSchedulePlan.flightEntity.flightRoute.originLocation.iataAirportCode =:iataCode AND fs.flightSchedulePlan.isDeleted = false  AND fs.departureDateTime BETWEEN :firstDate AND :firstEndDate ORDER By fs.departureDateTime ASC");
+            query.setParameter("iataCode", departureAirport);
+            query.setParameter("firstDate", gDepart);
+            query.setParameter("firstEndDate", gEndDate);
+            listOfFS = query.getResultList();
+        } catch (NoResultException ex) {
+            throw new FlightRouteDoesNotExistException();
+        }
+        List<FlightBundle> listOFlightSchedules = new ArrayList<>();
+        for (FlightScheduleEntity firstFs : listOfFS) {
+            GregorianCalendar firstStartTime = (GregorianCalendar) firstFs.getDepartureDateTime().clone();
+            GregorianCalendar firstEndTime = (GregorianCalendar) firstFs.getDepartureDateTime().clone();
+            firstStartTime.add(GregorianCalendar.HOUR, 2);
+            firstEndTime.add(GregorianCalendar.HOUR, 24);
+            String firstDepart = firstFs.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode();
+            String firstDestination = firstFs.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode();
+            query = em.createQuery("SELECT fs FROM FlightScheduleEntity fs WHERE fs.flightSchedulePlan.isDeleted = false AND fs.flightSchedulePlan.flightEntity.flightRoute.originLocation.iataAirportCode = :firstDestination AND fs.flightSchedulePlan.flightEntity.flightRoute.destinationLocation.iataAirportCode <> :firstDepart AND fs.departureDateTime BETWEEN :firstStart AND :firstEnd ORDER BY fs.departureDateTime ASC");
+            query.setParameter("firstDestination", firstDestination);
+            query.setParameter("firstDepart", firstDepart);
+            query.setParameter("firstStart", firstStartTime);
+            query.setParameter("firstEnd", firstEndTime);
+            List<FlightScheduleEntity> secondBoundFs = query.getResultList();
+            if (secondBoundFs.size() <= 0) {
+                continue;
+            }
+            for (FlightScheduleEntity secondFs : secondBoundFs) {
+                GregorianCalendar secondStartTime = (GregorianCalendar) secondFs.getDepartureDateTime().clone();
+                GregorianCalendar secondEndTime = (GregorianCalendar) secondFs.getDepartureDateTime().clone();
+                secondStartTime.add(GregorianCalendar.HOUR, 2);
+                secondEndTime.add(GregorianCalendar.HOUR, 24);
+                String secondFlightDestination = secondFs.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode();
+
+                if (secondFs.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode().equals(destinationAirport)) {
+                    listOFlightSchedules.add(new FlightBundle(firstFs, secondFs, null));
+                    continue;
+                }
+                query = em.createQuery("SELECT fs FROM FlightScheduleEntity fs "
+                        + "WHERE fs.flightSchedulePlan.isDeleted = false "
+                        + "AND fs.flightSchedulePlan.flightEntity.flightRoute.originLocation.iataAirportCode = :secondDestination "
+                        + "AND fs.flightSchedulePlan.flightEntity.flightRoute.destinationLocation.iataAirportCode = :finalDestination "
+                        + "AND fs.departureDateTime BETWEEN :secondStart "
+                        + "AND :secondEnd ORDER BY fs.departureDateTime ASC");
+                query.setParameter("secondDestination", secondFlightDestination);
+                query.setParameter("finalDestination", destinationAirport);
+                query.setParameter("secondStart", secondStartTime);
+                query.setParameter("secondEnd", secondEndTime);
+
+                List<FlightScheduleEntity> lastHop = query.getResultList();
+                for (FlightScheduleEntity thirdFs : lastHop) {
+                    listOFlightSchedules.add(new FlightBundle(firstFs, secondFs, thirdFs));
+                }
+
             }
         }
+        System.out.println("listOFlightSchedules.size():" + listOFlightSchedules.size());
+        for (FlightBundle cfs : listOFlightSchedules) {
 
-        System.out.println("*********************listOfFlightRecord.size():*****************************" + listOfFlightRecord.size());
-        return listOfFlightRecord;
+            cfs.getDepartOne().getFlightSchedulePlan().getListOfFare().size();
+            cfs.getDepartOne().getFlightSchedulePlan().getFlightEntity().getAircraftConfig().getCabinClasses().size();
+            cfs.getDepartOne().getSeatingPlan().size();
+            cfs.getDepartOne().getFlightSchedulePlan().getListOfFlightSchedule().size();
+            cfs.getDepartTwo().getFlightSchedulePlan().getListOfFare().size();
+            cfs.getDepartTwo().getFlightSchedulePlan().getFlightEntity().getAircraftConfig().getCabinClasses().size();
+            cfs.getDepartTwo().getSeatingPlan().size();
+            cfs.getDepartTwo().getFlightSchedulePlan().getListOfFlightSchedule().size();
+            if (cfs.getDepartThree() != null) {
+                cfs.getDepartThree().getFlightSchedulePlan().getListOfFare().size();
+                cfs.getDepartThree().getFlightSchedulePlan().getFlightEntity().getAircraftConfig().getCabinClasses().size();
+                cfs.getDepartThree().getSeatingPlan().size();
+                cfs.getDepartThree().getFlightSchedulePlan().getListOfFlightSchedule().size();
+
+            }
+        }
+        return listOFlightSchedules;
+
+    }
+
+    public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDays(Date actualDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+        GregorianCalendar actual = new GregorianCalendar();
+        actual.setTime(actualDate);
+
+        GregorianCalendar gDepart = (GregorianCalendar) actual.clone();
+        gDepart.add(GregorianCalendar.SECOND, -1);
+        actual.add(GregorianCalendar.DATE, -3);
+        GregorianCalendar gEndDate = (GregorianCalendar) actual.clone();
+
+        String strDepart = format.format(gDepart.getTime());
+        String strEndDate = format.format(gEndDate.getTime());
+        System.out.println("3 days less strDepart" + strDepart + " strEndDate" + strEndDate);
+
+        List<FlightScheduleEntity> listOfFS = null;
+        Query query = null;
+        try {
+            flightRouteSessionBean.retrieveOD(departureAirport);
+
+            query = em.createQuery("SELECT fs FROM FlightScheduleEntity fs WHERE  fs.flightSchedulePlan.flightEntity.flightRoute.originLocation.iataAirportCode =:iataCode AND fs.flightSchedulePlan.isDeleted = false  AND fs.departureDateTime BETWEEN :firstDate AND :firstEndDate ORDER By fs.departureDateTime ASC");
+            query.setParameter("iataCode", departureAirport);
+            query.setParameter("firstDate", gEndDate);
+            query.setParameter("firstEndDate", gDepart);
+            listOfFS = query.getResultList();
+        } catch (NoResultException ex) {
+            throw new FlightRouteDoesNotExistException();
+        }
+        List<FlightBundle> listOFlightSchedules = new ArrayList<>();
+        for (FlightScheduleEntity firstFs : listOfFS) {
+            GregorianCalendar firstStartTime = (GregorianCalendar) firstFs.getDepartureDateTime().clone();
+            GregorianCalendar firstEndTime = (GregorianCalendar) firstFs.getDepartureDateTime().clone();
+            firstStartTime.add(GregorianCalendar.HOUR, 2);
+            firstEndTime.add(GregorianCalendar.HOUR, 24);
+            String firstDepart = firstFs.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode();
+            String firstDestination = firstFs.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode();
+            query = em.createQuery("SELECT fs FROM FlightScheduleEntity fs WHERE fs.flightSchedulePlan.isDeleted = false AND fs.flightSchedulePlan.flightEntity.flightRoute.originLocation.iataAirportCode = :firstDestination AND fs.flightSchedulePlan.flightEntity.flightRoute.destinationLocation.iataAirportCode <> :firstDepart AND fs.departureDateTime BETWEEN :firstStart AND :firstEnd ORDER BY fs.departureDateTime ASC");
+            query.setParameter("firstDestination", firstDestination);
+            query.setParameter("firstDepart", firstDepart);
+            query.setParameter("firstStart", firstStartTime);
+            query.setParameter("firstEnd", firstEndTime);
+            List<FlightScheduleEntity> secondBoundFs = query.getResultList();
+            if (secondBoundFs.size() <= 0) {
+                continue;
+            }
+            for (FlightScheduleEntity secondFs : secondBoundFs) {
+                GregorianCalendar secondStartTime = (GregorianCalendar) secondFs.getDepartureDateTime().clone();
+                GregorianCalendar secondEndTime = (GregorianCalendar) secondFs.getDepartureDateTime().clone();
+                secondStartTime.add(GregorianCalendar.HOUR, 2);
+                secondEndTime.add(GregorianCalendar.HOUR, 24);
+                String secondFlightDestination = secondFs.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode();
+
+                if (secondFs.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode().equals(destinationAirport)) {
+                    listOFlightSchedules.add(new FlightBundle(firstFs, secondFs, null));
+                    continue;
+                }
+                query = em.createQuery("SELECT fs FROM FlightScheduleEntity fs "
+                        + "WHERE fs.flightSchedulePlan.isDeleted = false "
+                        + "AND fs.flightSchedulePlan.flightEntity.flightRoute.originLocation.iataAirportCode = :secondDestination "
+                        + "AND fs.flightSchedulePlan.flightEntity.flightRoute.destinationLocation.iataAirportCode = :finalDestination  "
+                        + "AND fs.flightSchedulePlan.flightEntity.flightRoute.destinationLocation.iataAirportCode <> :secondFs "
+                        + "AND fs.departureDateTime BETWEEN :secondStart "
+                        + "AND :secondEnd ORDER BY fs.departureDateTime ASC");
+                query.setParameter("secondDestination", secondFlightDestination);
+                query.setParameter("finalDestination", destinationAirport);
+                query.setParameter("secondFs", secondFs.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode());
+                query.setParameter("secondStart", secondStartTime);
+                query.setParameter("secondEnd", secondEndTime);
+
+                List<FlightScheduleEntity> lastHop = query.getResultList();
+                for (FlightScheduleEntity thirdFs : lastHop) {
+                    listOFlightSchedules.add(new FlightBundle(firstFs, secondFs, thirdFs));
+                }
+
+            }
+        }
+        System.out.println("listOFlightSchedules.size():" + listOFlightSchedules.size());
+        for (FlightBundle cfs : listOFlightSchedules) {
+
+            cfs.getDepartOne().getFlightSchedulePlan().getListOfFare().size();
+            cfs.getDepartOne().getFlightSchedulePlan().getFlightEntity().getAircraftConfig().getCabinClasses().size();
+            cfs.getDepartOne().getSeatingPlan().size();
+            cfs.getDepartOne().getFlightSchedulePlan().getListOfFlightSchedule().size();
+            cfs.getDepartTwo().getFlightSchedulePlan().getListOfFare().size();
+            cfs.getDepartTwo().getFlightSchedulePlan().getFlightEntity().getAircraftConfig().getCabinClasses().size();
+            cfs.getDepartTwo().getSeatingPlan().size();
+            cfs.getDepartTwo().getFlightSchedulePlan().getListOfFlightSchedule().size();
+            if (cfs.getDepartThree() != null) {
+                cfs.getDepartThree().getFlightSchedulePlan().getListOfFare().size();
+                cfs.getDepartThree().getFlightSchedulePlan().getFlightEntity().getAircraftConfig().getCabinClasses().size();
+                cfs.getDepartThree().getSeatingPlan().size();
+                cfs.getDepartThree().getFlightSchedulePlan().getListOfFlightSchedule().size();
+
+            }
+        }
+        return listOFlightSchedules;
+    }
+
+    public List<FlightBundle> listOfConnectingFlightRecordsAftThreeDays(Date actual, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
+
+        GregorianCalendar gActual = new GregorianCalendar();
+        gActual.setTime(actual);
+
+        GregorianCalendar gDepart = (GregorianCalendar) gActual.clone();
+        gDepart.add(GregorianCalendar.DATE, 4);
+        gDepart.add(GregorianCalendar.SECOND, -1);
+
+        GregorianCalendar gEndDate = (GregorianCalendar) gActual.clone();
+        gEndDate.add(GregorianCalendar.DATE, 1);
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        String strDepart = format.format(gDepart.getTime());
+        String strEndDate = format.format(gEndDate.getTime());
+        System.out.println("listOfConnectingFlightRecordsAftThreeDays" + strEndDate + " || "+  strDepart);
+        List<FlightScheduleEntity> listOfFS = null;
+        Query query = null;
+        try {
+            flightRouteSessionBean.retrieveOD(departureAirport);
+
+            query = em.createQuery("SELECT fs FROM FlightScheduleEntity fs WHERE  fs.flightSchedulePlan.flightEntity.flightRoute.originLocation.iataAirportCode =:iataCode AND fs.flightSchedulePlan.isDeleted = false  AND fs.departureDateTime BETWEEN :firstDate AND :firstEndDate ORDER By fs.departureDateTime ASC");
+            query.setParameter("iataCode", departureAirport);
+            query.setParameter("firstDate", gEndDate);
+            query.setParameter("firstEndDate", gDepart);
+            listOfFS = query.getResultList();
+        } catch (NoResultException ex) {
+            throw new FlightRouteDoesNotExistException();
+        }
+        List<FlightBundle> listOFlightSchedules = new ArrayList<>();
+        for (FlightScheduleEntity firstFs : listOfFS) {
+            GregorianCalendar firstStartTime = (GregorianCalendar) firstFs.getDepartureDateTime().clone();
+            GregorianCalendar firstEndTime = (GregorianCalendar) firstFs.getDepartureDateTime().clone();
+            firstStartTime.add(GregorianCalendar.HOUR, 2);
+            firstEndTime.add(GregorianCalendar.HOUR, 24);
+            String firstDepart = firstFs.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode();
+            String firstDestination = firstFs.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode();
+            query = em.createQuery("SELECT fs FROM FlightScheduleEntity fs WHERE fs.flightSchedulePlan.isDeleted = false AND fs.flightSchedulePlan.flightEntity.flightRoute.originLocation.iataAirportCode = :firstDestination AND fs.flightSchedulePlan.flightEntity.flightRoute.destinationLocation.iataAirportCode <> :firstDepart AND fs.departureDateTime BETWEEN :firstStart AND :firstEnd ORDER BY fs.departureDateTime ASC");
+            query.setParameter("firstDestination", firstDestination);
+            query.setParameter("firstDepart", firstDepart);
+            query.setParameter("firstStart", firstStartTime);
+            query.setParameter("firstEnd", firstEndTime);
+            List<FlightScheduleEntity> secondBoundFs = query.getResultList();
+            if (secondBoundFs.size() <= 0) {
+                continue;
+            }
+            for (FlightScheduleEntity secondFs : secondBoundFs) {
+                GregorianCalendar secondStartTime = (GregorianCalendar) secondFs.getDepartureDateTime().clone();
+                GregorianCalendar secondEndTime = (GregorianCalendar) secondFs.getDepartureDateTime().clone();
+                secondStartTime.add(GregorianCalendar.HOUR, 2);
+                secondEndTime.add(GregorianCalendar.HOUR, 24);
+                String secondFlightDestination = secondFs.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode();
+
+                if (secondFs.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode().equals(destinationAirport)) {
+                    listOFlightSchedules.add(new FlightBundle(firstFs, secondFs, null));
+                    continue;
+                }
+                query = em.createQuery("SELECT fs FROM FlightScheduleEntity fs "
+                        + "WHERE fs.flightSchedulePlan.isDeleted = false "
+                        + "AND fs.flightSchedulePlan.flightEntity.flightRoute.originLocation.iataAirportCode = :secondDestination "
+                        + "AND fs.flightSchedulePlan.flightEntity.flightRoute.destinationLocation.iataAirportCode = :finalDestination "
+                        + "AND fs.departureDateTime BETWEEN :secondStart "
+                        + "AND :secondEnd ORDER BY fs.departureDateTime ASC");
+                query.setParameter("secondDestination", secondFlightDestination);
+                query.setParameter("finalDestination", destinationAirport);
+                query.setParameter("secondStart", secondStartTime);
+                query.setParameter("secondEnd", secondEndTime);
+
+                List<FlightScheduleEntity> lastHop = query.getResultList();
+                for (FlightScheduleEntity thirdFs : lastHop) {
+                    listOFlightSchedules.add(new FlightBundle(firstFs, secondFs, thirdFs));
+                }
+
+            }
+        }
+        System.out.println("listOFlightSchedules.size():" + listOFlightSchedules.size());
+        for (FlightBundle cfs : listOFlightSchedules) {
+
+            cfs.getDepartOne().getFlightSchedulePlan().getListOfFare().size();
+            cfs.getDepartOne().getFlightSchedulePlan().getFlightEntity().getAircraftConfig().getCabinClasses().size();
+            cfs.getDepartOne().getSeatingPlan().size();
+            cfs.getDepartOne().getFlightSchedulePlan().getListOfFlightSchedule().size();
+            cfs.getDepartTwo().getFlightSchedulePlan().getListOfFare().size();
+            cfs.getDepartTwo().getFlightSchedulePlan().getFlightEntity().getAircraftConfig().getCabinClasses().size();
+            cfs.getDepartTwo().getSeatingPlan().size();
+            cfs.getDepartTwo().getFlightSchedulePlan().getListOfFlightSchedule().size();
+            if (cfs.getDepartThree() != null) {
+                cfs.getDepartThree().getFlightSchedulePlan().getListOfFare().size();
+                cfs.getDepartThree().getFlightSchedulePlan().getFlightEntity().getAircraftConfig().getCabinClasses().size();
+                cfs.getDepartThree().getSeatingPlan().size();
+                cfs.getDepartThree().getFlightSchedulePlan().getListOfFlightSchedule().size();
+
+            }
+        }
+        return listOFlightSchedules;
+    }
+
+    public List<FlightBundle> getDirectFlight(GregorianCalendar gStart, GregorianCalendar gEnd, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
+        Query query = null;
+
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        System.out.println("-------------------gStart" + format.format(gStart.getTime()) + " gEnd" + format.format(gEnd.getTime()) + "--------------");
+        List<FlightBundle> listOfFS = new ArrayList<>();
+        List<FlightScheduleEntity> fs = null;
+        try {
+            flightRouteSessionBean.retrieveOD(departureAirport);
+
+            query = em.createQuery("SELECT fs FROM FlightScheduleEntity fs "
+                    + "WHERE  fs.flightSchedulePlan.flightEntity.flightRoute.originLocation.iataAirportCode =:iataCode "
+                    + "AND fs.flightSchedulePlan.flightEntity.flightRoute.destinationLocation.iataAirportCode=:destination "
+                    + "AND fs.flightSchedulePlan.isDeleted = false  "
+                    + "AND fs.departureDateTime BETWEEN :firstDate AND :firstEndDate ORDER By fs.departureDateTime ASC");
+            query.setParameter("iataCode", departureAirport);
+            query.setParameter("destination", destinationAirport);
+            query.setParameter("firstDate", gStart);
+            query.setParameter("firstEndDate", gEnd);
+            fs = query.getResultList();
+            for (int i = 0; i < fs.size(); i++) {
+                FlightBundle fb = new FlightBundle();
+                fb.setDepartOne(fs.get(i));
+                listOfFS.add(fb);
+            }
+            System.out.println("listOfFS direct flight:" + fs.size());
+        } catch (FlightRouteDoesNotExistException ex) {
+            throw new FlightRouteDoesNotExistException("Flight does not exist");
+        }
+        for (FlightBundle cfs : listOfFS) {
+
+            cfs.getDepartOne().getFlightSchedulePlan().getListOfFare().size();
+            cfs.getDepartOne().getFlightSchedulePlan().getFlightEntity().getAircraftConfig().getCabinClasses().size();
+            cfs.getDepartOne().getSeatingPlan().size();
+            cfs.getDepartOne().getFlightSchedulePlan().getListOfFlightSchedule().size();
+
+        }
+        return listOfFS;
     }
 
 }

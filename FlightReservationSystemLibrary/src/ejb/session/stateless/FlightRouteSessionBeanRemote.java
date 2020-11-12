@@ -35,4 +35,6 @@ public interface FlightRouteSessionBeanRemote {
     public FlightRouteEntity getFlightRoute(Long id) throws FlightRouteDoesNotExistException;
 
     public FlightRouteEntity getMainFlightRoute(Long id) throws FlightRouteDoesNotExistException, FlightRouteIsNotMainRouteException;
+
+    public void retrieveOD(String oIataCode) throws FlightRouteDoesNotExistException;
 }

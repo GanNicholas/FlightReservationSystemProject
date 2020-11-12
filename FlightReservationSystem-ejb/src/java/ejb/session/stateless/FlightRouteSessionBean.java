@@ -177,4 +177,17 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
         }
     }
 
+    @Override
+    public void retrieveOD(String oIataCode) throws FlightRouteDoesNotExistException {
+
+        
+            Query q1 = em.createQuery("SELECT fr from FlightRouteEntity fr WHERE fr.originLocation.iataAirportCode =:oIataCode")
+                    .setParameter("oIataCode", oIataCode);
+           List< FlightRouteEntity> fr =  q1.getResultList();
+            if(fr.isEmpty()){
+                throw new FlightRouteDoesNotExistException();
+            }
+        
+    }
+
 }
