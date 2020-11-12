@@ -318,23 +318,31 @@ public class Customer {
                 fb.setDepartOne(flyOver.getDepartOne());
                 origin = flyOver.getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation();
                 destination = flyOver.getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
+                
+                fb.setDepartOneCabinClassType(cabinType);
                 if (flyOver.getDepartTwo() != null) {
+                    fb.setDepartTwoCabinClassType(cabinType);
                     fb.setDepartTwo(flyOver.getDepartTwo());
                     destination = flyOver.getDepartTwo().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
+                    
                 }
                 if (flyOver.getDepartThree() != null) {
                     fb.setDepartThree(flyOver.getDepartThree());
+                    fb.setDepartThreeCabinClassType(cabinType);
                     destination = flyOver.getDepartThree().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
                 }
                 if (tripType.equals("2")) {
                     System.out.println("Please enter the flight you want to reserve for flying back:");
                     secondFlight = sc.nextInt()-1;
                     FlightBundle temp = tempList.get(secondFlight);
+                      fb.setReturnOneCabinClassType(cabinType);
                     fb.setReturnOne(temp.getDepartOne());
                     if (temp.getDepartTwo() != null) {
                         fb.setReturnTwo(temp.getDepartOne());
+                        fb.setReturnTwoCabinClassType(cabinType);
                     }
                     if (temp.getDepartThree() != null) {
+                         fb.setReturnThreeCabinClassType(cabinType);
                         fb.setReturnThree(temp.getDepartThree());
                     }
                 }
