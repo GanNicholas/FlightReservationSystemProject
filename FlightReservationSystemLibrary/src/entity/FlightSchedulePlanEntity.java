@@ -52,7 +52,7 @@ public abstract class FlightSchedulePlanEntity implements Serializable {
     @OneToOne
     private FlightSchedulePlanEntity returnFlightSchedulePlan;
 
-    @OneToMany(cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = {CascadeType.PERSIST})
     private List<FareEntity> listOfFare;
 
     private boolean isDeleted;

@@ -19,6 +19,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -49,6 +50,7 @@ public class FlightEntity implements Serializable {
     @OneToOne(optional = false, cascade = CascadeType.PERSIST)
     private AircraftConfigurationEntity aircraftConfig;
 
+    @Column(nullable = false)
     private boolean isDeleted;
 
     @OneToMany(mappedBy = "flightEntity")
@@ -57,9 +59,12 @@ public class FlightEntity implements Serializable {
     @OneToOne
     private FlightEntity returnFlight;
 
+    @Column(nullable = false)
     private boolean isMainRoute;
-    
-    
+
+    @Column(nullable = false)
+    private Integer layOver;
+
     public FlightEntity() {
         listOfFlightSchedulePlan = new ArrayList<FlightSchedulePlanEntity>();
         aircraftConfig = null;
@@ -74,11 +79,10 @@ public class FlightEntity implements Serializable {
         this.listOfFlightSchedulePlan = new ArrayList<FlightSchedulePlanEntity>();
         this.isDeleted = false;
         this.isMainRoute = true;
+        this.layOver = 0;
     }
-    
-    
 
-    public FlightEntity(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig, boolean isDeleted, List<FlightSchedulePlanEntity> listOfFlightSchedulePlan, FlightEntity returnFlight, boolean isMainRoute) {
+    public FlightEntity(String flightNumber, FlightRouteEntity flightRoute, AircraftConfigurationEntity aircraftConfig, boolean isDeleted, List<FlightSchedulePlanEntity> listOfFlightSchedulePlan, FlightEntity returnFlight, boolean isMainRoute, Integer layOver) {
         this.flightNumber = flightNumber;
         this.flightRoute = flightRoute;
         this.aircraftConfig = aircraftConfig;
@@ -86,6 +90,7 @@ public class FlightEntity implements Serializable {
         this.listOfFlightSchedulePlan = listOfFlightSchedulePlan;
         this.returnFlight = returnFlight;
         this.isMainRoute = isMainRoute;
+        this.layOver = layOver;
     }
 
     @Override
@@ -175,6 +180,14 @@ public class FlightEntity implements Serializable {
 
     public void setIsMainRoute(boolean isMainRoute) {
         this.isMainRoute = isMainRoute;
+    }
+
+    public Integer getLayOver() {
+        return layOver;
+    }
+
+    public void setLayOver(Integer layOver) {
+        this.layOver = layOver;
     }
 
 }
