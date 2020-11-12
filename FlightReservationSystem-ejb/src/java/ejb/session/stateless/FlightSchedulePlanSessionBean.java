@@ -19,7 +19,9 @@ import entity.SingleFlightScheduleEntity;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import javax.annotation.Resource;
 import javax.ejb.EJB;
+import javax.ejb.EJBContext;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -30,6 +32,7 @@ import util.exception.FlightDoesNotExistException;
 import util.exception.FlightScheduleDoesNotExistException;
 import util.exception.FlightScheduleExistException;
 import util.exception.FlightSchedulePlanDoesNotExistException;
+import util.exception.FlightSchedulePlanEndDateIsBeforeStartDateException;
 import util.exception.FlightSchedulePlanIsEmptyException;
 
 /**
@@ -41,6 +44,9 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
 
     @EJB
     private FlightScheduleSessionBeanLocal flightScheduleSessionBean;
+
+    @Resource
+    EJBContext eJBContext;
 
     @PersistenceContext(unitName = "FlightReservationSystem-ejbPU")
     private EntityManager em;
@@ -156,7 +162,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
     }
 
     @Override
-    public String createRecurrentFlightSchedulePlan(String flightNumber, GregorianCalendar departureDateTime, GregorianCalendar endDate, Integer flightDuration, boolean createReturnFlightSchedule, List<FareEntity> listOfFares, Integer layover, Integer recurrency) throws FlightDoesNotExistException, FlightScheduleExistException {
+    public String createRecurrentFlightSchedulePlan(String flightNumber, GregorianCalendar departureDateTime, GregorianCalendar endDate, Integer flightDuration, boolean createReturnFlightSchedule, List<FareEntity> listOfFares, Integer layover, Integer recurrency) throws FlightDoesNotExistException, FlightScheduleExistException, FlightSchedulePlanEndDateIsBeforeStartDateException {
         FlightEntity flight;
         try {
             System.out.println("*******flightNumber******" + flightNumber);
@@ -200,8 +206,12 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             em.persist(fs);
         }
 
-        em.persist(fsp);
-        em.flush();
+        if (!fsp.getListOfFlightSchedule().isEmpty()) {
+            em.persist(fsp);
+            em.flush();
+        } else {
+            throw new FlightSchedulePlanEndDateIsBeforeStartDateException("Flight Schedule Plan end date is before the start date!");
+        }
 
         //return Flight entity
         FlightEntity returnFlight = null;
@@ -259,8 +269,12 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
 
             fsp.setReturnFlightSchedulePlan(returnFSP);
 
-            em.persist(returnFSP);
-            em.flush();
+            if (!fsp.getListOfFlightSchedule().isEmpty()) {
+                em.persist(returnFSP);
+                em.flush();
+            } else {
+                throw new FlightSchedulePlanEndDateIsBeforeStartDateException("Flight Schedule Plan end date is before the start date!");
+            }
 
         }
 
@@ -568,7 +582,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             for (FareEntity fareInList : fsp.getListOfFare()) {
                 if (fareInList.getCabinType().equals(fare.getCabinType())) {
                     fsp.getListOfFare().remove(fare);
-                    
+
                     if (fsp.getReturnFlightSchedulePlan() != null) {
                         fsp.getReturnFlightSchedulePlan().getListOfFare().remove(fare);
                     }
@@ -711,7 +725,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
                 fsp.getFlightEntity().getFlightRoute().getOriginLocation();
                 fsp.getFlightEntity().getFlightRoute().getDestinationLocation();
             }
-            
+
             return listOfFlightSchedulePlan;
         }
 

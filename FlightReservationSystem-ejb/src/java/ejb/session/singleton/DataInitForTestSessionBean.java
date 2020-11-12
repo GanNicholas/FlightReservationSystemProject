@@ -5,17 +5,24 @@
  */
 package ejb.session.singleton;
 
+import ejb.session.stateless.AircraftSessionBeanLocal;
+import ejb.session.stateless.FlightSessionBeanLocal;
+import entity.AircraftConfigurationEntity;
 import entity.AircraftTypeEntity;
 import entity.AirportEntity;
 import entity.EmployeeEntity;
 import entity.PartnerEntity;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
 import javax.ejb.Startup;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import util.enumeration.UserRole;
+import util.exception.NoAircraftTypeAvailableException;
 
 /**
  *
@@ -25,6 +32,12 @@ import util.enumeration.UserRole;
 @LocalBean
 //@Startup
 public class DataInitForTestSessionBean {
+
+    @EJB
+    private AircraftSessionBeanLocal aircraftSessionBean;
+
+    @EJB
+    private FlightSessionBeanLocal flightSessionBean;
 
     @PersistenceContext(unitName = "FlightReservationSystem-ejbPU")
     private EntityManager em;
@@ -76,6 +89,33 @@ public class DataInitForTestSessionBean {
         }
 
         em.flush();
+
+//        Integer maxSeatingCapacity, AircraftTypeEntity aircraftType, String aircraftName
+//        if (em.find(AircraftConfigurationEntity.class, 1L) == null) {
+//            AircraftTypeEntity aircraftType1 = null;
+//            AircraftTypeEntity aircraftType2 = null;
+//            try {
+//                aircraftType1 = aircraftSessionBean.getAircraftType(1L);
+//                aircraftType2 = aircraftSessionBean.getAircraftType(2L);
+//            } catch (NoAircraftTypeAvailableException ex) {
+//                System.out.println(ex.getMessage());
+//            }
+//
+//            AircraftConfigurationEntity ac1 = new AircraftConfigurationEntity(180, aircraftType1, "Boeing 737 All Economy");
+//            em.persist(ac1);
+//            
+//            AircraftConfigurationEntity ac2 = new AircraftConfigurationEntity(180, aircraftType1, "Boeing 737 Three Classes");
+//            em.persist(ac2);
+//            
+//            AircraftConfigurationEntity ac3 = new AircraftConfigurationEntity(380, aircraftType2, "Boeing 747 All Economy");
+//            em.persist(ac3);
+//            
+//            AircraftConfigurationEntity ac4 = new AircraftConfigurationEntity(360, aircraftType2, "Boeing 747 Three Classes");
+//            em.persist(ac4);
+//            
+//
+//        }
+
     }
 
 }

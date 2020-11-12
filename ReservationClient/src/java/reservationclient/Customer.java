@@ -86,6 +86,7 @@ public class Customer {
             Scanner sc = new Scanner(System.in);
             System.out.println("1. Register Customer");
             System.out.println("2. Customer Login");
+            System.out.println("3. Exit");
             String input = sc.nextLine();
             //while (true) {
             if (input.equals("1")) {
@@ -95,6 +96,9 @@ public class Customer {
                 if (loginSuccessful) {
                     afterLoginPage();
                 }
+            } else if(input.equals("3")){
+                System.out.println("Goodbye!");
+                System.exit(0);
             }
         } catch (NumberFormatException ex) {
             System.out.println("You have invalid input.");
@@ -115,7 +119,7 @@ public class Customer {
         if (input.equals("1")) {
             searchFlight();
         } else if (input.equals("2")) {
-            viewFlightReservations(sc);
+            viewFlightReservations();
         } else if (input.equals("3")) {
 
         } else if (input.equals("4")) {
@@ -532,27 +536,27 @@ public class Customer {
 
         FlightScheduleEntity fs1 = flightBundleForReservation.getDepartOne();
         CabinClassType cabinForFs1 = flightBundleForReservation.getDepartOneCabinClassType();
-        FareEntity fareForFs1 = flightBundleForReservation.getDepartOneFare();
+        FareEntity fareForFs1 = flightBundleForReservation.getDepartFareOne();
 
         FlightScheduleEntity fs2 = flightBundleForReservation.getDepartTwo();
         CabinClassType cabinForFs2 = flightBundleForReservation.getDepartTwoCabinClassType();
-        FareEntity fareForFs2 = flightBundleForReservation.getDepartTwoFare();
+        FareEntity fareForFs2 = flightBundleForReservation.getDepartFareTwo();
 
         FlightScheduleEntity fs3 = flightBundleForReservation.getDepartThree();
         CabinClassType cabinForFs3 = flightBundleForReservation.getDepartThreeCabinClassType();
-        FareEntity fareForFs3 = flightBundleForReservation.getDepartThreeFare();
+        FareEntity fareForFs3 = flightBundleForReservation.getDepartFareThree();
 
         FlightScheduleEntity returnFs1 = flightBundleForReservation.getReturnOne();
         CabinClassType cabinForReturnFs1 = flightBundleForReservation.getReturnOneCabinClassType();
-        FareEntity fareForReturnFs1 = flightBundleForReservation.getReturnOneFare();
+        FareEntity fareForReturnFs1 = flightBundleForReservation.getReturnFareOne();
 
         FlightScheduleEntity returnFs2 = flightBundleForReservation.getReturnTwo();
         CabinClassType cabinForReturnFs2 = flightBundleForReservation.getReturnTwoCabinClassType();
-        FareEntity fareForReturnFs2 = flightBundleForReservation.getReturnTwoFare();
+        FareEntity fareForReturnFs2 = flightBundleForReservation.getReturnFareTwo();
 
         FlightScheduleEntity returnFs3 = flightBundleForReservation.getReturnThree();
         CabinClassType cabinForReturnFs3 = flightBundleForReservation.getReturnThreeCabinClassType();
-        FareEntity fareForReturnFs3 = flightBundleForReservation.getReturnThreeFare();
+        FareEntity fareForReturnFs3 = flightBundleForReservation.getReturnFareThree();
 
         List<PassengerEntity> listOfPassengers = new ArrayList<>();
 
@@ -1180,7 +1184,7 @@ public class Customer {
     }
 
     public void viewFlightReservations() {
-        Scanner sc = new Scanner(System.in);
+//        Scanner sc = new Scanner(System.in);
         try {
             List<FlightReservationEntity> listOfFlightReservation = flightReservationSessionBean.retrieveListOfReservation(customer.getCustomerId());
             System.out.printf("%-30s%-60s%-60s%-50s%-50s", "Flight Reservation ID", "Origin Location", " Destination Location", "Booked by", "Total Amount");

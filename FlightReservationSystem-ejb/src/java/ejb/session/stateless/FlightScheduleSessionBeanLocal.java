@@ -39,4 +39,12 @@ public interface FlightScheduleSessionBeanLocal {
     public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDays(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
 
     public List<FlightBundle> getDirectFlight(GregorianCalendar actual, GregorianCalendar changeDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+
+    public List<FlightBundle> getDirectFlightUnmanaged(GregorianCalendar gStart, GregorianCalendar gEnd, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+
+    public List<FlightBundle> listOfConnectingFlightRecordsAftThreeDaysUnmanaged(Date actual, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+
+    public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDaysUnmanaged(Date actualDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+
+    public List<FlightBundle> listOfConnectingFlightRecordsUnmanaged(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
 }
