@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -38,10 +39,10 @@ public class SeatEntity implements Serializable {
 
     private boolean reserved;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.DETACH})
     private PassengerEntity passenger;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.DETACH})
     private FareEntity fare;
 
     @NotNull

@@ -43,18 +43,18 @@ public class AircraftConfigurationEntity implements Serializable {
     @Column(nullable = false)
     private Integer maxSeatingCapacity;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, cascade = {CascadeType.DETACH})
     private AircraftTypeEntity aircraftType;
 
-    @OneToMany(cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH})
     private List<CabinClassConfigurationEntity> cabinClasses;
 
     @NotEmpty(message = "Aircraft name cannot be empty!")
     @Size(max = 80, message = "Aircraft name should not exceed 80 characters!")
     @Column(nullable = false, length = 80)
     private String aircraftName;
-    
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST )
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
     private List<SeatEntity> seatingPlan;
 
     public AircraftConfigurationEntity() {
@@ -117,7 +117,6 @@ public class AircraftConfigurationEntity implements Serializable {
     public void setSeatingPlan(List<SeatEntity> seatingPlan) {
         this.seatingPlan = seatingPlan;
     }
-    
 
     @Override
     public int hashCode() {

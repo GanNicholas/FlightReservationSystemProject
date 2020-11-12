@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -34,17 +35,17 @@ public class IndividualFlightReservationEntity implements Serializable {
     private Long indivFlightResId;
 
     @NotNull
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, cascade = {CascadeType.DETACH})
     private FlightScheduleEntity flightSchedule;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.DETACH})
     private List<PassengerEntity> listOfPassengers;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, cascade = {CascadeType.DETACH})
     @JoinColumn(nullable = false)
-    private PartnerEntity partnerInfo;
+    private CustomerEntity customerInfo;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.DETACH})
     //@JoinColumn(nullable = false)
     private List<SeatEntity> listOfSeats;
 
@@ -53,19 +54,22 @@ public class IndividualFlightReservationEntity implements Serializable {
     @Column(nullable = false, scale = 2)
     private BigDecimal amount;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = {CascadeType.DETACH})
     @JoinColumn(nullable = false)
     private FlightReservationEntity flightReservation;
+    
+   
 
     public IndividualFlightReservationEntity() {
         this.listOfPassengers = new ArrayList<>();
         this.listOfSeats = new ArrayList<>();
+        
     }
 
-    public IndividualFlightReservationEntity(FlightScheduleEntity flightSchedule, PartnerEntity partnerInfo, BigDecimal amount, FlightReservationEntity flightReservation) {
+    public IndividualFlightReservationEntity(FlightScheduleEntity flightSchedule, CustomerEntity customerInfo, BigDecimal amount, FlightReservationEntity flightReservation) {
         this();
         this.flightSchedule = flightSchedule;
-        this.partnerInfo = partnerInfo;
+        this.customerInfo = customerInfo;
         this.amount = amount;
         this.flightReservation = flightReservation;
     }
@@ -78,20 +82,20 @@ public class IndividualFlightReservationEntity implements Serializable {
         this.indivFlightResId = indivFlightResId;
     }
 
-    public List<PassengerEntity> getlistOfPassenger() {
+    public List<PassengerEntity> getListOfPassenger() {
         return listOfPassengers;
     }
 
-    public void setlistOfPassenger(List<PassengerEntity> listOfPassenger) {
+    public void setListOfPassenger(List<PassengerEntity> listOfPassenger) {
         this.listOfPassengers = listOfPassenger;
     }
 
-    public PartnerEntity getPartnerInfo() {
-        return partnerInfo;
+    public CustomerEntity getCustomerInfo() {
+        return customerInfo;
     }
 
-    public void setPartnerInfo(PartnerEntity partnerInfo) {
-        this.partnerInfo = partnerInfo;
+    public void setCustomerInfo(CustomerEntity customerInfo) {
+        this.customerInfo = customerInfo;
     }
 
     public List<SeatEntity> getListOfSeats() {
@@ -133,6 +137,23 @@ public class IndividualFlightReservationEntity implements Serializable {
     @Override
     public String toString() {
         return "entity.IndividualFlightReservationEntity[ id=" + indivFlightResId + " ]";
+    }
+
+
+    public FlightScheduleEntity getFlightSchedule() {
+        return flightSchedule;
+    }
+
+    public void setFlightSchedule(FlightScheduleEntity flightSchedule) {
+        this.flightSchedule = flightSchedule;
+    }
+
+    public FlightReservationEntity getFlightReservation() {
+        return flightReservation;
+    }
+
+    public void setFlightReservation(FlightReservationEntity flightReservation) {
+        this.flightReservation = flightReservation;
     }
 
 }

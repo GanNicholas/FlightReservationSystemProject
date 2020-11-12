@@ -177,9 +177,7 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
             for (FlightScheduleEntity tempFlightSchedule : tempFlight) {
 
                 GregorianCalendar tempFSPDepartureDate = tempFlightSchedule.getDepartureDateTime();
-                GregorianCalendar tempFSPArrivalDate = (GregorianCalendar) tempFSPDepartureDate.clone();
-
-                tempFSPArrivalDate.add(GregorianCalendar.MINUTE, tempFlightSchedule.getFlightDuration());
+                GregorianCalendar tempFSPArrivalDate = tempFlightSchedule.getArrivalDateTime();
 
                 boolean newArriveBeforeOldDepart = tempFSPDepartureDate.after(arrivalDateTime);
                 boolean newDepartureBeforeOldDepart = tempFSPDepartureDate.after(departureDateTime);
@@ -236,9 +234,7 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
                 for (FlightScheduleEntity tempFlightSchedule : tempFlight) {
 
                     GregorianCalendar tempFSPDepartureDate = tempFlightSchedule.getDepartureDateTime();
-                    GregorianCalendar tempFSPArrivalDate = (GregorianCalendar) tempFSPDepartureDate.clone();
-
-                    tempFSPArrivalDate.add(GregorianCalendar.MINUTE, tempFlightSchedule.getFlightDuration());
+                    GregorianCalendar tempFSPArrivalDate = tempFlightSchedule.getArrivalDateTime();
 
                     boolean newArriveBeforeOldDepart = tempFSPDepartureDate.after(arrivalDateTime);
                     boolean newDepartureBeforeOldDepart = tempFSPDepartureDate.after(departureDateTime);

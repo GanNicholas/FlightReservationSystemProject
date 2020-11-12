@@ -43,11 +43,11 @@ public class FlightScheduleEntity implements Serializable {
     @Positive
     private Integer flightDuration;
 
-    @ManyToOne(optional = true)
+    @ManyToOne(optional = true, cascade = {CascadeType.DETACH})
     @JoinColumn(nullable = false)
     private FlightSchedulePlanEntity flightSchedulePlan;
 
-    @OneToMany(cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH})
     private List<SeatEntity> seatingPlan;
 
     public FlightScheduleEntity() {

@@ -38,7 +38,7 @@ public class FlightRouteEntity implements Serializable {
 
     private boolean isDeleted;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.DETACH})
     private FlightRouteEntity returnRoute;
 
     private boolean mainRoute;

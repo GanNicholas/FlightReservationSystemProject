@@ -6,30 +6,14 @@
 package ejb.session.singleton;
 
 import ejb.session.stateless.AircraftSessionBeanLocal;
-import ejb.session.stateless.CustomerSessionBean;
 import ejb.session.stateless.CustomerSessionBeanLocal;
 import ejb.session.stateless.FlightRouteSessionBeanLocal;
 import ejb.session.stateless.FlightSchedulePlanSessionBeanLocal;
 import ejb.session.stateless.FlightSessionBeanLocal;
-import entity.AircraftConfigurationEntity;
 import entity.AircraftTypeEntity;
 import entity.AirportEntity;
-import entity.CabinClassConfigurationEntity;
-import entity.CustomerEntity;
 import entity.EmployeeEntity;
-import entity.FRSCustomerEntity;
-import entity.FareEntity;
-import entity.FlightEntity;
-import entity.FlightRouteEntity;
-import entity.FlightScheduleEntity;
-import entity.FlightSchedulePlanEntity;
 import entity.PartnerEntity;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
@@ -37,16 +21,8 @@ import javax.ejb.LocalBean;
 import javax.ejb.Startup;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import util.enumeration.CabinClassType;
 import util.enumeration.UserRole;
-import util.exception.AircraftConfigurationNotExistException;
-import util.exception.AirportODPairNotFoundException;
-import util.exception.CustomerExistException;
-import util.exception.FlightDoesNotExistException;
-import util.exception.FlightExistsException;
-import util.exception.FlightRouteDoesNotExistException;
-import util.exception.FlightRouteODPairExistException;
-import util.exception.FlightScheduleExistException;
+
 
 /**
  *
