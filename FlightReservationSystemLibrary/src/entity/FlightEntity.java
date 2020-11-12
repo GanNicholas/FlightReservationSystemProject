@@ -44,19 +44,19 @@ public class FlightEntity implements Serializable {
     @Column(nullable = false, length = 16, unique = true)
     private String flightNumber;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.DETACH})
     private FlightRouteEntity flightRoute;
 
-    @OneToOne(optional = false, cascade = CascadeType.PERSIST)
+    @OneToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
     private AircraftConfigurationEntity aircraftConfig;
 
     @Column(nullable = false)
     private boolean isDeleted;
 
-    @OneToMany(mappedBy = "flightEntity")
+    @OneToMany(mappedBy = "flightEntity", cascade = {CascadeType.DETACH})
     private List<FlightSchedulePlanEntity> listOfFlightSchedulePlan;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.DETACH})
     private FlightEntity returnFlight;
 
     @Column(nullable = false)

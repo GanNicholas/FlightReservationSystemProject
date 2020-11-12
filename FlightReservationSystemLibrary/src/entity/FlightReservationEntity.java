@@ -8,7 +8,9 @@ package entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,9 +20,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Future;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -42,7 +46,7 @@ public class FlightReservationEntity implements Serializable {
     @Column(nullable = false, length = 3, unique = true)
     private String destinationIATACode;
 
-    @OneToMany(mappedBy = "flightReservation")
+    @OneToMany(mappedBy = "flightReservation", cascade = {CascadeType.DETACH})
     private List<IndividualFlightReservationEntity> listOfIndividualFlightRes;
 
     @NotNull
@@ -55,8 +59,27 @@ public class FlightReservationEntity implements Serializable {
     @JoinColumn(nullable = false)
     private CustomerEntity customer;
 
+    @Size(min = 2, max = 26)
+    @Column(length = 26)
+    private String creditCardName;
+
+    @Size(min = 16, max = 16)
+    @Column(unique = true, length = 16)
+    private String creditCardNumber;
+
+    @Size(min = 3, max = 3)
+    @Column(length = 3)
+    private String cvv;
+
+    @Future
+    private GregorianCalendar creditCardExpiryDate;
+
     public FlightReservationEntity() {
-        listOfIndividualFlightRes = new ArrayList<>();
+        this.listOfIndividualFlightRes = new ArrayList<>();
+        this.creditCardName = "";
+        this.creditCardNumber = "";
+        this.cvv = "";
+        this.creditCardExpiryDate = new GregorianCalendar();
     }
 
     public FlightReservationEntity(String originIATACode, String destinationIATACode, BigDecimal totalAmount, CustomerEntity customer) {
@@ -113,6 +136,38 @@ public class FlightReservationEntity implements Serializable {
 
     public void setCustomer(CustomerEntity customer) {
         this.customer = customer;
+    }
+
+    public String getCreditCardName() {
+        return creditCardName;
+    }
+
+    public void setCreditCardName(String creditCardName) {
+        this.creditCardName = creditCardName;
+    }
+
+    public String getCreditCardNumber() {
+        return creditCardNumber;
+    }
+
+    public void setCreditCardNumber(String creditCardNumber) {
+        this.creditCardNumber = creditCardNumber;
+    }
+
+    public String getCvv() {
+        return cvv;
+    }
+
+    public void setCvv(String cvv) {
+        this.cvv = cvv;
+    }
+
+    public GregorianCalendar getCreditCardExpiryDate() {
+        return creditCardExpiryDate;
+    }
+
+    public void setCreditCardExpiryDate(GregorianCalendar creditCardExpiryDate) {
+        this.creditCardExpiryDate = creditCardExpiryDate;
     }
 
     @Override

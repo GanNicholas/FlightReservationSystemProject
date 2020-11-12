@@ -45,14 +45,14 @@ public abstract class FlightSchedulePlanEntity implements Serializable {
     @Column(nullable = false, length = 8)
     private String flightNumber;
 
-    @OneToMany(mappedBy = "flightSchedulePlan")
+    @OneToMany(mappedBy = "flightSchedulePlan", cascade = {CascadeType.DETACH})
     @JoinColumn(nullable = false)
     private List<FlightScheduleEntity> listOfFlightSchedule;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.DETACH})
     private FlightSchedulePlanEntity returnFlightSchedulePlan;
 
-    @OneToMany(cascade = {CascadeType.PERSIST})
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH})
     private List<FareEntity> listOfFare;
 
     private boolean isDeleted;

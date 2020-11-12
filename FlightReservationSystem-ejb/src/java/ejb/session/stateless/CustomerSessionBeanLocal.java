@@ -7,6 +7,8 @@ package ejb.session.stateless;
 
 import entity.CustomerEntity;
 import javax.ejb.Local;
+import util.exception.AccessFromWrongPortalException;
+import util.exception.CustomerDoesNotExistException;
 import util.exception.CustomerExistException;
 import util.exception.CustomerLoginInvalid;
 
@@ -20,4 +22,10 @@ public interface CustomerSessionBeanLocal {
     public Long registerCustomer(CustomerEntity c) throws CustomerExistException;
 
     public CustomerEntity customerLogin(String username, String password) throws CustomerLoginInvalid;
+
+    public boolean isCustomerExist(String login) throws CustomerExistException;
+
+    public CustomerEntity retrieveCustomerInfo(Long custId) throws CustomerDoesNotExistException;
+
+      public CustomerEntity customerLoginUnmanaged(String username, String password) throws CustomerLoginInvalid, AccessFromWrongPortalException;
 }

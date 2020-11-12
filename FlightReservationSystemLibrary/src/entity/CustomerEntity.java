@@ -8,6 +8,7 @@ package entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -53,7 +54,7 @@ public abstract class CustomerEntity implements Serializable {
     private UserRole userRole;
 
     //@NotNull
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", cascade = {CascadeType.DETACH})
     private List<FlightReservationEntity> listOfFlightReservation;
 
     public CustomerEntity() {

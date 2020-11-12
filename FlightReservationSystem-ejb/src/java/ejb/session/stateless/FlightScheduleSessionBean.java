@@ -87,16 +87,6 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
                 GregorianCalendar tempFSPDepartureDate = tempFlightSchedule.getDepartureDateTime();
                 GregorianCalendar tempFSPArrivalDate = tempFlightSchedule.getArrivalDateTime();
 
-
-//                boolean newDepartBeforeOld = tempFSPDepartureDate.after(departureDateTime);
-//                boolean newDepartAfterOld = tempFSPDepartureDate.before(departureDateTime);
-//                boolean newArriveBeforeOld = tempFSPArrivalDate.after(arrivalDateTime);
-//                boolean newArriveAfterOld = tempFSPArrivalDate.before(arrivalDateTime);
-//
-//                if ((newDepartBeforeOld && newArriveBeforeOld) || (newDepartBeforeOld && newArriveAfterOld) || (newDepartAfterOld && newArriveBeforeOld) || (newDepartAfterOld && newArriveAfterOld)) {
-//                    eJBContext.setRollbackOnly();
-//                    throw new FlightScheduleExistException("Flight Schedule has conflict with existing flight schedule!");
-//                }
                 boolean newArriveBeforeOldDepart = tempFSPDepartureDate.after(arrivalDateTime);
                 boolean newDepartureBeforeOldDepart = tempFSPDepartureDate.after(departureDateTime);
                 boolean newArriveAfterOldArrive = tempFSPArrivalDate.before(arrivalDateTime);
@@ -122,7 +112,7 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         return true;
     }
 
-    public List<FlightBundle> listOfConnectingFlightRecords(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
+   public List<FlightBundle> listOfConnectingFlightRecords(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
 
         GregorianCalendar gDepart = new GregorianCalendar();
         gDepart.setTime(departureDate);
@@ -451,6 +441,9 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         return listOfFS;
     }
 
+    
+
+
     @Override
     public FlightScheduleEntity updateFlightSchedule(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight, FlightScheduleEntity currentFs) throws FlightScheduleExistException {
         String flightNumber = flight.getFlightNumber();
@@ -488,9 +481,7 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
             for (FlightScheduleEntity tempFlightSchedule : tempFlight) {
 
                 GregorianCalendar tempFSPDepartureDate = tempFlightSchedule.getDepartureDateTime();
-                GregorianCalendar tempFSPArrivalDate = (GregorianCalendar) tempFSPDepartureDate.clone();
-
-                tempFSPArrivalDate.add(GregorianCalendar.MINUTE, tempFlightSchedule.getFlightDuration());
+                GregorianCalendar tempFSPArrivalDate = tempFlightSchedule.getArrivalDateTime();
 
                 boolean newArriveBeforeOldDepart = tempFSPDepartureDate.after(arrivalDateTime);
                 boolean newDepartureBeforeOldDepart = tempFSPDepartureDate.after(departureDateTime);
@@ -547,9 +538,7 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
                 for (FlightScheduleEntity tempFlightSchedule : tempFlight) {
 
                     GregorianCalendar tempFSPDepartureDate = tempFlightSchedule.getDepartureDateTime();
-                    GregorianCalendar tempFSPArrivalDate = (GregorianCalendar) tempFSPDepartureDate.clone();
-
-                    tempFSPArrivalDate.add(GregorianCalendar.MINUTE, tempFlightSchedule.getFlightDuration());
+                    GregorianCalendar tempFSPArrivalDate = tempFlightSchedule.getArrivalDateTime();
 
                     boolean newArriveBeforeOldDepart = tempFSPDepartureDate.after(arrivalDateTime);
                     boolean newDepartureBeforeOldDepart = tempFSPDepartureDate.after(departureDateTime);

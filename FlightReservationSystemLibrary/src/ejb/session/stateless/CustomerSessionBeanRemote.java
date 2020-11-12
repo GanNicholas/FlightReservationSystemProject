@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.CustomerEntity;
 import javax.ejb.Remote;
+import util.exception.CustomerDoesNotExistException;
 import util.exception.CustomerExistException;
 import util.exception.CustomerLoginInvalid;
 
@@ -20,4 +21,8 @@ public interface CustomerSessionBeanRemote {
     public Long registerCustomer(CustomerEntity c) throws CustomerExistException;
 
     public CustomerEntity customerLogin(String username, String password) throws CustomerLoginInvalid;
+    
+    public boolean isCustomerExist(String login) throws CustomerExistException;
+
+    public CustomerEntity retrieveCustomerInfo(Long custId) throws CustomerDoesNotExistException;
 }

@@ -1,0 +1,268 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI (http://jax-ws.java.net). RI's version is Metro/2.4.3 (RELEASE-2.4.3-ad3323c; 2019-01-21T17:46:06+0000) JAXWS-RI/2.3.2 JAXWS-API/2.3.2 JAXB-RI/2.3.2 JAXB-API/2.3.2 git-revision#unknown. --><xs:schema xmlns:tns="http://ws.session.ejb/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://ws.session.ejb/">
+
+<xs:element name="AccessFromWrongPortalException" type="tns:AccessFromWrongPortalException"/>
+
+<xs:element name="CustomerHasNoReservationException" type="tns:CustomerHasNoReservationException"/>
+
+<xs:element name="CustomerLoginInvalid" type="tns:CustomerLoginInvalid"/>
+
+<xs:element name="FlightReservationDoesNotExistException" type="tns:FlightReservationDoesNotExistException"/>
+
+<xs:element name="loginPartner" type="tns:loginPartner"/>
+
+<xs:element name="loginPartnerResponse" type="tns:loginPartnerResponse"/>
+
+<xs:element name="retrieveIndividualFlightReservation" type="tns:retrieveIndividualFlightReservation"/>
+
+<xs:element name="retrieveIndividualFlightReservationResponse" type="tns:retrieveIndividualFlightReservationResponse"/>
+
+<xs:element name="retrieveListOfReservation" type="tns:retrieveListOfReservation"/>
+
+<xs:element name="retrieveListOfReservationResponse" type="tns:retrieveListOfReservationResponse"/>
+
+<xs:complexType name="retrieveListOfReservation">
+<xs:sequence>
+<xs:element name="custId" type="xs:long" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveListOfReservationResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:flightReservationEntity" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="flightReservationEntity">
+<xs:sequence>
+<xs:element name="creditCardExpiryDate" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="creditCardName" type="xs:string" minOccurs="0"/>
+<xs:element name="creditCardNumber" type="xs:string" minOccurs="0"/>
+<xs:element name="customer" type="tns:customerEntity" minOccurs="0"/>
+<xs:element name="cvv" type="xs:string" minOccurs="0"/>
+<xs:element name="destinationIATACode" type="xs:string" minOccurs="0"/>
+<xs:element name="flightReservationId" type="xs:long" minOccurs="0"/>
+<xs:element name="listOfIndividualFlightRes" type="tns:individualFlightReservationEntity" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="originIATACode" type="xs:string" minOccurs="0"/>
+<xs:element name="totalAmount" type="xs:decimal" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="customerEntity" abstract="true">
+<xs:sequence>
+<xs:element name="customerId" type="xs:long" minOccurs="0"/>
+<xs:element name="listOfFlightReservation" type="tns:flightReservationEntity" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="loginId" type="xs:string" minOccurs="0"/>
+<xs:element name="loginPw" type="xs:string" minOccurs="0"/>
+<xs:element name="userRole" type="tns:userRole" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="individualFlightReservationEntity">
+<xs:sequence>
+<xs:element name="amount" type="xs:decimal" minOccurs="0"/>
+<xs:element name="customerInfo" type="tns:customerEntity" minOccurs="0"/>
+<xs:element name="flightReservation" type="tns:flightReservationEntity" minOccurs="0"/>
+<xs:element name="flightSchedule" type="tns:flightScheduleEntity" minOccurs="0"/>
+<xs:element name="indivFlightResId" type="xs:long" minOccurs="0"/>
+<xs:element name="listOfPassenger" type="tns:passengerEntity" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="listOfSeats" type="tns:seatEntity" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="flightScheduleEntity">
+<xs:sequence>
+<xs:element name="arrivalDateTime" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="departureDateTime" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="flightDuration" type="xs:int" minOccurs="0"/>
+<xs:element name="flightSchedulePlan" type="tns:flightSchedulePlanEntity" minOccurs="0"/>
+<xs:element name="seatingPlan" type="tns:seatEntity" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="flightSchedulePlanEntity" abstract="true">
+<xs:sequence>
+<xs:element name="flightEntity" type="tns:flightEntity" minOccurs="0"/>
+<xs:element name="flightNumber" type="xs:string" minOccurs="0"/>
+<xs:element name="isDeleted" type="xs:boolean"/>
+<xs:element name="listOfFare" type="tns:fareEntity" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="listOfFlightSchedule" type="tns:flightScheduleEntity" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="returnFlightSchedulePlan" type="tns:flightSchedulePlanEntity" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="flightEntity">
+<xs:sequence>
+<xs:element name="aircraftConfig" type="tns:aircraftConfigurationEntity" minOccurs="0"/>
+<xs:element name="flightId" type="xs:long" minOccurs="0"/>
+<xs:element name="flightNumber" type="xs:string" minOccurs="0"/>
+<xs:element name="flightRoute" type="tns:flightRouteEntity" minOccurs="0"/>
+<xs:element name="isDeleted" type="xs:boolean"/>
+<xs:element name="isMainRoute" type="xs:boolean"/>
+<xs:element name="layOver" type="xs:int" minOccurs="0"/>
+<xs:element name="listOfFlightSchedulePlan" type="tns:flightSchedulePlanEntity" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="returnFlight" type="tns:flightEntity" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="aircraftConfigurationEntity">
+<xs:sequence>
+<xs:element name="aircraftConfigId" type="xs:long" minOccurs="0"/>
+<xs:element name="aircraftName" type="xs:string" minOccurs="0"/>
+<xs:element name="aircraftType" type="tns:aircraftTypeEntity" minOccurs="0"/>
+<xs:element name="cabinClasses" type="tns:cabinClassConfigurationEntity" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="maxSeatingCapacity" type="xs:int" minOccurs="0"/>
+<xs:element name="seatingPlan" type="tns:seatEntity" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="aircraftTypeEntity">
+<xs:sequence>
+<xs:element name="aircraftTypeId" type="xs:long" minOccurs="0"/>
+<xs:element name="aircraftTypeName" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="cabinClassConfigurationEntity">
+<xs:sequence>
+<xs:element name="availableSeats" type="xs:int" minOccurs="0"/>
+<xs:element name="balancedSeats" type="xs:int" minOccurs="0"/>
+<xs:element name="cabinClassConfigId" type="xs:long" minOccurs="0"/>
+<xs:element name="cabinclassType" type="tns:cabinClassType" minOccurs="0"/>
+<xs:element name="numAisles" type="xs:int" minOccurs="0"/>
+<xs:element name="numRows" type="xs:int" minOccurs="0"/>
+<xs:element name="reservedSeats" type="xs:int" minOccurs="0"/>
+<xs:element name="seatingConfig" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="seatEntity">
+<xs:sequence>
+<xs:element name="cabinType" type="tns:cabinClassType" minOccurs="0"/>
+<xs:element name="fare" type="tns:fareEntity" minOccurs="0"/>
+<xs:element name="passenger" type="tns:passengerEntity" minOccurs="0"/>
+<xs:element name="reserved" type="xs:boolean"/>
+<xs:element name="seatId" type="xs:long" minOccurs="0"/>
+<xs:element name="seatNumber" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="fareEntity">
+<xs:sequence>
+<xs:element name="cabinType" type="tns:cabinClassType" minOccurs="0"/>
+<xs:element name="fareAmount" type="xs:decimal" minOccurs="0"/>
+<xs:element name="fareBasisCode" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="passengerEntity">
+<xs:sequence>
+<xs:element name="firstName" type="xs:string" minOccurs="0"/>
+<xs:element name="lastName" type="xs:string" minOccurs="0"/>
+<xs:element name="passengerId" type="xs:long" minOccurs="0"/>
+<xs:element name="passportNumber" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="flightRouteEntity">
+<xs:sequence>
+<xs:element name="destinationLocation" type="tns:airportEntity" minOccurs="0"/>
+<xs:element name="flightRouteId" type="xs:long" minOccurs="0"/>
+<xs:element name="isDeleted" type="xs:boolean"/>
+<xs:element name="mainRoute" type="xs:boolean"/>
+<xs:element name="originLocation" type="tns:airportEntity" minOccurs="0"/>
+<xs:element name="returnRoute" type="tns:flightRouteEntity" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="airportEntity">
+<xs:sequence>
+<xs:element name="airportName" type="xs:string" minOccurs="0"/>
+<xs:element name="city" type="xs:string" minOccurs="0"/>
+<xs:element name="country" type="xs:string" minOccurs="0"/>
+<xs:element name="iataAirportCode" type="xs:string" minOccurs="0"/>
+<xs:element name="state" type="xs:string" minOccurs="0"/>
+<xs:element name="timeZoneHour" type="xs:int" minOccurs="0"/>
+<xs:element name="timeZoneMin" type="xs:int" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="CustomerHasNoReservationException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveIndividualFlightReservation">
+<xs:sequence>
+<xs:element name="arg0" type="xs:long" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveIndividualFlightReservationResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:flightReservationEntity" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="FlightReservationDoesNotExistException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="loginPartner">
+<xs:sequence>
+<xs:element name="arg0" type="xs:string" minOccurs="0"/>
+<xs:element name="arg1" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="loginPartnerResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:partnerEntity" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="partnerEntity">
+<xs:complexContent>
+<xs:extension base="tns:customerEntity">
+<xs:sequence>
+<xs:element name="partnerName" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="CustomerLoginInvalid">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="AccessFromWrongPortalException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:simpleType name="userRole">
+<xs:restriction base="xs:string">
+<xs:enumeration value="CUSTOMER"/>
+<xs:enumeration value="FLEETMANAGER"/>
+<xs:enumeration value="ROUTEPLANNER"/>
+<xs:enumeration value="SCHEDULEMANAGER"/>
+<xs:enumeration value="SALESMANAGER"/>
+<xs:enumeration value="PARTNEREMPLOYEE"/>
+<xs:enumeration value="PARTNERRESERVATIONMANAGER"/>
+</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="cabinClassType">
+<xs:restriction base="xs:string">
+<xs:enumeration value="F"/>
+<xs:enumeration value="J"/>
+<xs:enumeration value="W"/>
+<xs:enumeration value="Y"/>
+</xs:restriction>
+</xs:simpleType>
+</xs:schema>
