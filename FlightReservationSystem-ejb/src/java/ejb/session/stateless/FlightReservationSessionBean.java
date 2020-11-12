@@ -29,22 +29,28 @@ public class FlightReservationSessionBean implements FlightReservationSessionBea
     @Override
     public void reserveFlights(List<FlightReservationEntity> listOfFlightRes) {
         for (FlightReservationEntity flightRes : listOfFlightRes) {
+            em.merge(flightRes.getCustomer());
+            em.persist(flightRes);
             for (IndividualFlightReservationEntity indivFlightRes : flightRes.getListOfIndividualFlightRes()) {
+                System.out.println(indivFlightRes);
+                System.out.println(indivFlightRes.getFlightSchedule());
                 em.merge(indivFlightRes.getFlightSchedule());
 
                 for (SeatEntity seat : indivFlightRes.getListOfSeats()) {
+                    System.out.println(seat);
+                    System.out.println(seat.getFare());
                     em.persist(seat.getFare());
                     em.merge(seat);
                 }
 
                 for (PassengerEntity passenger : indivFlightRes.getListOfPassenger()) {
+                    System.out.println(passenger);
                     em.persist(passenger);
                 }
 
                 em.persist(indivFlightRes);
             }
 
-            em.persist(flightRes);
         }
 
     }

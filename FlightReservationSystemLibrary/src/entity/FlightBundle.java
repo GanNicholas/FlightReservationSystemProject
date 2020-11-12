@@ -30,13 +30,13 @@ public class FlightBundle implements  Serializable{
     private CabinClassType returnTwoCabinClassType;
     private CabinClassType returnThreeCabinClassType;
 
-    private FareEntity departFareOne;
-    private FareEntity departFareTwo;
-    private FareEntity departFareThree;
+    private FareEntity departOneFare;
+    private FareEntity departTwoFare;
+    private FareEntity departThreeFare;
     
-    private FareEntity returnFareOne;
-    private FareEntity returnFareTwo;
-    private FareEntity returnFareThree;
+    private FareEntity returnOneFare;
+    private FareEntity returnTwoFare;
+    private FareEntity returnThreeFare;
     
     
     public FlightBundle() {
@@ -62,52 +62,52 @@ public class FlightBundle implements  Serializable{
         this.departThree = departThree;
     }
 
-    public FareEntity getDepartFareOne() {
-        return departFareOne;
+    public FareEntity getDepartOneFare() {
+        return departOneFare;
     }
 
-    public void setDepartFareOne(FareEntity departFareOne) {
-        this.departFareOne = departFareOne;
+    public void setDepartOneFare(FareEntity departOneFare) {
+        this.departOneFare = departOneFare;
     }
 
-    public FareEntity getDepartFareTwo() {
-        return departFareTwo;
+    public FareEntity getDepartTwoFare() {
+        return departTwoFare;
     }
 
-    public void setDepartFareTwo(FareEntity departFareTwo) {
-        this.departFareTwo = departFareTwo;
+    public void setDepartTwoFare(FareEntity departTwoFare) {
+        this.departTwoFare = departTwoFare;
     }
 
-    public FareEntity getDepartFareThree() {
-        return departFareThree;
+    public FareEntity getDepartThreeFare() {
+        return departThreeFare;
     }
 
-    public void setDepartFareThree(FareEntity departFareThree) {
-        this.departFareThree = departFareThree;
+    public void setDepartThreeFare(FareEntity departThreeFare) {
+        this.departThreeFare = departThreeFare;
     }
 
-    public FareEntity getReturnFareOne() {
-        return returnFareOne;
+    public FareEntity getReturnOneFare() {
+        return returnOneFare;
     }
 
-    public void setReturnFareOne(FareEntity returnFareOne) {
-        this.returnFareOne = returnFareOne;
+    public void setReturnOneFare(FareEntity returnOneFare) {
+        this.returnOneFare = returnOneFare;
     }
 
-    public FareEntity getReturnFareTwo() {
-        return returnFareTwo;
+    public FareEntity getReturnTwoFare() {
+        return returnTwoFare;
     }
 
-    public void setReturnFareTwo(FareEntity returnFareTwo) {
-        this.returnFareTwo = returnFareTwo;
+    public void setReturnTwoFare(FareEntity returnTwoFare) {
+        this.returnTwoFare = returnTwoFare;
     }
 
-    public FareEntity getReturnFareThree() {
-        return returnFareThree;
+    public FareEntity getReturnThreeFare() {
+        return returnThreeFare;
     }
 
-    public void setReturnFareThree(FareEntity returnFareThree) {
-        this.returnFareThree = returnFareThree;
+    public void setReturnThreeFare(FareEntity returnThreeFare) {
+        this.returnThreeFare = returnThreeFare;
     }
     
     

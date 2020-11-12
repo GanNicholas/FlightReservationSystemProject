@@ -199,5 +199,18 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
             }
         
     }
+    
+    @Override
+    public FlightRouteEntity getFlightRouteOD(String oIATA, String dIATA) throws FlightRouteODPairExistException {
+        try {
+            Query query = em.createQuery("SELECT a from FlightRouteEntity a WHERE a.originLocation.iataAirportCode =:origin AND a.destinationLocation.iataAirportCode =:destination")
+                    .setParameter("origin", oIATA).setParameter("destination", dIATA);
+            FlightRouteEntity tempFrEntity = (FlightRouteEntity) query.getSingleResult();
+            return tempFrEntity;
+        } catch (NoResultException ex) {
+            throw new FlightRouteODPairExistException();
+        }
+
+    }
 
 }

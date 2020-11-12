@@ -39,5 +39,6 @@ public interface FlightRouteSessionBeanLocal {
     public List<FlightRouteEntity> viewListOfAllFlightRoute();
 
     public void retrieveOD(String oIataCode) throws FlightRouteDoesNotExistException;
+    public FlightRouteEntity getFlightRouteOD(String oIATA, String dIATA) throws FlightRouteODPairExistException;
 
 }

@@ -598,18 +598,18 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
 
         for (FlightBundle currentFb : listOfFS) {
             em.detach(currentFb.getDepartOne());
-            em.detach(currentFb.getDepartFareTwo());
+            em.detach(currentFb.getDepartTwo());
             em.detach(currentFb.getDepartThree());
-            em.detach(currentFb.getDepartFareOne());
-            em.detach(currentFb.getDepartFareTwo());
-            em.detach(currentFb.getDepartFareThree());
+            em.detach(currentFb.getDepartOneFare());
+            em.detach(currentFb.getDepartTwoFare());
+            em.detach(currentFb.getDepartThreeFare());
             em.detach(currentFb.getReturnOne());
             em.detach(currentFb.getReturnTwo());
             em.detach(currentFb.getReturnThree());
             em.detach(currentFb.getReturnOne());
-            em.detach(currentFb.getReturnFareOne());
-            em.detach(currentFb.getDepartFareTwo());
-            em.detach(currentFb.getDepartFareThree());
+            em.detach(currentFb.getReturnOneFare());
+            em.detach(currentFb.getReturnTwoFare());
+            em.detach(currentFb.getReturnThreeFare());
         }
         return listOfFS;
     }
@@ -710,19 +710,19 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         }
 
         for (FlightBundle currentFb : listOFlightSchedules) {
-            em.detach(currentFb.getDepartOne());
-            em.detach(currentFb.getDepartFareTwo());
+           em.detach(currentFb.getDepartOne());
+            em.detach(currentFb.getDepartTwo());
             em.detach(currentFb.getDepartThree());
-            em.detach(currentFb.getDepartFareOne());
-            em.detach(currentFb.getDepartFareTwo());
-            em.detach(currentFb.getDepartFareThree());
+            em.detach(currentFb.getDepartOneFare());
+            em.detach(currentFb.getDepartTwoFare());
+            em.detach(currentFb.getDepartThreeFare());
             em.detach(currentFb.getReturnOne());
             em.detach(currentFb.getReturnTwo());
             em.detach(currentFb.getReturnThree());
             em.detach(currentFb.getReturnOne());
-            em.detach(currentFb.getReturnFareOne());
-            em.detach(currentFb.getDepartFareTwo());
-            em.detach(currentFb.getDepartFareThree());
+            em.detach(currentFb.getReturnOneFare());
+            em.detach(currentFb.getReturnTwoFare());
+            em.detach(currentFb.getReturnThreeFare());
         }
 
         return listOFlightSchedules;
@@ -826,19 +826,19 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         }
 
         for (FlightBundle currentFb : listOFlightSchedules) {
-            em.detach(currentFb.getDepartOne());
-            em.detach(currentFb.getDepartFareTwo());
+           em.detach(currentFb.getDepartOne());
+            em.detach(currentFb.getDepartTwo());
             em.detach(currentFb.getDepartThree());
-            em.detach(currentFb.getDepartFareOne());
-            em.detach(currentFb.getDepartFareTwo());
-            em.detach(currentFb.getDepartFareThree());
+            em.detach(currentFb.getDepartOneFare());
+            em.detach(currentFb.getDepartTwoFare());
+            em.detach(currentFb.getDepartThreeFare());
             em.detach(currentFb.getReturnOne());
             em.detach(currentFb.getReturnTwo());
             em.detach(currentFb.getReturnThree());
             em.detach(currentFb.getReturnOne());
-            em.detach(currentFb.getReturnFareOne());
-            em.detach(currentFb.getDepartFareTwo());
-            em.detach(currentFb.getDepartFareThree());
+            em.detach(currentFb.getReturnOneFare());
+            em.detach(currentFb.getReturnTwoFare());
+            em.detach(currentFb.getReturnThreeFare());
         }
 
         return listOFlightSchedules;
@@ -938,19 +938,19 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         }
 
         for (FlightBundle currentFb : listOFlightSchedules) {
-            em.detach(currentFb.getDepartOne());
-            em.detach(currentFb.getDepartFareTwo());
+       em.detach(currentFb.getDepartOne());
+            em.detach(currentFb.getDepartTwo());
             em.detach(currentFb.getDepartThree());
-            em.detach(currentFb.getDepartFareOne());
-            em.detach(currentFb.getDepartFareTwo());
-            em.detach(currentFb.getDepartFareThree());
+            em.detach(currentFb.getDepartOneFare());
+            em.detach(currentFb.getDepartTwoFare());
+            em.detach(currentFb.getDepartThreeFare());
             em.detach(currentFb.getReturnOne());
             em.detach(currentFb.getReturnTwo());
             em.detach(currentFb.getReturnThree());
             em.detach(currentFb.getReturnOne());
-            em.detach(currentFb.getReturnFareOne());
-            em.detach(currentFb.getDepartFareTwo());
-            em.detach(currentFb.getDepartFareThree());
+            em.detach(currentFb.getReturnOneFare());
+            em.detach(currentFb.getReturnTwoFare());
+            em.detach(currentFb.getReturnThreeFare());
         }
 
         return listOFlightSchedules;

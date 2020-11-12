@@ -7,6 +7,7 @@ package reservationclient;
 
 import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.FlightReservationSessionBeanRemote;
+import ejb.session.stateless.FlightRouteSessionBeanRemote;
 import ejb.session.stateless.FlightScheduleSessionBeanRemote;
 import ejb.session.stateless.FlightSessionBeanRemote;
 import java.util.Scanner;
@@ -17,6 +18,9 @@ import javax.ejb.EJB;
  * @author nickg
  */
 public class Main {
+
+    @EJB
+    private static FlightRouteSessionBeanRemote flightRouteSessionBean;
 
     @EJB
     private static FlightReservationSessionBeanRemote flightReservationSessionBean;
@@ -41,7 +45,7 @@ public class Main {
         String input = sc.nextLine();
         while (true) {
             if (input.equals("1")) {
-                Customer c = new Customer(customerSessionBean, flightScheduleSessionBean, flightReservationSessionBean);
+                Customer c = new Customer(customerSessionBean, flightScheduleSessionBean, flightReservationSessionBean, flightRouteSessionBean);
                 c.runApp();
             }
         }
