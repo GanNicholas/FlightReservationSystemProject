@@ -120,17 +120,22 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
                 Query queryReturnFlight = em.createQuery("SELECT f FROM FlightRouteEntity f where f.flightRouteId = :flightRouteId and f.isDeleted=:isDeleted").setParameter("flightRouteId", flightRoute.getReturnRoute().getFlightRouteId()).setParameter("isDeleted", false);
                 returnFlightRoute = (FlightRouteEntity) queryReturnFlight.getSingleResult();
             }
-
-            if (checkFlightRouteUsedByOthers(id)) {
+            Query usedByOther = em.createQuery("SELECT s FROM FlightEntity s WHERE s.flightRoute=:flightRoute").setParameter("flightRoute", flightRoute);
+            List<FlightEntity> f = usedByOther.getResultList();
+            if (f.isEmpty() || f == null) {
                 if (flightRoute.getReturnRoute() != null) {
-                    returnFlightRoute.setIsDeleted(true);
-                }
-                flightRoute.setIsDeleted(true);
-            } else {
-                if (flightRoute.getReturnRoute() != null) {
-                    em.remove(returnFlightRoute);
+                    returnFlightRoute.setMainRoute(true);
+                    returnFlightRoute.setReturnRoute(null);
+                    flightRoute.setReturnRoute(null);
                 }
                 em.remove(flightRoute);
+            } else {
+                if (flightRoute.getReturnRoute() != null) {
+                    returnFlightRoute.setMainRoute(true);
+                    returnFlightRoute.setReturnRoute(null);
+                    flightRoute.setReturnRoute(null);
+                }
+                flightRoute.setIsDeleted(true);
             }
         } catch (NoResultException ex) {
             throw new FlightRouteDoesNotExistException("Invalid flight route id");
@@ -176,7 +181,7 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
             }
         }
     }
-    
+
     @Override
     public List<FlightRouteEntity> viewListOfAllFlightRoute() {
 
@@ -186,20 +191,18 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
         return listOfFlightRoute;
     }
 
-
     @Override
     public void retrieveOD(String oIataCode) throws FlightRouteDoesNotExistException {
 
-        
-            Query q1 = em.createQuery("SELECT fr from FlightRouteEntity fr WHERE fr.originLocation.iataAirportCode =:oIataCode")
-                    .setParameter("oIataCode", oIataCode);
-           List< FlightRouteEntity> fr =  q1.getResultList();
-            if(fr.isEmpty()){
-                throw new FlightRouteDoesNotExistException();
-            }
-        
+        Query q1 = em.createQuery("SELECT fr from FlightRouteEntity fr WHERE fr.originLocation.iataAirportCode =:oIataCode")
+                .setParameter("oIataCode", oIataCode);
+        List< FlightRouteEntity> fr = q1.getResultList();
+        if (fr.isEmpty()) {
+            throw new FlightRouteDoesNotExistException();
+        }
+
     }
-    
+
     @Override
     public FlightRouteEntity getFlightRouteOD(String oIATA, String dIATA) throws FlightRouteODPairExistException {
         try {

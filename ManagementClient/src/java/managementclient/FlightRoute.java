@@ -168,7 +168,7 @@ public class FlightRoute {
 
     }
 
-    public void DeleteFlightRoute() {
+    public void DeleteFlightRoute(){
         Scanner sc = new Scanner(System.in);
         List<FlightRouteEntity> listOfFlightRoute = flightRouteSessionBean.viewListOfFlightRoute();
         System.out.println("***List of flight route***");
