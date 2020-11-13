@@ -1391,8 +1391,8 @@ public class Customer {
                     FareEntity newFareForReturnFs1 = new FareEntity(fareForReturnFs1.getFareBasisCode(), fareForReturnFs1.getFareAmount(), fareForReturnFs1.getCabinType());
                     seat.setFare(fareForReturnFs1);
 
-                    FareEntity newFare = new FareEntity("F1020", BigDecimal.TEN, cabinForReturnFs1);
-                    seat.setFare(newFare);
+//                    FareEntity newFare = new FareEntity("F1020", BigDecimal.TEN, cabinForReturnFs1);
+//                    seat.setFare(newFare);
 
                     seat.setPassenger(passenger);
                     indivResForReturnFs1.getListOfSeats().add(seat);

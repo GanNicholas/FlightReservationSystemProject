@@ -171,7 +171,7 @@ public class PartnerReservationSystem {
     }
 
     @WebMethod(operationName = "listOfConnectingFlightRecordsAftThreeDays")
-    public List<FlightBundle> listOfConnectingFlightRecordsAftThreeDays(Date actual, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
+    public List<FlightBundle> listOfConnectingFlightRecordsAftThreeDays(GregorianCalendar actual, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
 
         List<FlightBundle> listOfflightBundle = flightScheduleSessionBean.listOfConnectingFlightRecordsAftThreeDaysUnmanaged(actual, departureAirport, destinationAirport);
         for (FlightBundle currentFb : listOfflightBundle) {
@@ -230,7 +230,7 @@ public class PartnerReservationSystem {
     }
 
     @WebMethod(operationName = "listOfConnectingFlightRecordsLessThreeDays")
-    public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDays(Date actualDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
+    public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDays(GregorianCalendar actualDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
         List<FlightBundle> listOfflightBundle = flightScheduleSessionBean.listOfConnectingFlightRecordsLessThreeDaysUnmanaged(actualDate, departureAirport, destinationAirport);
 
         for (FlightBundle currentFb : listOfflightBundle) {
@@ -288,7 +288,7 @@ public class PartnerReservationSystem {
     }
 
     @WebMethod(operationName = "listOfConnectingFlightRecords")
-    public List<FlightBundle> listOfConnectingFlightRecords(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
+    public List<FlightBundle> listOfConnectingFlightRecords(GregorianCalendar departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
         List<FlightBundle> listOfflightBundle = flightScheduleSessionBean.listOfConnectingFlightRecordsUnmanaged(departureDate, departureAirport, destinationAirport);
 
         for (FlightBundle currentFb : listOfflightBundle) {

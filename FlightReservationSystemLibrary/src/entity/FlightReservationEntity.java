@@ -64,7 +64,7 @@ public class FlightReservationEntity implements Serializable {
     private String creditCardName;
 
     @Size(max = 16)
-    @Column(unique = true, length = 16)
+    @Column(length = 16)
     private String creditCardNumber;
 
     @Size(max = 3)
