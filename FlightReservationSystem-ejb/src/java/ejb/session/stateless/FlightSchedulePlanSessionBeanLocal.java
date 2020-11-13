@@ -18,6 +18,7 @@ import util.exception.FlightDoesNotExistException;
 import util.exception.FlightScheduleDoesNotExistException;
 import util.exception.FlightScheduleExistException;
 import util.exception.FlightSchedulePlanDoesNotExistException;
+import util.exception.FlightSchedulePlanEndDateIsBeforeStartDateException;
 import util.exception.FlightSchedulePlanIsEmptyException;
 
 /**
@@ -29,7 +30,7 @@ public interface FlightSchedulePlanSessionBeanLocal {
 
     public String createNonRecurrentFlightSchedulePlan(String flightNumber, List<GregorianCalendar> listOfDepartureDateTime, Integer flightDuration, boolean createReturnFlightSchedule, List<FareEntity> listOfFares, Integer layover) throws FlightDoesNotExistException, FlightScheduleExistException;
 
-    public String createRecurrentFlightSchedulePlan(String flightNumber, GregorianCalendar departureDateTime, GregorianCalendar endDate, Integer flightDuration, boolean createReturnFlightSchedule, List<FareEntity> listOfFares, Integer layover, Integer recurrency) throws FlightDoesNotExistException, FlightScheduleExistException;
+    public String createRecurrentFlightSchedulePlan(String flightNumber, GregorianCalendar departureDateTime, GregorianCalendar endDate, Integer flightDuration, boolean createReturnFlightSchedule, List<FareEntity> listOfFares, Integer layover, Integer recurrency) throws FlightDoesNotExistException, FlightScheduleExistException, FlightSchedulePlanEndDateIsBeforeStartDateException;
 
     public List<FlightSchedulePlanEntity> viewAllFlightSchedulePlan() throws FlightSchedulePlanIsEmptyException;
 

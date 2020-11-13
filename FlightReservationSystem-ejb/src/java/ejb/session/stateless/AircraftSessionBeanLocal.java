@@ -12,6 +12,7 @@ import java.util.List;
 import javax.ejb.Local;
 import util.exception.AircraftConfigurationNotExistException;
 import util.exception.CabinClassExceedMaxCapacity;
+import util.exception.NoAircraftTypeAvailableException;
 
 /**
  *
@@ -25,5 +26,9 @@ public interface AircraftSessionBeanLocal {
     public List<AircraftConfigurationEntity> viewAircraftConfiguration();
 
     public AircraftConfigurationEntity viewDetailAircraftConfiguration(Long index) throws AircraftConfigurationNotExistException;
+
+    public List<AircraftTypeEntity> getAircraftTypes() throws NoAircraftTypeAvailableException;
+
+    public AircraftTypeEntity getAircraftType(Long id) throws NoAircraftTypeAvailableException;
 
 }

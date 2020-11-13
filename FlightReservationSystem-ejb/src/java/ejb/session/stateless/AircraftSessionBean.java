@@ -22,6 +22,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.AircraftConfigurationNotExistException;
 import util.exception.CabinClassExceedMaxCapacity;
+import util.exception.NoAircraftTypeAvailableException;
 
 /**
  *
@@ -33,9 +34,10 @@ public class AircraftSessionBean implements AircraftSessionBeanRemote, AircraftS
     @PersistenceContext(unitName = "FlightReservationSystem-ejbPU")
     private EntityManager em;
 
+    @Override
     public Long createAircraftConfiguration(AircraftConfigurationEntity aircraftConfigurationEntity, AircraftTypeEntity aircarAircraftTypeEntity, List<CabinClassConfigurationEntity> listOfCabinClassConfig) {
         int totalCabinPeople = 0;
-        em.persist(aircarAircraftTypeEntity);
+        em.merge(aircarAircraftTypeEntity);
         em.flush();
         aircraftConfigurationEntity.setAircraftType(aircarAircraftTypeEntity);
         em.persist(aircraftConfigurationEntity);
@@ -98,6 +100,8 @@ public class AircraftSessionBean implements AircraftSessionBeanRemote, AircraftS
         }
         return aircraftConfigurationEntity.getAircraftConfigId();
     }
+
+    @Override
     public List<AircraftConfigurationEntity> viewAircraftConfiguration() {
         Query query = em.createQuery("SELECT a FROM AircraftConfigurationEntity AS a ORDER BY a.aircraftType.aircraftTypeName asc, a.aircraftName asc");
         List<AircraftConfigurationEntity> aircraftConfiguration = query.getResultList();
@@ -105,6 +109,7 @@ public class AircraftSessionBean implements AircraftSessionBeanRemote, AircraftS
         return aircraftConfiguration;
     }
 
+    @Override
     public AircraftConfigurationEntity viewDetailAircraftConfiguration(Long index) throws AircraftConfigurationNotExistException {
         AircraftConfigurationEntity aircraft = null;
         try {
@@ -116,6 +121,28 @@ public class AircraftSessionBean implements AircraftSessionBeanRemote, AircraftS
             throw new AircraftConfigurationNotExistException("No such record");
         }
         return aircraft;
+    }
+
+    @Override
+    public List<AircraftTypeEntity> getAircraftTypes() throws NoAircraftTypeAvailableException {
+        List<AircraftTypeEntity> listOfAircraftType = em.createQuery("SELECT a FROM AircraftTypeEntity a").getResultList();
+
+        if (listOfAircraftType.isEmpty()) {
+            throw new NoAircraftTypeAvailableException("No aircraft type available!");
+        } else {
+            return listOfAircraftType;
+        }
+    }
+
+    @Override
+    public AircraftTypeEntity getAircraftType(Long id) throws NoAircraftTypeAvailableException {
+        AircraftTypeEntity ac = em.find(AircraftTypeEntity.class, id);
+
+        if (ac == null) {
+            throw new NoAircraftTypeAvailableException("No aircraft type available!");
+        } else {
+            return ac;
+        }
     }
 
 }

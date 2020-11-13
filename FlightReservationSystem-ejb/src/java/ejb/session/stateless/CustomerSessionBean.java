@@ -59,6 +59,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         try {
             Query query = em.createQuery("SELECT c FROM CustomerEntity c WHERE c.loginId =:login AND c.loginPw=:password").setParameter("login", username).setParameter("password", password);
             CustomerEntity customer = (CustomerEntity) query.getSingleResult();
+            customer.getListOfFlightReservation().size();
             return customer;
         } catch (NoResultException ex) {
             throw new CustomerLoginInvalid("Invalid customer login");
