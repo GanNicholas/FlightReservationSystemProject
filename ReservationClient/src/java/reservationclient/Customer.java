@@ -356,7 +356,7 @@ public class Customer {
                         fb.setReturnThree(temp.getDepartThree());
                     }
                 }
-                //  reserveFlight(fb, origin, destination, new BigDecimal(BigInteger.ONE), new BigDecimal(BigInteger.ONE), Integer.parseInt(passenger));
+                reserveFlight(fb, origin, destination, new BigDecimal(BigInteger.ONE), new BigDecimal(BigInteger.ONE), Integer.parseInt(passenger));
 
             } catch (NumberFormatException ex) {
                 System.out.println("You have invalid input");
@@ -984,6 +984,7 @@ public class Customer {
 ////            IndividualFlightReservationEntity indivResForFs1 = new IndividualFlightReservationEntity(fs1, customer, amountForFs1, flightRes);
 //            BigDecimal amountForFs2 = fareForFs2.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
 //            IndividualFlightReservationEntity indivResForFs2 = new IndividualFlightReservationEntity(fs2, customer, amountForFs2, flightRes);
+
             IndividualFlightReservationEntity indivResForFs1 = new IndividualFlightReservationEntity(fs1, customer, BigDecimal.TEN, flightRes);
             IndividualFlightReservationEntity indivResForFs2 = new IndividualFlightReservationEntity(fs2, customer, BigDecimal.TEN, flightRes);
 
