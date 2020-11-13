@@ -230,16 +230,9 @@ public class Customer {
                 System.out.println("2. Business class");
                 System.out.println("3. Premium economy class");
                 System.out.println("4. Economy class");
+                System.out.println("5. Any cabin type");
                 String strCabinType = sc.nextLine().trim();
-                while (Integer.parseInt(strCabinType) > 4 && Integer.parseInt(strCabinType) <= 0) {
-                    System.out.println("Invalid cabin class type.");
-                    System.out.println("Please enter the cabin type:");
-                    System.out.println("1. First class.");
-                    System.out.println("2. Business class");
-                    System.out.println("3. Premium economy class");
-                    System.out.println("4. Economy class");
-                    strCabinType = sc.nextLine().trim();
-                }
+                
                 CabinClassType cabinType = null;
                 if (strCabinType.equalsIgnoreCase("1")) {
                     cabinType = CabinClassType.F;
@@ -370,28 +363,6 @@ public class Customer {
                     }
                 }
                 
-               /* System.out.println("fb  1:" + fb.getDepartOne().getFlightScheduleId() + " || " + fb.getDepartOneCabinClassType() + "|| "  + fb.getDepartOneFare().getFareBasisCode() + "||" + fb.getDepartOneFare().getFareAmount());
-                if(fb.getDepartTwo()!= null){
-                     System.out.println("fb 2: " + fb.getDepartTwo().getFlightScheduleId() + " || " + fb.getDepartTwoCabinClassType() + "|| "  + fb.getDepartTwoFare().getFareBasisCode() + "||" + fb.getDepartTwoFare().getFareAmount());
-               
-                }
-                if(fb.getDepartThree()!=null){
-                     System.out.println("fb 3: " + fb.getDepartThree().getFlightScheduleId() + " || " + fb.getDepartThreeCabinClassType() + "|| "  + fb.getDepartThreeFare().getFareBasisCode() + "||" + fb.getDepartThreeFare().getFareAmount());
-               
-                }
-                if(fb.getReturnOne()!=null){
-                     System.out.println("fb  r1:" + fb.getReturnOne().getFlightScheduleId() + " || " + fb.getReturnOneCabinClassType() + "|| "  + fb.getReturnOneFare().getFareBasisCode() + "||" + fb.getReturnOneFare().getFareAmount());
-                
-                }
-                
-                if(fb.getReturnTwo() !=null){
-                    System.out.println("fb r2:" + fb.getReturnTwo().getFlightScheduleId() + " || " + fb.getReturnTwoCabinClassType() + "|| "  + fb.getReturnTwoFare().getFareBasisCode() + "||" + fb.getReturnTwoFare().getFareAmount());
-                
-                }
-                if(fb.getReturnThree() !=null){
-                    System.out.println("fb r3:" + fb.getReturnThree().getFlightScheduleId() + " || " + fb.getReturnThreeCabinClassType() + "|| "  + fb.getReturnThreeFare().getFareBasisCode() + "||" + fb.getReturnThreeFare().getFareAmount());
-                
-                }*/
                 reserveFlight(fb, origin, destination, Integer.parseInt(passenger));
 
             } catch (NumberFormatException ex) {
@@ -820,8 +791,9 @@ public class Customer {
         int countFs1 = 0;
         int countFs2 = 0;
         int countFs3 = 0;
+        
         for (int i = 0; i < fs1.getSeatingPlan().size(); i++) {
-            if (!fs1.getSeatingPlan().get(i).isReserved() && fs1.getSeatingPlan().get(i).getCabinType().equals(cabinType)) {
+            if ((cabinType == null && !fs1.getSeatingPlan().get(i).isReserved())  || (cabinType!=null &&  !fs1.getSeatingPlan().get(i).isReserved() && fs1.getSeatingPlan().get(i).getCabinType().equals(cabinType))) {
                 countFs1++;
                 if (countFs1 == noOfPassenger) {
                     return true;
