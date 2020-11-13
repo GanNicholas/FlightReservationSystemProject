@@ -39,7 +39,7 @@ public class FlightScheduleEntity implements Serializable {
     @Future
     private GregorianCalendar arrivalDateTime;
 
-    @Max(value = 480, message = "Maximum flight duration is 480 minutes (8 hours)!")
+    @Max(value = 1800, message = "Maximum flight duration is 1800 minutes (30 hours)!")
     @Positive
     private Integer flightDuration;
 
