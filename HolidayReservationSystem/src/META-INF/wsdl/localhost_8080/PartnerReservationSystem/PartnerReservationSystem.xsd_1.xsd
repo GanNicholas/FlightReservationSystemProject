@@ -292,6 +292,24 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="convertCalendar">
+<xs:sequence>
+<xs:element name="arg0" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="convertCalendarResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:dateTime" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="IncorrectFormatException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="loginPartner">
 <xs:sequence>
 <xs:element name="arg0" type="xs:string" minOccurs="0"/>
@@ -322,24 +340,6 @@
 </xs:complexType>
 
 <xs:complexType name="AccessFromWrongPortalException">
-<xs:sequence>
-<xs:element name="message" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="convertCalendar">
-<xs:sequence>
-<xs:element name="arg0" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="convertCalendarResponse">
-<xs:sequence>
-<xs:element name="return" type="xs:dateTime" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="IncorrectFormatException">
 <xs:sequence>
 <xs:element name="message" type="xs:string" minOccurs="0"/>
 </xs:sequence>
@@ -423,20 +423,6 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="listOfConnectingFlightRecords">
-<xs:sequence>
-<xs:element name="arg0" type="xs:dateTime" minOccurs="0"/>
-<xs:element name="arg1" type="xs:string" minOccurs="0"/>
-<xs:element name="arg2" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="listOfConnectingFlightRecordsResponse">
-<xs:sequence>
-<xs:element name="return" type="tns:flightBundle" minOccurs="0" maxOccurs="unbounded"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="createFlightReservation">
 <xs:sequence>
 <xs:element name="arg0" type="xs:string" minOccurs="0"/>
@@ -452,16 +438,15 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="getDirectFlight">
+<xs:complexType name="listOfConnectingFlightRecords">
 <xs:sequence>
 <xs:element name="arg0" type="xs:dateTime" minOccurs="0"/>
-<xs:element name="arg1" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="arg1" type="xs:string" minOccurs="0"/>
 <xs:element name="arg2" type="xs:string" minOccurs="0"/>
-<xs:element name="arg3" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="getDirectFlightResponse">
+<xs:complexType name="listOfConnectingFlightRecordsResponse">
 <xs:sequence>
 <xs:element name="return" type="tns:flightBundle" minOccurs="0" maxOccurs="unbounded"/>
 </xs:sequence>
@@ -475,6 +460,21 @@
 
 <xs:complexType name="reserveFlightResponse">
 <xs:sequence/>
+</xs:complexType>
+
+<xs:complexType name="getDirectFlight">
+<xs:sequence>
+<xs:element name="arg0" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="arg1" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="arg2" type="xs:string" minOccurs="0"/>
+<xs:element name="arg3" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="getDirectFlightResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:flightBundle" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
 </xs:complexType>
 
 <xs:complexType name="listOfConnectingFlightRecordsLessThreeDays">

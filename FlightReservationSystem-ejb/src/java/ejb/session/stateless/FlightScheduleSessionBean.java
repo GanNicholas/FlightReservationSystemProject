@@ -115,10 +115,9 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
     }
 
     @Override
-    public List<FlightBundle> listOfConnectingFlightRecords(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
+    public List<FlightBundle> listOfConnectingFlightRecords(GregorianCalendar departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
 
-        GregorianCalendar gDepart = new GregorianCalendar();
-        gDepart.setTime(departureDate);
+        GregorianCalendar gDepart = (GregorianCalendar) departureDate.clone();
 
         GregorianCalendar gEndDate = (GregorianCalendar) gDepart.clone();
         gEndDate.add(GregorianCalendar.HOUR_OF_DAY, 24);
@@ -215,11 +214,10 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
     }
 
     @Override
-    public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDays(Date actualDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
+    public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDays(GregorianCalendar actualDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
-        GregorianCalendar actual = new GregorianCalendar();
-        actual.setTime(actualDate);
+        GregorianCalendar actual =(GregorianCalendar) actualDate.clone();
 
         GregorianCalendar gDepart = (GregorianCalendar) actual.clone();
         gDepart.add(GregorianCalendar.SECOND, -1);
@@ -318,10 +316,9 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
     }
 
     @Override
-    public List<FlightBundle> listOfConnectingFlightRecordsAftThreeDays(Date actual, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
+    public List<FlightBundle> listOfConnectingFlightRecordsAftThreeDays(GregorianCalendar actual, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
 
-        GregorianCalendar gActual = new GregorianCalendar();
-        gActual.setTime(actual);
+        GregorianCalendar gActual = (GregorianCalendar) actual.clone();
 
         GregorianCalendar gDepart = (GregorianCalendar) gActual.clone();
         gDepart.add(GregorianCalendar.DATE, 4);
@@ -639,11 +636,9 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
     }
 
     @Override
-    public List<FlightBundle> listOfConnectingFlightRecordsAftThreeDaysUnmanaged(Date actual, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
+    public List<FlightBundle> listOfConnectingFlightRecordsAftThreeDaysUnmanaged(GregorianCalendar actual, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
 
-        GregorianCalendar gActual = new GregorianCalendar();
-        gActual.setTime(actual);
-
+        GregorianCalendar gActual = (GregorianCalendar) actual.clone();
         GregorianCalendar gDepart = (GregorianCalendar) gActual.clone();
         gDepart.add(GregorianCalendar.DATE, 4);
         gDepart.add(GregorianCalendar.SECOND, -1);
@@ -753,12 +748,10 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
     }
 
     @Override
-    public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDaysUnmanaged(Date actualDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
+    public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDaysUnmanaged(GregorianCalendar actualDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
-        GregorianCalendar actual = new GregorianCalendar();
-        actual.setTime(actualDate);
-
+        GregorianCalendar actual = (GregorianCalendar) actualDate.clone();
         GregorianCalendar gDepart = (GregorianCalendar) actual.clone();
         gDepart.add(GregorianCalendar.SECOND, -1);
         actual.add(GregorianCalendar.DATE, -3);
@@ -869,10 +862,9 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
     }
 
     @Override
-    public List<FlightBundle> listOfConnectingFlightRecordsUnmanaged(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
+    public List<FlightBundle> listOfConnectingFlightRecordsUnmanaged(GregorianCalendar departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException {
 
-        GregorianCalendar gDepart = new GregorianCalendar();
-        gDepart.setTime(departureDate);
+        GregorianCalendar gDepart = (GregorianCalendar) departureDate.clone();
 
         GregorianCalendar gEndDate = (GregorianCalendar) gDepart.clone();
         gEndDate.add(GregorianCalendar.HOUR_OF_DAY, 24);

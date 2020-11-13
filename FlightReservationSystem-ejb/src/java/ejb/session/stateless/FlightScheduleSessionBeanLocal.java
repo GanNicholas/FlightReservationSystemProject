@@ -32,19 +32,19 @@ public interface FlightScheduleSessionBeanLocal {
 
     public FlightScheduleEntity updateReccurentFlightSchedule(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight) throws FlightScheduleExistException;
 
-    public List<FlightBundle> listOfConnectingFlightRecords(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+    public List<FlightBundle> listOfConnectingFlightRecords(GregorianCalendar departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
 
-    public List<FlightBundle> listOfConnectingFlightRecordsAftThreeDays(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+    public List<FlightBundle> listOfConnectingFlightRecordsAftThreeDays(GregorianCalendar departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
 
-    public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDays(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+    public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDays(GregorianCalendar departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
 
     public List<FlightBundle> getDirectFlight(GregorianCalendar actual, GregorianCalendar changeDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
 
     public List<FlightBundle> getDirectFlightUnmanaged(GregorianCalendar gStart, GregorianCalendar gEnd, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
 
-    public List<FlightBundle> listOfConnectingFlightRecordsAftThreeDaysUnmanaged(Date actual, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+    public List<FlightBundle> listOfConnectingFlightRecordsAftThreeDaysUnmanaged(GregorianCalendar actual, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
 
-    public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDaysUnmanaged(Date actualDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+    public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDaysUnmanaged(GregorianCalendar actualDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
 
-    public List<FlightBundle> listOfConnectingFlightRecordsUnmanaged(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+    public List<FlightBundle> listOfConnectingFlightRecordsUnmanaged(GregorianCalendar departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
 }

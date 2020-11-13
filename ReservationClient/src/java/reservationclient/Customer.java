@@ -260,36 +260,34 @@ public class Customer {
 
                 System.out.print("Enter depature date:(dd/mm/yyyy) ");
                 String departureDate = sc.nextLine().trim();
-                LocalDate searchDateFO = null;
+                GregorianCalendar searchDateFO = null;
                 String[] splitDepartDate = departureDate.trim().split("/");
                 if (splitDepartDate.length == 3) {
-                    searchDateFO = LocalDate.of(Integer.valueOf(splitDepartDate[2]), Integer.valueOf(splitDepartDate[1]), Integer.valueOf(splitDepartDate[0]));
+                    searchDateFO = new GregorianCalendar(Integer.valueOf(splitDepartDate[2]), Integer.valueOf(splitDepartDate[1])-1, Integer.valueOf(splitDepartDate[0]));
                 } else {
                     System.out.println("You have invalid date input for departure date. Please be in 'dd/mm/yyyy' format");
                     //   throw new DateInvalidException("You have invalid date input for departure flight date. Please be in 'dd/mm/yyyy' format");
                 }
 
-                Date actualSearchFO = Date.from(searchDateFO.atStartOfDay(ZoneId.systemDefault()).toInstant());
                 String returnDate = "";
                 if (tripType.equals("2")) {
                     System.out.print("Enter return date:(dd/mm/yyyy) ");
                     returnDate = sc.nextLine().trim();
                 }
                 //convert return time (if exist) to 3 days before and 3 days after
-                LocalDate searchDateReturn = null;
-                Date currentSearchReturnDate = null;
+                
+                GregorianCalendar currentSearchReturnDate = null;
                 String[] splitDepartDateReturn;
                 if (tripType.equals("2")) {
                     splitDepartDateReturn = returnDate.trim().split("/");
                     if (splitDepartDateReturn.length == 3) {
-                        searchDateReturn = LocalDate.of(Integer.valueOf(splitDepartDateReturn[2]), Integer.valueOf(splitDepartDateReturn[1]), Integer.valueOf(splitDepartDateReturn[0]));
-                        currentSearchReturnDate = Date.from(searchDateReturn.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                        currentSearchReturnDate = new GregorianCalendar(Integer.valueOf(splitDepartDateReturn[2]), Integer.valueOf(splitDepartDateReturn[1])-1, Integer.valueOf(splitDepartDateReturn[0]));
+                        
                     } else {
                         System.out.println("You have invalid date input for return flight date. Please be in 'dd/mm/yyyy' format");
                     }
                 }
                 SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-                System.out.println("current return flight date:" + format.format(currentSearchReturnDate.getTime()));
                 System.out.print("Enter number of passenger: ");
                 String passenger = sc.nextLine().trim();
                 int noOfPassenger = Integer.parseInt(passenger);
@@ -298,25 +296,24 @@ public class Customer {
                 // start calling searh flight with respectively to (1. one way 2. two ways -> inside of each, see if they want (a)connecting flight, (b)direct flight
                 if (tripType.equals("1")) {// one way
                     if (indictatorConnectFlightOrNot.equals("1")) {// connecting flight
-                        tempList = getConnectingFlight(actualSearchFO, cabinType, noOfPassenger, departureAirport, destinationAirport, 0);
+                        tempList = getConnectingFlight(searchDateFO, cabinType, noOfPassenger, departureAirport, destinationAirport, 0);
 
                     } else if (indictatorConnectFlightOrNot.equals("2")) {//direct flight
-                        tempList = getDirectFlight(departureAirport, destinationAirport, actualSearchFO, cabinType, noOfPassenger, 0);
+                        tempList = getDirectFlight(departureAirport, destinationAirport, searchDateFO, cabinType, noOfPassenger, 0);
                     }
                 } else {// two ways
                     if (indictatorConnectFlightOrNot.equals("1")) {
-                        flightBundle = getConnectingFlight(actualSearchFO, cabinType, noOfPassenger, departureAirport, destinationAirport, 0);
+                        flightBundle = getConnectingFlight(searchDateFO, cabinType, noOfPassenger, departureAirport, destinationAirport, 0);
                         System.out.println("Return Flight result: ");
                         tempList = getConnectingFlight(currentSearchReturnDate, cabinType, noOfPassenger, destinationAirport, departureAirport, flightBundle.size());
                         tempList = combineAllThreeFlights(flightBundle, tempList, null);
                     } else if (indictatorConnectFlightOrNot.equals("2")) {
-                        flightBundle = getDirectFlight(departureAirport, destinationAirport, actualSearchFO, cabinType, noOfPassenger, 0);
+                        flightBundle = getDirectFlight(departureAirport, destinationAirport, searchDateFO, cabinType, noOfPassenger, 0);
                         System.out.println("Return Flight result: ");
                         tempList = getDirectFlight(destinationAirport, departureAirport, currentSearchReturnDate, cabinType, noOfPassenger, flightBundle.size());
                         tempList = combineAllThreeFlights(flightBundle, tempList, null);
 
                     }
-                    System.out.println("tempList.size()" + tempList.size());
                 }
                 System.out.println("Please enter the flight you want to reserve for flying over:");
                 FlightBundle fb = new FlightBundle();
@@ -615,9 +612,8 @@ public class Customer {
 
     }
 
-    public List<FlightBundle> getConnectingFlight(Date actualDay, CabinClassType cabinType, int noOfPassenger, String departureAirport, String destinationAirport, int seqUpTo) {
-        GregorianCalendar gDepart = new GregorianCalendar();
-        gDepart.setTime(actualDay);
+    public List<FlightBundle> getConnectingFlight(GregorianCalendar actualDay, CabinClassType cabinType, int noOfPassenger, String departureAirport, String destinationAirport, int seqUpTo) {
+        GregorianCalendar gDepart = (GregorianCalendar) actualDay.clone();
 
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
@@ -651,12 +647,11 @@ public class Customer {
         //listOfSearchFlight.sort(sortFlightScheduleId);
     }
 
-    public List<FlightBundle> getDirectFlight(String originIATA, String desIATA, Date actual, CabinClassType cabinType, int noOfPassenger, int seqUpTo) {
+    public List<FlightBundle> getDirectFlight(String originIATA, String desIATA, GregorianCalendar actual, CabinClassType cabinType, int noOfPassenger, int seqUpTo) {
         List<FlightBundle> flightBundleLess3Day = null;
         List<FlightBundle> flightBundleActualDay = null;
         List<FlightBundle> flightBundleAdd3Day = null;
-        GregorianCalendar gTempActual = new GregorianCalendar();
-        gTempActual.setTime(actual);
+        GregorianCalendar gTempActual = (GregorianCalendar) actual.clone();
 
         GregorianCalendar dateThreeDateBefore = (GregorianCalendar) gTempActual.clone();
         dateThreeDateBefore.add(GregorianCalendar.DATE, -3);

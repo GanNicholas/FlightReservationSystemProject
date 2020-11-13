@@ -32,11 +32,11 @@ public interface FlightScheduleSessionBeanRemote {
 
     public FlightScheduleEntity updateReccurentFlightSchedule(GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight) throws FlightScheduleExistException;
 
-    public List<FlightBundle> listOfConnectingFlightRecords(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+    public List<FlightBundle> listOfConnectingFlightRecords(GregorianCalendar departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
 
-    public List<FlightBundle> listOfConnectingFlightRecordsAftThreeDays(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+    public List<FlightBundle> listOfConnectingFlightRecordsAftThreeDays(GregorianCalendar departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
 
-    public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDays(Date departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
+    public List<FlightBundle> listOfConnectingFlightRecordsLessThreeDays(GregorianCalendar departureDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
 
     public List<FlightBundle> getDirectFlight(GregorianCalendar actual, GregorianCalendar changeDate, String departureAirport, String destinationAirport) throws FlightRouteDoesNotExistException;
 }
