@@ -30,6 +30,7 @@ import entity.SeatEntity;
 import entity.SingleFlightScheduleEntity;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -287,13 +288,14 @@ public class Customer {
                         System.out.println("You have invalid date input for return flight date. Please be in 'dd/mm/yyyy' format");
                     }
                 }
-
+                SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+                System.out.println("current return flight date:" + format.format(currentSearchReturnDate.getTime()));
                 System.out.print("Enter number of passenger: ");
                 String passenger = sc.nextLine().trim();
                 int noOfPassenger = Integer.parseInt(passenger);
                 List<FlightBundle> flightBundle = new ArrayList<>();
                 List<FlightBundle> tempList = null;
-                // start calling searh flight with respectively to (1. one way 2. two ways -> inside of each, see if they want (a)connecting flight, (b)direct flight or (c)borth)
+                // start calling searh flight with respectively to (1. one way 2. two ways -> inside of each, see if they want (a)connecting flight, (b)direct flight
                 if (tripType.equals("1")) {// one way
                     if (indictatorConnectFlightOrNot.equals("1")) {// connecting flight
                         tempList = getConnectingFlight(actualSearchFO, cabinType, noOfPassenger, departureAirport, destinationAirport, 0);
@@ -312,10 +314,10 @@ public class Customer {
                         System.out.println("Return Flight result: ");
                         tempList = getDirectFlight(destinationAirport, departureAirport, currentSearchReturnDate, cabinType, noOfPassenger, flightBundle.size());
                         tempList = combineAllThreeFlights(flightBundle, tempList, null);
-                    }
 
+                    }
+                    System.out.println("tempList.size()" + tempList.size());
                 }
-                SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
                 System.out.println("Please enter the flight you want to reserve for flying over:");
                 FlightBundle fb = new FlightBundle();
                 int firstFlight = sc.nextInt() - 1;
@@ -372,67 +374,240 @@ public class Customer {
 
     }
 
-    public void printConnectingFlightResult(List<FlightBundle> listOfSearchFlight, String nDay, int index) {
+    public BigDecimal getHighestFare(List<FareEntity> listOfFe) {
+        if (listOfFe == null || listOfFe.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal max = new BigDecimal(-999999);
+        for (int i = 0; i < listOfFe.size(); i++) {
+            BigDecimal actualVal = listOfFe.get(i).getFareAmount();
+            if (max.compareTo(actualVal) == -1) {
+                max = actualVal;
+            }
+        }
+        return max;
+    }
+
+    public BigDecimal getLowestFare(List<FareEntity> listOfFe) {
+        if (listOfFe == null || listOfFe.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal min = new BigDecimal(99999);
+        for (int i = 0; i < listOfFe.size(); i++) {
+            BigDecimal actualVal = listOfFe.get(i).getFareAmount();
+            if (min.compareTo(actualVal) == 1) {
+                min = actualVal;
+            }
+        }
+        return min;
+    }
+
+    public void printConnectingFlightResult(List<FlightBundle> listOfSearchFlight, String nDay, int index, int noOfPassenger) {
         //connecting flight
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         System.out.printf("%-15s %-45s %-45s %-25s %-25s", "", "", nDay, "", "");
         System.out.println();
-        System.out.printf("%-5s %-15s %-45s %-45s %-25s %-25s ", "Index", "Flight Number ", " Origin Airport ", " Destination Airport ", "Departure Date", "Arriving Time");
+        System.out.printf("%-5s %-15s %-45s %-45s %-25s %-25s %-6s", "Id", "Flight Number ", " Origin Airport ", " Destination Airport ", "Departure Date", "Arriving Time", "Pricing");
         System.out.println();
+        BigDecimal totalSumOfConnecting = BigDecimal.ZERO;
         for (int i = 0; i < listOfSearchFlight.size(); i++) {
+            BigDecimal unitPriceDepartOne = BigDecimal.ZERO;
+            BigDecimal unitPriceDepartTwo = BigDecimal.ZERO;
+            BigDecimal unitPriceDepartThree = BigDecimal.ZERO;
+
+            BigDecimal totalDepartOne = BigDecimal.ZERO;
+            BigDecimal totalDepartTwo = BigDecimal.ZERO;
+            BigDecimal totalDepartThree = BigDecimal.ZERO;
+
+            BigDecimal unitPriceDepartReturnOne = BigDecimal.ZERO;
+            BigDecimal unitPriceDepartReturnTwo = BigDecimal.ZERO;
+            BigDecimal unitPriceDepartReturnThree = BigDecimal.ZERO;
+
+            BigDecimal totalReturnOne = BigDecimal.ZERO;
+            BigDecimal totalReturnTwo = BigDecimal.ZERO;
+            BigDecimal totalReturnThree = BigDecimal.ZERO;
+
+            BigDecimal totalDepartPrice = BigDecimal.ZERO;
+            BigDecimal totalReturnPrice = BigDecimal.ZERO;
+            totalSumOfConnecting = BigDecimal.ZERO;
+            if (customer.getUserRole().equals(UserRole.CUSTOMER)) {
+
+                //main flight
+                if (listOfSearchFlight.get(i).getDepartOne() != null) {
+                    unitPriceDepartOne = getLowestFare(listOfSearchFlight.get(i).getDepartOne().getFlightSchedulePlan().getListOfFare());
+                    totalDepartOne = unitPriceDepartOne.multiply(new BigDecimal(noOfPassenger));
+                    totalDepartPrice = totalDepartPrice.add(totalDepartOne);
+                }
+                if (listOfSearchFlight.get(i).getDepartTwo() != null) {
+                    unitPriceDepartTwo = getLowestFare(listOfSearchFlight.get(i).getDepartTwo().getFlightSchedulePlan().getListOfFare());
+                    totalDepartTwo = unitPriceDepartTwo.multiply(new BigDecimal(noOfPassenger));
+                    totalDepartPrice = totalDepartPrice.add(totalDepartTwo);
+                }
+                if (listOfSearchFlight.get(i).getDepartThree() != null) {
+                    unitPriceDepartThree = getLowestFare(listOfSearchFlight.get(i).getDepartThree().getFlightSchedulePlan().getListOfFare());
+                    totalDepartThree = unitPriceDepartThree.multiply(new BigDecimal(noOfPassenger));
+                    totalDepartPrice = totalDepartPrice.add(totalDepartThree);
+                }
+                // return
+
+                if (listOfSearchFlight.get(i).getReturnOne() != null) {
+                    unitPriceDepartReturnOne = getLowestFare(listOfSearchFlight.get(i).getReturnOne().getFlightSchedulePlan().getListOfFare());
+                    totalReturnOne = unitPriceDepartReturnOne.multiply(new BigDecimal(noOfPassenger));
+                    totalReturnPrice = totalReturnPrice.add(totalReturnOne);
+                }
+                if (listOfSearchFlight.get(i).getReturnTwo() != null) {
+                    unitPriceDepartReturnTwo = getLowestFare(listOfSearchFlight.get(i).getReturnTwo().getFlightSchedulePlan().getListOfFare());
+                    totalReturnTwo = unitPriceDepartReturnTwo.multiply(new BigDecimal(noOfPassenger));
+                    totalReturnPrice = totalReturnPrice.add(totalReturnTwo);
+                }
+                if (listOfSearchFlight.get(i).getReturnThree() != null) {
+                    unitPriceDepartReturnThree = getLowestFare(listOfSearchFlight.get(i).getReturnThree().getFlightSchedulePlan().getListOfFare());
+                    totalReturnThree = unitPriceDepartReturnThree.multiply(new BigDecimal(noOfPassenger));
+                    totalReturnPrice = totalReturnPrice.add(totalReturnThree);
+                }
+
+            } else if (customer.getUserRole().equals(UserRole.PARTNEREMPLOYEE) || customer.getUserRole().equals(UserRole.PARTNERRESERVATIONMANAGER)) {
+                if (listOfSearchFlight.get(i).getDepartOne() != null) {
+                    unitPriceDepartOne = getHighestFare(listOfSearchFlight.get(i).getDepartOne().getFlightSchedulePlan().getListOfFare());
+                    totalDepartOne = unitPriceDepartOne.multiply(new BigDecimal(noOfPassenger));
+                    totalDepartPrice = totalDepartPrice.add(totalDepartOne);
+                }
+                if (listOfSearchFlight.get(i).getDepartTwo() != null) {
+                    unitPriceDepartTwo = getHighestFare(listOfSearchFlight.get(i).getDepartTwo().getFlightSchedulePlan().getListOfFare());
+                    totalDepartTwo = unitPriceDepartTwo.multiply(new BigDecimal(noOfPassenger));
+                    totalDepartPrice = totalDepartPrice.add(totalDepartOne);
+                }
+                if (listOfSearchFlight.get(i).getDepartThree() != null) {
+                    unitPriceDepartThree = getHighestFare(listOfSearchFlight.get(i).getDepartThree().getFlightSchedulePlan().getListOfFare());
+                    totalDepartThree = unitPriceDepartThree.multiply(new BigDecimal(noOfPassenger));
+                    totalDepartPrice = totalDepartPrice.add(totalDepartOne);
+                }
+                // return
+
+                if (listOfSearchFlight.get(i).getReturnOne() != null) {
+                    unitPriceDepartReturnOne = getHighestFare(listOfSearchFlight.get(i).getReturnOne().getFlightSchedulePlan().getListOfFare());
+                    totalReturnOne = unitPriceDepartReturnOne.multiply(new BigDecimal(noOfPassenger));
+                    totalReturnPrice = totalReturnPrice.add(totalReturnOne);
+                }
+                if (listOfSearchFlight.get(i).getReturnTwo() != null) {
+                    unitPriceDepartReturnTwo = getHighestFare(listOfSearchFlight.get(i).getReturnTwo().getFlightSchedulePlan().getListOfFare());
+                    totalReturnTwo = unitPriceDepartReturnTwo.multiply(new BigDecimal(noOfPassenger));
+                    totalReturnPrice = totalReturnPrice.add(totalReturnTwo);
+                }
+                if (listOfSearchFlight.get(i).getReturnThree() != null) {
+                    unitPriceDepartReturnThree = getHighestFare(listOfSearchFlight.get(i).getReturnThree().getFlightSchedulePlan().getListOfFare());
+                    totalReturnThree = unitPriceDepartReturnThree.multiply(new BigDecimal(noOfPassenger));
+                    totalReturnPrice = totalReturnPrice.add(totalReturnThree);
+                }
+
+            }
             System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
             String firstDepartTime = format.format(listOfSearchFlight.get(i).getDepartOne().getDepartureDateTime().getTime());
             String firstArrTime = format.format(listOfSearchFlight.get(i).getDepartOne().getArrivalDateTime().getTime());
-            System.out.printf("%-5d %-15s %-45s %-45s %-25s %-25s ", index, listOfSearchFlight.get(i).getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightNumber(),
+            System.out.printf("%-5d %-15s %-45s %-45s %-25s %-25s %-6s", index, listOfSearchFlight.get(i).getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightNumber(),
                     listOfSearchFlight.get(i).getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getAirportName(),
                     listOfSearchFlight.get(i).getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName(),
-                    firstDepartTime, firstArrTime);
+                    firstDepartTime, firstArrTime, String.valueOf(unitPriceDepartOne));
+            System.out.println();
+            System.out.println();
+            System.out.printf("Sub total price for connecting flight 1: " + String.valueOf(totalDepartOne));
             System.out.println();
             System.out.println();
             System.out.println("Connecting flight: ");
             System.out.println();
-            System.out.printf("%-5s %-15s %-45s %-45s %-25s %-25s ", "Index", "Flight Number ", " Origin Airport ", " Destination Airport ", "Departure Date", "Arriving Time");
+            System.out.printf("%-5s %-15s %-45s %-45s %-25s %-25s %-6s", "Id", "Flight Number ", " Origin Airport ", " Destination Airport ", "Departure Date", "Arriving Time", "Pricing");
             String secDepartTime = format.format(listOfSearchFlight.get(i).getDepartTwo().getDepartureDateTime().getTime());
             String secArrTime = format.format(listOfSearchFlight.get(i).getDepartTwo().getArrivalDateTime().getTime());
             System.out.println();
-            System.out.printf("%-5d %-15s %-45s %-45s %-25s %-25s", index, listOfSearchFlight.get(i).getDepartTwo().getFlightSchedulePlan().getFlightEntity().getFlightNumber(),
+            System.out.printf("%-5d %-15s %-45s %-45s %-25s %-25s %-6s", index, listOfSearchFlight.get(i).getDepartTwo().getFlightSchedulePlan().getFlightEntity().getFlightNumber(),
                     listOfSearchFlight.get(i).getDepartTwo().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getAirportName(),
                     listOfSearchFlight.get(i).getDepartTwo().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName(),
-                    secDepartTime, secArrTime);
+                    secDepartTime, secArrTime, String.valueOf(unitPriceDepartTwo));
             System.out.println();
+            System.out.println();
+            System.out.println("Sub total price for connecting flight 2: " + String.valueOf(totalDepartTwo));
             System.out.println();
             if (listOfSearchFlight.get(i).getDepartThree() != null) {
-                System.out.printf("%-5s %-15s %-45s %-45s %-25s %-25s ", "Index", "Flight Number ", " Origin Airport ", " Destination Airport ", "Departure Date", "Arriving Time");
+                System.out.printf("%-5s %-15s %-45s %-45s %-25s %-25s %-6s ", "Id", "Flight Number ", " Origin Airport ", " Destination Airport ", "Departure Date", "Arriving Time", "Pricing");
                 String thirdDepartTime = format.format(listOfSearchFlight.get(i).getDepartThree().getDepartureDateTime().getTime());
                 String thirdArrTime = format.format(listOfSearchFlight.get(i).getDepartThree().getArrivalDateTime().getTime());
                 System.out.println();
-                System.out.printf("%-5d %-15s %-45s %-45s %-25s %-25s ", index, listOfSearchFlight.get(i).getDepartThree().getFlightSchedulePlan().getFlightEntity().getFlightNumber(),
+                System.out.printf("%-5d %-15s %-45s %-45s %-25s %-25s %-6s ", index, listOfSearchFlight.get(i).getDepartThree().getFlightSchedulePlan().getFlightEntity().getFlightNumber(),
                         listOfSearchFlight.get(i).getDepartThree().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getAirportName(),
                         listOfSearchFlight.get(i).getDepartThree().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName(),
-                        thirdDepartTime, thirdArrTime);
+                        thirdDepartTime, thirdArrTime, String.valueOf(unitPriceDepartThree));
                 System.out.println();
+                System.out.println();
+                System.out.println("Sub total price for connecting flight 3: " + String.valueOf(totalDepartThree));
                 System.out.println();
             }
+            totalSumOfConnecting = totalSumOfConnecting.add(totalDepartOne);
+            totalSumOfConnecting = totalSumOfConnecting.add(totalDepartTwo);
+            totalSumOfConnecting = totalSumOfConnecting.add(totalDepartThree);
+            System.out.println("Total price : " + String.valueOf(totalSumOfConnecting));
         }
         System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
     }
 
-    public void printDirectFlightResult(List<FlightBundle> listOfSearchFlight, String nDays, int index) {
+    public void printDirectFlightResult(List<FlightBundle> listOfSearchFlight, String nDays, int index, int noOfPassenger) {
         //connecting flight
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        System.out.printf("%-5s %-15s %-45s %-45s %-25s %-25s", "", "", "", nDays, "", "");
+        System.out.printf("%-15s %-45s %-45s %-25s %-25s", "", "", nDays, "", "");
         System.out.println();
-        System.out.printf("%-5s %-15s %-45s %-45s %-25s %-25s ", "Index", "Flight Number ", " Origin Airport ", " Destination Airport ", "Departure Date", "Arriving Time");
+        System.out.printf("%-5s %-15s %-45s %-45s %-25s %-25s %-6s", "Id", "Flight Number ", " Origin Airport ", " Destination Airport ", "Departure Date", "Arriving Time", "Pricing");
         System.out.println();
         for (int i = 0; i < listOfSearchFlight.size(); i++) {
+            BigDecimal unitPriceDepartOne = BigDecimal.ZERO;
+
+            BigDecimal totalDepartOne = BigDecimal.ZERO;
+
+            BigDecimal unitPriceDepartReturnOne = BigDecimal.ZERO;
+
+            BigDecimal totalReturnOne = BigDecimal.ZERO;
+
+            BigDecimal totalDepartPrice = BigDecimal.ZERO;
+            BigDecimal totalReturnPrice = BigDecimal.ZERO;
+            if (customer.getUserRole().equals(UserRole.CUSTOMER)) {
+
+                //main flight
+                if (listOfSearchFlight.get(i).getDepartOne() != null) {
+                    unitPriceDepartOne = getLowestFare(listOfSearchFlight.get(i).getDepartOne().getFlightSchedulePlan().getListOfFare());
+                    totalDepartOne = unitPriceDepartOne.multiply(new BigDecimal(noOfPassenger));
+                    totalDepartPrice = totalDepartPrice.add(totalDepartOne);
+                }
+                // return
+
+                if (listOfSearchFlight.get(i).getReturnOne() != null) {
+                    unitPriceDepartReturnOne = getLowestFare(listOfSearchFlight.get(i).getReturnOne().getFlightSchedulePlan().getListOfFare());
+                    totalReturnOne = unitPriceDepartReturnOne.multiply(new BigDecimal(noOfPassenger));
+                    totalReturnPrice = totalReturnPrice.add(totalReturnOne);
+                }
+
+            } else if (customer.getUserRole().equals(UserRole.PARTNEREMPLOYEE) || customer.getUserRole().equals(UserRole.PARTNERRESERVATIONMANAGER)) {
+                if (listOfSearchFlight.get(i).getDepartOne() != null) {
+                    unitPriceDepartOne = getHighestFare(listOfSearchFlight.get(i).getDepartOne().getFlightSchedulePlan().getListOfFare());
+                    totalDepartOne = unitPriceDepartOne.multiply(new BigDecimal(noOfPassenger));
+                    totalDepartPrice = totalDepartPrice.add(totalDepartOne);
+                }
+                // return
+
+                if (listOfSearchFlight.get(i).getReturnOne() != null) {
+                    unitPriceDepartReturnOne = getHighestFare(listOfSearchFlight.get(i).getReturnOne().getFlightSchedulePlan().getListOfFare());
+                    totalReturnOne = unitPriceDepartReturnOne.multiply(new BigDecimal(noOfPassenger));
+                    totalReturnPrice = totalReturnPrice.add(totalReturnOne);
+                }
+            }
             System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
             String firstDepartTime = format.format(listOfSearchFlight.get(i).getDepartOne().getDepartureDateTime().getTime());
             String firstArrTime = format.format(listOfSearchFlight.get(i).getDepartOne().getArrivalDateTime().getTime());
-            System.out.printf("%-5d %-15s %-45s %-45s %-25s %-25s ", index, listOfSearchFlight.get(i).getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightNumber(),
+            System.out.printf("%-5d %-15s %-45s %-45s %-25s %-25s %-6s ", index, listOfSearchFlight.get(i).getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightNumber(),
                     listOfSearchFlight.get(i).getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getAirportName(),
                     listOfSearchFlight.get(i).getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName(),
-                    firstDepartTime, firstArrTime);
+                    firstDepartTime, firstArrTime, String.valueOf(unitPriceDepartOne));
+            System.out.println();
+            System.out.println();
+            System.out.println(String.valueOf(totalDepartOne));
             System.out.println();
             System.out.println();
         }
@@ -462,11 +637,11 @@ public class Customer {
             flightResult = processListGetCabinClassAndSeatAva(listOfFlightSchedules, cabinType, noOfPassenger, "Connecting");
             flightResultAftThreeDay = processListGetCabinClassAndSeatAva(flightResultAftThreeDay, cabinType, noOfPassenger, "Connecting");
             combined = combineAllThreeFlights(flightResultLessThreeDay, listOfFlightSchedules, flightResultAftThreeDay);
-            printConnectingFlightResult(flightResultLessThreeDay, " 3 Days before the booking date", seqUpTo + 1);
+            printConnectingFlightResult(flightResultLessThreeDay, " 3 Days before the booking date", seqUpTo + 1, noOfPassenger);
 
-            printConnectingFlightResult(flightResult, " The actual date you are looking for ", seqUpTo + flightResultLessThreeDay.size() + 1);
+            printConnectingFlightResult(flightResult, " The actual date you are looking for ", seqUpTo + flightResultLessThreeDay.size() + 1, noOfPassenger);
 
-            printConnectingFlightResult(flightResultAftThreeDay, "3 Days after the booking date ", seqUpTo + flightResultLessThreeDay.size() + flightResult.size() + 1);
+            printConnectingFlightResult(flightResultAftThreeDay, "3 Days after the booking date ", seqUpTo + flightResultLessThreeDay.size() + flightResult.size() + 1, noOfPassenger);
         } catch (FlightRouteDoesNotExistException fe) {
             System.out.println("You have invalid O-D");
         }
@@ -525,9 +700,9 @@ public class Customer {
         List<FlightBundle> add3DaysFlight = processListGetCabinClassAndSeatAva(flightBundleAdd3Day, cabinType, noOfPassenger, "Direct");
         List<FlightBundle> combined = combineAllThreeFlights(less3DaysFlight, actualFlight, add3DaysFlight);
 
-        printDirectFlightResult(less3DaysFlight, "  3 Days before the booking date", seqUpTo + 1);
-        printDirectFlightResult(actualFlight, " The actual date you are looking for ", seqUpTo + less3DaysFlight.size() + 1);
-        printDirectFlightResult(add3DaysFlight, "3 Days after the booking date ", seqUpTo + less3DaysFlight.size() + actualFlight.size() + 1);
+        printDirectFlightResult(less3DaysFlight, "  3 Days before the booking date", seqUpTo + 1, noOfPassenger);
+        printDirectFlightResult(actualFlight, " The actual date you are looking for ", seqUpTo + less3DaysFlight.size() + 1, noOfPassenger);
+        printDirectFlightResult(add3DaysFlight, "3 Days after the booking date ", seqUpTo + less3DaysFlight.size() + actualFlight.size() + 1, noOfPassenger);
         return combined;
     }
 
