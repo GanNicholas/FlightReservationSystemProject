@@ -39,11 +39,11 @@ public class FlightReservationEntity implements Serializable {
     private Long flightReservationId;
 
     @NotNull
-    @Column(nullable = false, length = 3, unique = true)
+    @Column(nullable = false, length = 3)
     private String originIATACode;
 
     @NotNull
-    @Column(nullable = false, length = 3, unique = true)
+    @Column(nullable = false, length = 3)
     private String destinationIATACode;
 
     @OneToMany(mappedBy = "flightReservation", cascade = {CascadeType.DETACH})

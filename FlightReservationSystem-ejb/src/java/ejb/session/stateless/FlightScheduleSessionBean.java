@@ -29,6 +29,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import sun.util.calendar.Gregorian;
+import util.enumeration.CabinClassType;
 import util.exception.FlightRouteDoesNotExistException;
 import util.exception.FlightScheduleExistException;
 
@@ -71,7 +72,8 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         List<SeatEntity> seatingPlan = flight.getAircraftConfig().getSeatingPlan();
 
         for (SeatEntity seat : flight.getAircraftConfig().getSeatingPlan()) {
-            flightSchedule.getSeatingPlan().add(seat);
+            SeatEntity newSeat = new SeatEntity(seat.getSeatNumber(), seat.getCabinType());
+            flightSchedule.getSeatingPlan().add(newSeat);
         }
 
         return flightSchedule;
@@ -468,8 +470,13 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         List<SeatEntity> seatingPlan = flight.getAircraftConfig().getSeatingPlan();
 
         for (SeatEntity seat : flight.getAircraftConfig().getSeatingPlan()) {
-            flightSchedule.getSeatingPlan().add(seat);
+            SeatEntity newSeat = new SeatEntity(seat.getSeatNumber(), seat.getCabinType());
+            flightSchedule.getSeatingPlan().add(newSeat);
         }
+
+        //        for (SeatEntity seat : flight.getAircraftConfig().getSeatingPlan()) {
+//            flightSchedule.getSeatingPlan().add(seat);
+//        }
 
         return flightSchedule;
     }
@@ -521,8 +528,12 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         //get seatingplan - need get seating plan from aircraft config, add to flight schedule
         List<SeatEntity> seatingPlan = flight.getAircraftConfig().getSeatingPlan();
 
+//        for (SeatEntity seat : flight.getAircraftConfig().getSeatingPlan()) {
+//            flightSchedule.getSeatingPlan().add(seat);
+//        }
         for (SeatEntity seat : flight.getAircraftConfig().getSeatingPlan()) {
-            flightSchedule.getSeatingPlan().add(seat);
+            SeatEntity newSeat = new SeatEntity(seat.getSeatNumber(), seat.getCabinType());
+            flightSchedule.getSeatingPlan().add(newSeat);
         }
 
         return flightSchedule;
@@ -710,7 +721,7 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         }
 
         for (FlightBundle currentFb : listOFlightSchedules) {
-           em.detach(currentFb.getDepartOne());
+            em.detach(currentFb.getDepartOne());
             em.detach(currentFb.getDepartTwo());
             em.detach(currentFb.getDepartThree());
             em.detach(currentFb.getDepartOneFare());
@@ -826,7 +837,7 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         }
 
         for (FlightBundle currentFb : listOFlightSchedules) {
-           em.detach(currentFb.getDepartOne());
+            em.detach(currentFb.getDepartOne());
             em.detach(currentFb.getDepartTwo());
             em.detach(currentFb.getDepartThree());
             em.detach(currentFb.getDepartOneFare());
@@ -938,7 +949,7 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
         }
 
         for (FlightBundle currentFb : listOFlightSchedules) {
-       em.detach(currentFb.getDepartOne());
+            em.detach(currentFb.getDepartOne());
             em.detach(currentFb.getDepartTwo());
             em.detach(currentFb.getDepartThree());
             em.detach(currentFb.getDepartOneFare());

@@ -210,7 +210,7 @@ public class FlightSchedulePlan {
                 boolean returnFlight = false;
                 try {
                     flight = flightSessionBean.viewFlightDetails(flightNumber);
-                    if (flight.getReturnFlight() != null && flight.isIsDeleted() == false) {
+                    if (flight.getReturnFlight() != null && flight.isIsDeleted() == false && flight.isIsMainRoute()) {
                         System.out.println("Please enter if you would like to create a return flight schedule plan for your existing flight? (1 for yes)");
                         System.out.print("Please enter your choice: ");
                         String choiceInString = sc.nextLine().trim();
@@ -311,7 +311,7 @@ public class FlightSchedulePlan {
             boolean returnFlight = false;
             try {
                 flight = flightSessionBean.viewFlightDetails(flightNumber);
-                if (flight.getReturnFlight() != null) {
+                if (flight.getReturnFlight() != null && flight.isIsMainRoute() && !flight.isIsDeleted()) {
                     System.out.println("Please enter if you would like to create a return flight schedule plan for your existing flight? (1 for yes)");
                     System.out.print("Please enter your choice: ");
                     int choice = sc.nextInt();
@@ -585,6 +585,79 @@ public class FlightSchedulePlan {
             sc.next();
         }
     }
+    
+    public void viewSpecificFspForAllFlight(Scanner sc) {
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        try {
+            List<FlightSchedulePlanEntity> listOfFsp = flightSchedulePlanSessionBean.viewAllFlightSchedulePlanForAllFlights();
+            System.out.println("=========FLIGHT SCHEDULE PLAN==========");
+            System.out.printf("%-10s%-20s%-70s%-70s%-30s", "FSP ID", "Flight Number", "Origin Airport", "Destination Airport", "Flight Schedule Plan Type");
+            System.out.println();
+            System.out.println();
+            for (FlightSchedulePlanEntity fsp : listOfFsp) {
+                String originLocation = fsp.getFlightEntity().getFlightRoute().getOriginLocation().getAirportName() + " in " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getCountry() + ", " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getCity();
+                String destinationLocation = fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName() + " in " + fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getCountry() + ", " + fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getCity();
+                String classType = "";
+                if (fsp instanceof SingleFlightScheduleEntity) {
+                    classType = "Single Flight Schedule";
+                } else if (fsp instanceof MultipleFlightScheduleEntity) {
+                    classType = "Multiple Flight Schedule";
+                } else if (fsp instanceof RecurringScheduleEntity) {
+                    classType = "Recurrening Flight Schedule";
+                } else if (fsp instanceof RecurringWeeklyScheduleEntity) {
+                    classType = "Recurring Weekly Flight Schedule";
+                }
+                System.out.printf("%-10s%-20s%-70s%-70s%-30s", fsp.getFlightSchedulePlanId(), fsp.getFlightNumber(), originLocation, destinationLocation, classType);
+                System.out.println();
+            }
+
+            System.out.print("Please enter ID of FSP you wish to view (eg 1): ");
+            Long id = sc.nextLong();
+            sc.nextLine();
+
+            FlightSchedulePlanEntity fsp = flightSchedulePlanSessionBean.viewFlightSchedulePlan(id);
+
+            System.out.println("===================Flight Route Details===================");
+            System.out.printf("%-15s%-25s%-14s%-70s", "Flight ID", "Origin/Destination", "IATA Code", " Airport");
+            System.out.println();
+            System.out.println();
+            FlightRouteEntity fr = fsp.getFlightEntity().getFlightRoute();
+            String originLocation = fsp.getFlightEntity().getFlightRoute().getOriginLocation().getAirportName() + " in " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getCountry() + ", " + fsp.getFlightEntity().getFlightRoute().getOriginLocation().getCity();
+            String destinationLocation = fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getAirportName() + " in " + fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getCountry() + ", " + fsp.getFlightEntity().getFlightRoute().getDestinationLocation().getCity();
+            System.out.printf("%-15s%-25s%-15s%-70s", fr.getFlightRouteId(), "Origin", fr.getOriginLocation().getIataAirportCode(), originLocation);
+            System.out.println();
+            System.out.printf("%-15s%-25s%-15s%-70s", fr.getFlightRouteId(), "Destination", fr.getDestinationLocation().getIataAirportCode(), destinationLocation);
+            System.out.println();
+            System.out.println();
+            System.out.println("============FLIGHT SCHEDULE=============");
+            System.out.println();
+            System.out.printf("%-30s%-30s%-30s", "Departure Date/Time", "Flight Duration", "Arrival Date/Time");
+            System.out.println();
+            for (FlightScheduleEntity fs : fsp.getListOfFlightSchedule()) {
+                int flightMins = fs.getFlightDuration();
+                int flightHour = flightMins / 60;
+                flightMins %= 60;
+                String flightduration = flightHour + "hr " + flightMins + " mins";
+                System.out.printf("%-30s%-30s%-30s", format.format(fs.getDepartureDateTime().getTime()), flightduration, format.format(fs.getArrivalDateTime().getTime()));
+                System.out.println();
+            }
+
+            System.out.println();
+            System.out.println("-----Fares for Flight Schedule Plan-----");
+            for (FareEntity fare : fsp.getListOfFare()) {
+                System.out.printf("%-20s%-15s%-15s", "Fare basis code", "Fare amount", "Fare cabin type");
+                System.out.println();
+                System.out.printf("%-20s%-15.2f%-15s", fare.getFareBasisCode(), fare.getFareAmount(), fare.getCabinType());
+                System.out.println();
+            }
+            System.out.println();
+            System.out.println();
+        } catch (FlightSchedulePlanDoesNotExistException | FlightSchedulePlanIsEmptyException | InputMismatchException ex) {
+            System.out.println(ex.getMessage());
+            sc.next();
+        }
+    }
+    
 
     public void createFlight(Scanner sc) {
         String choice = "";
@@ -1335,7 +1408,7 @@ public class FlightSchedulePlan {
 
     public void deleteFsp(Scanner sc) {
 
-        viewSpecificFsp(sc);
+        viewSpecificFspForAllFlight(sc);
         System.out.print("Please enter ID of Flight Schedule Plan you wish to delete: ");
         Long fspId = sc.nextLong();
         sc.nextLine();

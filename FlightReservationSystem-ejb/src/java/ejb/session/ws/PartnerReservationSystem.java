@@ -9,6 +9,7 @@ import ejb.session.stateless.CustomerSessionBeanLocal;
 import ejb.session.stateless.FlightReservationSessionBeanLocal;
 import ejb.session.stateless.FlightRouteSessionBeanLocal;
 import ejb.session.stateless.FlightScheduleSessionBeanLocal;
+import entity.CustomerEntity;
 import entity.FareEntity;
 import entity.FlightBundle;
 import entity.FlightEntity;
@@ -18,6 +19,9 @@ import entity.FlightScheduleEntity;
 import entity.FlightSchedulePlanEntity;
 import entity.IndividualFlightReservationEntity;
 import entity.PartnerEntity;
+import entity.PassengerEntity;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -26,12 +30,15 @@ import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import util.enumeration.CabinClassType;
 import util.exception.AccessFromWrongPortalException;
 import util.exception.CustomerHasNoReservationException;
 import util.exception.CustomerLoginInvalid;
 import util.exception.FlightReservationDoesNotExistException;
 import util.exception.FlightRouteDoesNotExistException;
+import util.exception.IncorrectFormatException;
 
 /**
  *
@@ -49,6 +56,9 @@ public class PartnerReservationSystem {
 
     @EJB
     private CustomerSessionBeanLocal customerSessionBean;
+
+    @PersistenceContext(unitName = "FlightReservationSystem-ejbPU")
+    private EntityManager em;
 
     @EJB
     private FlightReservationSessionBeanLocal flightReservationSessionBean;
@@ -333,6 +343,79 @@ public class PartnerReservationSystem {
         }
 
         return listOfflightBundle;
+    }
+
+    @WebMethod(operationName = "convertCalendar")
+    public GregorianCalendar convertCalendar(String dateTime) throws IncorrectFormatException {
+
+        String[] information = dateTime.split("/");
+        List<Integer> informationInteger = new ArrayList<>();
+        for (String info : information) {
+            informationInteger.add(Integer.parseInt(info));
+        }
+
+        if (informationInteger.size() != 3) {
+            throw new IncorrectFormatException("Wrong date format!");
+        }
+
+        //NEED VALIDATE CALENDAR INPUT 
+        GregorianCalendar newCalendar = new GregorianCalendar(informationInteger.get(2), (informationInteger.get(1) - 1), informationInteger.get(0), informationInteger.get(3), informationInteger.get(4));
+        return newCalendar;
+
+    }
+
+    @WebMethod(operationName = "reserveFlight")
+    public void reserveFlight(List<FlightReservationEntity> listOfFlightRes) {
+        for(FlightReservationEntity fr : listOfFlightRes){
+            for(IndividualFlightReservationEntity indivFr : fr.getListOfIndividualFlightRes()){
+                indivFr.setFlightReservation(fr);
+            }
+        }
+        
+        flightReservationSessionBean.reserveFlights(listOfFlightRes);
+    }
+
+    @WebMethod(operationName = "createFlightReservation")
+    public FlightReservationEntity createFlightReservation(String originIATACode, String destinationIATACode, BigDecimal totalAmount, CustomerEntity customer) {
+        FlightReservationEntity flightRes = new FlightReservationEntity(originIATACode, destinationIATACode, totalAmount, customer);
+        return flightRes;
+    }
+    
+    @WebMethod(operationName = "createIndivFlightRes")
+    public IndividualFlightReservationEntity createIndivFlightRes(FlightScheduleEntity flightSchedule, CustomerEntity customerInfo, BigDecimal amount, FlightReservationEntity flightReservation){
+        IndividualFlightReservationEntity indivFr = new IndividualFlightReservationEntity(flightSchedule, customerInfo, amount, flightReservation);
+        return indivFr;
+    }
+    
+    @WebMethod(operationName = "createPassenger")
+    public PassengerEntity createPassenger(String firstName, String lastName, String passportNumber){
+        PassengerEntity passenger = new PassengerEntity(firstName, lastName, passportNumber);
+        return passenger;
+    }
+    
+    @WebMethod(operationName = "createFare")
+    public FareEntity createFare(String fareBasisCode, BigDecimal fareAmount, CabinClassType cabinType){
+        FareEntity newFare = new FareEntity(fareBasisCode, fareAmount, cabinType);
+        return newFare;
+    }
+    
+    @WebMethod(operationName = "convertCalendarExpiryDate")
+    public GregorianCalendar convertCalendarExpiryDate(String dateTime) throws IncorrectFormatException {
+
+        String[] information = dateTime.split("/");
+        List<Integer> informationInteger = new ArrayList<>();
+        for (String info : information) {
+            informationInteger.add(Integer.parseInt(info));
+        }
+
+        if (informationInteger.size() <2 ) {
+            throw new IncorrectFormatException("Wrong date format!");
+        }
+
+        //NEED VALIDATE CALENDAR INPUT 
+        GregorianCalendar newCalendar = new GregorianCalendar(informationInteger.get(2), (informationInteger.get(1) - 1), informationInteger.get(0), informationInteger.get(3), informationInteger.get(4));
+        return newCalendar;
+
     }
 
 }

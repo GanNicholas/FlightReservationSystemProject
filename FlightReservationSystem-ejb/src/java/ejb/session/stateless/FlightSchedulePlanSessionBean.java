@@ -16,6 +16,7 @@ import entity.RecurringScheduleEntity;
 import entity.RecurringWeeklyScheduleEntity;
 import entity.SeatEntity;
 import entity.SingleFlightScheduleEntity;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -26,6 +27,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import util.enumeration.CabinClassType;
 import util.exception.FareCannotBeDeletedException;
 import util.exception.FareDoesNotExistException;
 import util.exception.FlightDoesNotExistException;
@@ -118,7 +120,9 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
             }
 
             for (FareEntity fare : listOfFares) {
-                returnFSP.getListOfFare().add(fare);
+                FareEntity newFare = new FareEntity(fare.getFareBasisCode(), fare.getFareAmount(), fare.getCabinType());
+                em.persist(newFare);
+                returnFSP.getListOfFare().add(newFare);
             }
 
 //            em.persist(returnFSP);
@@ -240,7 +244,9 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
 
 //            em.persist(returnFSP);
             for (FareEntity fare : listOfFares) {
-                returnFSP.getListOfFare().add(fare);
+                FareEntity newFare = new FareEntity(fare.getFareBasisCode(), fare.getFareAmount(), fare.getCabinType());
+                em.persist(newFare);
+                returnFSP.getListOfFare().add(newFare);
             }
 
             // GregorianCalendar departureDateTime, Integer flightDuration, FlightSchedulePlanEntity fsp, FlightEntity flight
@@ -325,6 +331,48 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
         return fspToReturn;
 
     }
+    
+     @Override
+    public List<FlightSchedulePlanEntity> viewAllFlightSchedulePlanForAllFlights() throws FlightSchedulePlanIsEmptyException {
+
+        List<FlightSchedulePlanEntity> listOfFsp = em.createQuery("SELECT f FROM FlightSchedulePlanEntity f, IN (f.listOfFlightSchedule) fs  WHERE f.isDeleted = FALSE ORDER BY f.flightEntity.flightNumber ASC, fs.departureDateTime DESC").getResultList();
+//        List<FlightSchedulePlanEntity> listOfFsp = em.createQuery("SELECT f FROM FlightSchedulePlanEntity f, IN (f.listOfFlightSchedule) fs  WHERE f.returnFlightSchedulePlan != NULL AND f.isDeleted = FALSE AND f.flightEntity.isMainRoute = TRUE ORDER BY f.flightEntity.flightNumber ASC, fs.departureDateTime DESC").getResultList();
+
+        if (listOfFsp.isEmpty()) {
+            throw new FlightSchedulePlanIsEmptyException("No flight schedule plan exists");
+        }
+
+        List<FlightSchedulePlanEntity> fspToReturn = new ArrayList<>();
+        int counter = 0;
+//        for (int i = 0; i < listOfFsp.size(); i++) {
+//            if (listOfFsp.get(i).getFlightEntity().isIsMainRoute() && listOfFsp.get(i).getReturnFlightSchedulePlan() != null && !listOfAllFsp.contains(listOfFsp.get(i).getReturnFlightSchedulePlan()) && !listOfAllFsp.contains(listOfFsp.get(i))) {
+//                System.out.println("=====================================" + listOfFsp.get(i).getFlightNumber() + " =======================================");
+//                listOfAllFsp.add(counter, listOfFsp.get(i));
+//                listOfAllFsp.add(counter + 1, listOfFsp.get(i).getReturnFlightSchedulePlan());
+//                counter += 2;
+//            } else if (!listOfAllFsp.contains(listOfFsp.get(i)) && listOfFsp.get(i).getFlightEntity().isIsMainRoute() && listOfFsp.get(i).getReturnFlightSchedulePlan() == null) {
+//                System.out.println("=====================================" + listOfFsp.get(i).getFlightNumber() + " =======================================");
+//                listOfAllFsp.add(counter, listOfFsp.get(i));
+//                counter++;
+//            }
+//        }
+
+        List<FlightScheduleEntity> listOfFs = new ArrayList<>();
+
+        for (FlightSchedulePlanEntity fsp : listOfFsp) {
+            if (!fspToReturn.contains(fsp) && !listOfFs.contains(fsp.getListOfFlightSchedule().get(0))) {
+                listOfFs.addAll(fsp.getListOfFlightSchedule());
+                fspToReturn.add(fsp);
+                if (fsp.getReturnFlightSchedulePlan() != null && fsp.getReturnFlightSchedulePlan().isIsDeleted() == false) {
+                    fspToReturn.add(fsp.getReturnFlightSchedulePlan());
+                }
+            }
+        }
+
+        return fspToReturn;
+
+    }
+    
 
     private void sortFlightSchedule(FlightSchedulePlanEntity fsp) {
         List<FlightScheduleEntity> listOfFlightSchedule = fsp.getListOfFlightSchedule();
@@ -687,10 +735,20 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
                 em.remove(fs);
             }
 
-            for (FareEntity fare : fsp.getListOfFare()) {
+//            for (FareEntity fare : fsp.getListOfFare()) {
+//                fsp.getListOfFare().remove(fare);
+////                fsp.getReturnFlightSchedulePlan().getListOfFare().remove(fare);
+//                em.remove(fare);
+//            }
+            for (int i = 0; i < fsp.getListOfFare().size(); i++) {
+                FareEntity fare = fsp.getListOfFare().get(i);
+                fsp.getListOfFare().remove(fare);
                 em.remove(fare);
             }
 
+            if (fsp.getReturnFlightSchedulePlan() != null) {
+                fsp.getReturnFlightSchedulePlan().setReturnFlightSchedulePlan(null);
+            }
             em.remove(fsp);
             message = "Flight Schedule Plan for flight has been sucessfully deleted!";
         }
