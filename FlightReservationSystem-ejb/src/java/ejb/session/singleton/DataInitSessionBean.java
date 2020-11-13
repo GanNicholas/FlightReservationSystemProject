@@ -30,7 +30,7 @@ import util.enumeration.UserRole;
  */
 @Singleton
 @LocalBean
-@Startup
+//@Startup
 public class DataInitSessionBean {
 
     @EJB

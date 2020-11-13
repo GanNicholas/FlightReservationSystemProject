@@ -30,7 +30,7 @@ import util.exception.NoAircraftTypeAvailableException;
  */
 @Singleton
 @LocalBean
-//@Startup
+@Startup
 public class DataInitForTestSessionBean {
 
     @EJB
