@@ -736,7 +736,7 @@ public class FlightSchedulePlan {
             try {
                 System.out.print("Please enter flight number: ");
                 String flightNumber = sc.nextLine().trim();
-                FlightEntity flight = flightSessionBean.viewActiveFlight(flightNumber);
+                FlightEntity flight = flightSessionBean.viewFlightDetails(flightNumber);
                 System.out.println();
                 System.out.println("What woud you like to update? ");
                 System.out.println("1. Flight Route");
@@ -841,7 +841,7 @@ public class FlightSchedulePlan {
                     System.out.println("Please enter a valid choice!");
                     counter++;
                 }
-            } catch (FlightDoesNotExistException | FlightRouteDoesNotExistException | AircraftConfigurationNotExistException | InputMismatchException | FlightHasFlightSchedulePlanException | FlightIsDeletedException ex) {
+            } catch (FlightDoesNotExistException | FlightRouteDoesNotExistException | AircraftConfigurationNotExistException | InputMismatchException | FlightHasFlightSchedulePlanException  ex) {
                 System.out.println(ex.getMessage());
                 if (ex instanceof InputMismatchException) {
                     sc.next();
