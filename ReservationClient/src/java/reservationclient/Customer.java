@@ -29,7 +29,6 @@ import entity.PassengerEntity;
 import entity.SeatEntity;
 import entity.SingleFlightScheduleEntity;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -260,36 +259,34 @@ public class Customer {
 
                 System.out.print("Enter depature date:(dd/mm/yyyy) ");
                 String departureDate = sc.nextLine().trim();
-                LocalDate searchDateFO = null;
+                GregorianCalendar searchDateFO = null;
                 String[] splitDepartDate = departureDate.trim().split("/");
                 if (splitDepartDate.length == 3) {
-                    searchDateFO = LocalDate.of(Integer.valueOf(splitDepartDate[2]), Integer.valueOf(splitDepartDate[1]), Integer.valueOf(splitDepartDate[0]));
+                    searchDateFO = new GregorianCalendar(Integer.valueOf(splitDepartDate[2]), Integer.valueOf(splitDepartDate[1]) - 1, Integer.valueOf(splitDepartDate[0]));
                 } else {
                     System.out.println("You have invalid date input for departure date. Please be in 'dd/mm/yyyy' format");
                     //   throw new DateInvalidException("You have invalid date input for departure flight date. Please be in 'dd/mm/yyyy' format");
                 }
 
-                Date actualSearchFO = Date.from(searchDateFO.atStartOfDay(ZoneId.systemDefault()).toInstant());
                 String returnDate = "";
                 if (tripType.equals("2")) {
                     System.out.print("Enter return date:(dd/mm/yyyy) ");
                     returnDate = sc.nextLine().trim();
                 }
                 //convert return time (if exist) to 3 days before and 3 days after
-                LocalDate searchDateReturn = null;
-                Date currentSearchReturnDate = null;
+
+                GregorianCalendar currentSearchReturnDate = null;
                 String[] splitDepartDateReturn;
                 if (tripType.equals("2")) {
                     splitDepartDateReturn = returnDate.trim().split("/");
                     if (splitDepartDateReturn.length == 3) {
-                        searchDateReturn = LocalDate.of(Integer.valueOf(splitDepartDateReturn[2]), Integer.valueOf(splitDepartDateReturn[1]), Integer.valueOf(splitDepartDateReturn[0]));
-                        currentSearchReturnDate = Date.from(searchDateReturn.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                        currentSearchReturnDate = new GregorianCalendar(Integer.valueOf(splitDepartDateReturn[2]), Integer.valueOf(splitDepartDateReturn[1]) - 1, Integer.valueOf(splitDepartDateReturn[0]));
+
                     } else {
                         System.out.println("You have invalid date input for return flight date. Please be in 'dd/mm/yyyy' format");
                     }
                 }
                 SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-                System.out.println("current return flight date:" + format.format(currentSearchReturnDate.getTime()));
                 System.out.print("Enter number of passenger: ");
                 String passenger = sc.nextLine().trim();
                 int noOfPassenger = Integer.parseInt(passenger);
@@ -298,25 +295,24 @@ public class Customer {
                 // start calling searh flight with respectively to (1. one way 2. two ways -> inside of each, see if they want (a)connecting flight, (b)direct flight
                 if (tripType.equals("1")) {// one way
                     if (indictatorConnectFlightOrNot.equals("1")) {// connecting flight
-                        tempList = getConnectingFlight(actualSearchFO, cabinType, noOfPassenger, departureAirport, destinationAirport, 0);
+                        tempList = getConnectingFlight(searchDateFO, cabinType, noOfPassenger, departureAirport, destinationAirport, 0);
 
                     } else if (indictatorConnectFlightOrNot.equals("2")) {//direct flight
-                        tempList = getDirectFlight(departureAirport, destinationAirport, actualSearchFO, cabinType, noOfPassenger, 0);
+                        tempList = getDirectFlight(departureAirport, destinationAirport, searchDateFO, cabinType, noOfPassenger, 0);
                     }
                 } else {// two ways
                     if (indictatorConnectFlightOrNot.equals("1")) {
-                        flightBundle = getConnectingFlight(actualSearchFO, cabinType, noOfPassenger, departureAirport, destinationAirport, 0);
+                        flightBundle = getConnectingFlight(searchDateFO, cabinType, noOfPassenger, departureAirport, destinationAirport, 0);
                         System.out.println("Return Flight result: ");
                         tempList = getConnectingFlight(currentSearchReturnDate, cabinType, noOfPassenger, destinationAirport, departureAirport, flightBundle.size());
                         tempList = combineAllThreeFlights(flightBundle, tempList, null);
                     } else if (indictatorConnectFlightOrNot.equals("2")) {
-                        flightBundle = getDirectFlight(departureAirport, destinationAirport, actualSearchFO, cabinType, noOfPassenger, 0);
+                        flightBundle = getDirectFlight(departureAirport, destinationAirport, searchDateFO, cabinType, noOfPassenger, 0);
                         System.out.println("Return Flight result: ");
                         tempList = getDirectFlight(destinationAirport, departureAirport, currentSearchReturnDate, cabinType, noOfPassenger, flightBundle.size());
                         tempList = combineAllThreeFlights(flightBundle, tempList, null);
 
                     }
-                    System.out.println("tempList.size()" + tempList.size());
                 }
                 System.out.println("Please enter the flight you want to reserve for flying over:");
                 FlightBundle fb = new FlightBundle();
@@ -328,34 +324,74 @@ public class Customer {
                 fb.setDepartOne(flyOver.getDepartOne());
                 origin = flyOver.getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation();
                 destination = flyOver.getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
-
+                FareEntity f = null;
+                f = getFareForCustomer(flyOver.getDepartOne().getFlightSchedulePlan().getListOfFare(), cabinType);
+                fb.setDepartOneFare(f);
                 fb.setDepartOneCabinClassType(cabinType);
+
                 if (flyOver.getDepartTwo() != null) {
                     fb.setDepartTwoCabinClassType(cabinType);
                     fb.setDepartTwo(flyOver.getDepartTwo());
                     destination = flyOver.getDepartTwo().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
-
+                    f = null;
+                    f = getFareForCustomer(flyOver.getDepartTwo().getFlightSchedulePlan().getListOfFare(), cabinType);
+                    fb.setDepartTwoFare(f);
                 }
                 if (flyOver.getDepartThree() != null) {
                     fb.setDepartThree(flyOver.getDepartThree());
                     fb.setDepartThreeCabinClassType(cabinType);
                     destination = flyOver.getDepartThree().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
+                    f = null;
+                    f = getFareForCustomer(flyOver.getDepartThree().getFlightSchedulePlan().getListOfFare(), cabinType);
+                    fb.setDepartThreeFare(f);
                 }
                 if (tripType.equals("2")) {
                     System.out.println("Please enter the flight you want to reserve for flying back:");
                     secondFlight = sc.nextInt() - 1;
                     FlightBundle temp = tempList.get(secondFlight);
                     fb.setReturnOneCabinClassType(cabinType);
+                    f = null;
+                    f = getFareForCustomer(temp.getDepartOne().getFlightSchedulePlan().getListOfFare(), cabinType);
+                    fb.setReturnOneFare(f);
                     fb.setReturnOne(temp.getDepartOne());
                     if (temp.getDepartTwo() != null) {
-                        fb.setReturnTwo(temp.getDepartOne());
+                        f = null;
+                        f = getFareForCustomer(temp.getDepartTwo().getFlightSchedulePlan().getListOfFare(), cabinType);
+                        fb.setReturnTwoFare(f);
+                        fb.setReturnTwo(temp.getDepartTwo());
                         fb.setReturnTwoCabinClassType(cabinType);
                     }
                     if (temp.getDepartThree() != null) {
+                        f = null;
+                        f = getFareForCustomer(temp.getDepartThree().getFlightSchedulePlan().getListOfFare(), cabinType);
+                        fb.setReturnThreeFare(f);
                         fb.setReturnThreeCabinClassType(cabinType);
                         fb.setReturnThree(temp.getDepartThree());
                     }
                 }
+                
+               /* System.out.println("fb  1:" + fb.getDepartOne().getFlightScheduleId() + " || " + fb.getDepartOneCabinClassType() + "|| "  + fb.getDepartOneFare().getFareBasisCode() + "||" + fb.getDepartOneFare().getFareAmount());
+                if(fb.getDepartTwo()!= null){
+                     System.out.println("fb 2: " + fb.getDepartTwo().getFlightScheduleId() + " || " + fb.getDepartTwoCabinClassType() + "|| "  + fb.getDepartTwoFare().getFareBasisCode() + "||" + fb.getDepartTwoFare().getFareAmount());
+               
+                }
+                if(fb.getDepartThree()!=null){
+                     System.out.println("fb 3: " + fb.getDepartThree().getFlightScheduleId() + " || " + fb.getDepartThreeCabinClassType() + "|| "  + fb.getDepartThreeFare().getFareBasisCode() + "||" + fb.getDepartThreeFare().getFareAmount());
+               
+                }
+                if(fb.getReturnOne()!=null){
+                     System.out.println("fb  r1:" + fb.getReturnOne().getFlightScheduleId() + " || " + fb.getReturnOneCabinClassType() + "|| "  + fb.getReturnOneFare().getFareBasisCode() + "||" + fb.getReturnOneFare().getFareAmount());
+                
+                }
+                
+                if(fb.getReturnTwo() !=null){
+                    System.out.println("fb r2:" + fb.getReturnTwo().getFlightScheduleId() + " || " + fb.getReturnTwoCabinClassType() + "|| "  + fb.getReturnTwoFare().getFareBasisCode() + "||" + fb.getReturnTwoFare().getFareAmount());
+                
+                }
+                if(fb.getReturnThree() !=null){
+                    System.out.println("fb r3:" + fb.getReturnThree().getFlightScheduleId() + " || " + fb.getReturnThreeCabinClassType() + "|| "  + fb.getReturnThreeFare().getFareBasisCode() + "||" + fb.getReturnThreeFare().getFareAmount());
+                
+                }*/
                 reserveFlight(fb, origin, destination, Integer.parseInt(passenger));
 
             } catch (NumberFormatException ex) {
@@ -372,6 +408,19 @@ public class Customer {
             }
         }
 
+    }
+
+    public FareEntity getFareForCustomer(List<FareEntity> fe, CabinClassType cabinType) {
+        FareEntity temp = null;
+        BigDecimal min = new BigDecimal("9999999");
+
+        for (int i = 0; i < fe.size(); i++) {
+            if (fe.get(i).getCabinType().equals(cabinType) && min.compareTo(fe.get(i).getFareAmount()) == 1) {
+                temp = fe.get(i);
+                min = fe.get(i).getFareAmount();
+            }
+        }
+        return temp;
     }
 
     public BigDecimal getHighestFare(List<FareEntity> listOfFe) {
@@ -615,9 +664,8 @@ public class Customer {
 
     }
 
-    public List<FlightBundle> getConnectingFlight(Date actualDay, CabinClassType cabinType, int noOfPassenger, String departureAirport, String destinationAirport, int seqUpTo) {
-        GregorianCalendar gDepart = new GregorianCalendar();
-        gDepart.setTime(actualDay);
+    public List<FlightBundle> getConnectingFlight(GregorianCalendar actualDay, CabinClassType cabinType, int noOfPassenger, String departureAirport, String destinationAirport, int seqUpTo) {
+        GregorianCalendar gDepart = (GregorianCalendar) actualDay.clone();
 
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
@@ -651,12 +699,11 @@ public class Customer {
         //listOfSearchFlight.sort(sortFlightScheduleId);
     }
 
-    public List<FlightBundle> getDirectFlight(String originIATA, String desIATA, Date actual, CabinClassType cabinType, int noOfPassenger, int seqUpTo) {
+    public List<FlightBundle> getDirectFlight(String originIATA, String desIATA, GregorianCalendar actual, CabinClassType cabinType, int noOfPassenger, int seqUpTo) {
         List<FlightBundle> flightBundleLess3Day = null;
         List<FlightBundle> flightBundleActualDay = null;
         List<FlightBundle> flightBundleAdd3Day = null;
-        GregorianCalendar gTempActual = new GregorianCalendar();
-        gTempActual.setTime(actual);
+        GregorianCalendar gTempActual = (GregorianCalendar) actual.clone();
 
         GregorianCalendar dateThreeDateBefore = (GregorianCalendar) gTempActual.clone();
         dateThreeDateBefore.add(GregorianCalendar.DATE, -3);
@@ -1245,7 +1292,6 @@ public class Customer {
 
 //                    FareEntity newFare = new FareEntity("F1020", BigDecimal.TEN, cabinForReturnFs2);
 //                    seatfs2.setFare(newFare);
-
                     seatfs2.setPassenger(passenger);
                     indivResForReturnFs2.getListOfSeats().add(seatfs2);
                     indivResForReturnFs2.getListOfPassenger().add(passenger);
@@ -1287,7 +1333,6 @@ public class Customer {
 
 //                    FareEntity newFare = new FareEntity("F1020", BigDecimal.TEN, cabinForReturnFs3);
 //                    seatfs3.setFare(newFare);
-
                     seatfs3.setPassenger(passenger);
                     indivResForReturnFs3.getListOfSeats().add(seatfs3);
                     indivResForReturnFs3.getListOfPassenger().add(passenger);
@@ -1304,14 +1349,13 @@ public class Customer {
             returnFlightRes.getListOfIndividualFlightRes().add(indivResForReturnFs3);
 
         } else if (returnFs1 != null && returnFs2 != null && returnFs3 == null) { // only 2 flights
-                BigDecimal amountForReturnFs1 = fareForReturnFs1.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
-                IndividualFlightReservationEntity indivResForReturnFs1 = new IndividualFlightReservationEntity(returnFs1, customer, amountForReturnFs1, returnFlightRes);
-                BigDecimal amountForReturnFs2 = fareForReturnFs2.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
-                IndividualFlightReservationEntity indivResForReturnFs2 = new IndividualFlightReservationEntity(returnFs2, customer, amountForReturnFs2, returnFlightRes);
+            BigDecimal amountForReturnFs1 = fareForReturnFs1.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
+            IndividualFlightReservationEntity indivResForReturnFs1 = new IndividualFlightReservationEntity(returnFs1, customer, amountForReturnFs1, returnFlightRes);
+            BigDecimal amountForReturnFs2 = fareForReturnFs2.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
+            IndividualFlightReservationEntity indivResForReturnFs2 = new IndividualFlightReservationEntity(returnFs2, customer, amountForReturnFs2, returnFlightRes);
 
 //            IndividualFlightReservationEntity indivResForReturnFs1 = new IndividualFlightReservationEntity(returnFs1, customer, BigDecimal.TEN, returnFlightRes);
 //            IndividualFlightReservationEntity indivResForReturnFs2 = new IndividualFlightReservationEntity(returnFs2, customer, BigDecimal.TEN, returnFlightRes);
-
             for (int i = 0; i < numberOfPassengers; i++) {
                 List<SeatEntity> listOfSeatsForReturnFs1 = findSeatsForCustomer(returnFs1, cabinForReturnFs1);
 
@@ -1391,7 +1435,6 @@ public class Customer {
 
 //                    FareEntity newFare = new FareEntity("F1020", BigDecimal.TEN, cabinForReturnFs2);
 //                    seatfs2.setFare(newFare);
-
                     seatfs2.setPassenger(passenger);
                     indivResForReturnFs2.getListOfSeats().add(seatfs2);
                     indivResForReturnFs2.getListOfPassenger().add(passenger);
@@ -1410,7 +1453,6 @@ public class Customer {
             IndividualFlightReservationEntity indivResForReturnFs1 = new IndividualFlightReservationEntity(returnFs1, customer, amountForReturnFs1, returnFlightRes);
 
 //            IndividualFlightReservationEntity indivResForReturnFs1 = new IndividualFlightReservationEntity(returnFs1, customer, BigDecimal.TEN, returnFlightRes);
-
             for (int i = 0; i < numberOfPassengers; i++) {
                 List<SeatEntity> listOfSeatsForReturnFs1 = findSeatsForCustomer(returnFs1, cabinForReturnFs1);
 
@@ -1448,7 +1490,6 @@ public class Customer {
 
 //                    FareEntity newFare = new FareEntity("F1020", BigDecimal.TEN, cabinForReturnFs1);
 //                    seat.setFare(newFare);
-
                     seat.setPassenger(passenger);
                     indivResForReturnFs1.getListOfSeats().add(seat);
                     indivResForReturnFs1.getListOfPassenger().add(passenger);
