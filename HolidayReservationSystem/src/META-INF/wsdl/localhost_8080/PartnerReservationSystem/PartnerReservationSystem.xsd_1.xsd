@@ -52,13 +52,17 @@
 
 <xs:element name="listOfConnectingFlightRecordsResponse" type="tns:listOfConnectingFlightRecordsResponse"/>
 
+<xs:element name="loginCustomer" type="tns:loginCustomer"/>
+
+<xs:element name="loginCustomerResponse" type="tns:loginCustomerResponse"/>
+
 <xs:element name="loginPartner" type="tns:loginPartner"/>
 
 <xs:element name="loginPartnerResponse" type="tns:loginPartnerResponse"/>
 
-<xs:element name="reserveFlight" type="tns:reserveFlight"/>
+<xs:element name="reserveFlightEJB" type="tns:reserveFlightEJB"/>
 
-<xs:element name="reserveFlightResponse" type="tns:reserveFlightResponse"/>
+<xs:element name="reserveFlightEJBResponse" type="tns:reserveFlightEJBResponse"/>
 
 <xs:element name="retrieveIndividualFlightReservation" type="tns:retrieveIndividualFlightReservation"/>
 
@@ -274,24 +278,6 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="retrieveIndividualFlightReservation">
-<xs:sequence>
-<xs:element name="arg0" type="xs:long" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="retrieveIndividualFlightReservationResponse">
-<xs:sequence>
-<xs:element name="return" type="tns:flightReservationEntity" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="FlightReservationDoesNotExistException">
-<xs:sequence>
-<xs:element name="message" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="convertCalendar">
 <xs:sequence>
 <xs:element name="arg0" type="xs:string" minOccurs="0"/>
@@ -345,6 +331,24 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="retrieveIndividualFlightReservation">
+<xs:sequence>
+<xs:element name="arg0" type="xs:long" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveIndividualFlightReservationResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:flightReservationEntity" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="FlightReservationDoesNotExistException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="convertCalendarExpiryDate">
 <xs:sequence>
 <xs:element name="arg0" type="xs:string" minOccurs="0"/>
@@ -369,6 +373,19 @@
 <xs:complexType name="createIndivFlightResResponse">
 <xs:sequence>
 <xs:element name="return" type="tns:individualFlightReservationEntity" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="loginCustomer">
+<xs:sequence>
+<xs:element name="arg0" type="xs:string" minOccurs="0"/>
+<xs:element name="arg1" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="loginCustomerResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:customerEntity" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
@@ -423,6 +440,16 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="reserveFlightEJB">
+<xs:sequence>
+<xs:element name="arg0" type="tns:flightReservationEntity" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="reserveFlightEJBResponse">
+<xs:sequence/>
+</xs:complexType>
+
 <xs:complexType name="createFlightReservation">
 <xs:sequence>
 <xs:element name="arg0" type="xs:string" minOccurs="0"/>
@@ -450,16 +477,6 @@
 <xs:sequence>
 <xs:element name="return" type="tns:flightBundle" minOccurs="0" maxOccurs="unbounded"/>
 </xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="reserveFlight">
-<xs:sequence>
-<xs:element name="arg0" type="tns:flightReservationEntity" minOccurs="0" maxOccurs="unbounded"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="reserveFlightResponse">
-<xs:sequence/>
 </xs:complexType>
 
 <xs:complexType name="getDirectFlight">

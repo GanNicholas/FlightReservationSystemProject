@@ -91,7 +91,7 @@ public class FlightRouteSessionBean implements FlightRouteSessionBeanRemote, Fli
     @Override
     public List<FlightRouteEntity> viewListOfFlightRoute() {
 
-        Query query = em.createQuery("SELECT f FROM FlightRouteEntity f WHERE f.mainRoute=:mainRoute AND f.isDeleted =:isDeleted").setParameter("mainRoute", true).setParameter("isDeleted", false);
+        Query query = em.createQuery("SELECT f FROM FlightRouteEntity f WHERE f.isDeleted =:isDeleted").setParameter("isDeleted", false);
         List<FlightRouteEntity> listOfFlightRoute = query.getResultList();
         listOfFlightRoute.size();
         return listOfFlightRoute;

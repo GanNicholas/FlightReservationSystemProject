@@ -27,5 +27,6 @@ public interface CustomerSessionBeanLocal {
 
     public CustomerEntity retrieveCustomerInfo(Long custId) throws CustomerDoesNotExistException;
 
-      public CustomerEntity customerLoginUnmanaged(String username, String password) throws CustomerLoginInvalid, AccessFromWrongPortalException;
+    public CustomerEntity customerLoginUnmanaged(String username, String password) throws CustomerLoginInvalid;
+//      , AccessFromWrongPortalException
 }

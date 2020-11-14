@@ -17,6 +17,7 @@ import entity.RecurringScheduleEntity;
 import entity.RecurringWeeklyScheduleEntity;
 import entity.SeatEntity;
 import entity.SingleFlightScheduleEntity;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -239,14 +240,18 @@ public class SalesManagement {
             for (CabinClassConfigurationEntity cabin : fs.getFlightSchedulePlan().getFlightEntity().getAircraftConfig().getCabinClasses()) {
                 listOfAllReservedSeats.addAll(getPassengersPerCabinClass(fs.getSeatingPlan(), cabin.getCabinclassType()));
             }
-            
+            BigDecimal totalSum = BigDecimal.ZERO;
             for(SeatEntity seat : listOfAllReservedSeats){
-                System.out.printf("%-30s%-40s%-20s", "Seating Number", "Passenger Name", "Fare Basis Code");
+                System.out.printf("%-30s%-40s%-30s%-20s", "Seating Number", "Passenger Name", "Fare Basis Code", "Amount Paid");
                 System.out.println();
                 String passsengerName = seat.getPassenger().getFirstName() + " " + seat.getPassenger().getLastName();
-                System.out.printf("%-30s%-40s%-20s", seat.getSeatNumber(),passsengerName, seat.getFare().getFareBasisCode());
+                System.out.printf("%-30s%-40s%-30s%-20s", seat.getSeatNumber(),passsengerName, seat.getFare().getFareBasisCode(),"$"+seat.getFare().getFareAmount());
+                totalSum = totalSum.add(seat.getFare().getFareAmount());
                 System.out.println();
             }
+            
+            System.out.println("Total Amount paid: $" + totalSum);
+            System.out.println();
             
 
         } catch (FlightSchedulePlanIsEmptyException | FlightSchedulePlanDoesNotExistException | FlightScheduleDoesNotExistException ex) {

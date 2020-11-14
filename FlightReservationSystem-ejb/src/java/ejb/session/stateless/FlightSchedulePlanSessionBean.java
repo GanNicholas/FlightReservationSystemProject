@@ -178,7 +178,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
 
         flight.setLayOver(layover);
         FlightSchedulePlanEntity fsp;
-        if (recurrency != 6) {
+        if (recurrency != 7) {
             fsp = new RecurringScheduleEntity(flightNumber, false, flight, endDate, recurrency);
         } else { //MUST CHECK RECURRENCY 7 OR LESSER
             fsp = new RecurringWeeklyScheduleEntity(flightNumber, false, flight, endDate);
@@ -236,7 +236,7 @@ public class FlightSchedulePlanSessionBean implements FlightSchedulePlanSessionB
 
             //create return FSP
             FlightSchedulePlanEntity returnFSP;
-            if (recurrency != 6) {
+            if (recurrency != 7) {
                 returnFSP = new RecurringScheduleEntity(returnFlight.getFlightNumber(), false, returnFlight, endDate, recurrency);
             } else { //MUST CHECK RECURRENCY 7 OR LESSER
                 returnFSP = new RecurringWeeklyScheduleEntity(returnFlight.getFlightNumber(), false, returnFlight, endDate);

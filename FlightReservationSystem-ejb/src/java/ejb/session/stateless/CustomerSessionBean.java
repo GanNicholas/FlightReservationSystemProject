@@ -8,6 +8,8 @@ package ejb.session.stateless;
 import entity.AircraftConfigurationEntity;
 import entity.CustomerEntity;
 import entity.FRSCustomerEntity;
+import entity.FlightReservationEntity;
+import entity.IndividualFlightReservationEntity;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -77,17 +79,26 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
     
     @Override
-    public CustomerEntity customerLoginUnmanaged(String username, String password) throws CustomerLoginInvalid, AccessFromWrongPortalException {
+    public CustomerEntity customerLoginUnmanaged(String username, String password) throws CustomerLoginInvalid {
+//        , AccessFromWrongPortalException
         try {
             Query query = em.createQuery("SELECT c FROM CustomerEntity c WHERE c.loginId =:login AND c.loginPw=:password").setParameter("login", username).setParameter("password", password);
             CustomerEntity customer = (CustomerEntity) query.getSingleResult();
             
-            if(customer instanceof FRSCustomerEntity){
-                throw new AccessFromWrongPortalException("You are accessing this website using the wrong client!");
-            }
+//            if(customer instanceof FRSCustomerEntity){
+//                throw new AccessFromWrongPortalException("You are accessing this website using the wrong client!");
+//            }
             
             
             em.detach(customer);
+            for(FlightReservationEntity fr : customer.getListOfFlightReservation()){
+                em.detach(fr);
+                for(IndividualFlightReservationEntity indivFr : fr.getListOfIndividualFlightRes()){
+                    em.detach(indivFr);
+                }
+            }
+            
+            
             return customer;
         } catch (NoResultException ex) {
             throw new CustomerLoginInvalid("Invalid customer login");

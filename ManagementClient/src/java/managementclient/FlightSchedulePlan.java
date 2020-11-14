@@ -193,7 +193,7 @@ public class FlightSchedulePlan {
                     try {
                         GregorianCalendar departDateTime = createDateTime(dateTime);
                         Date date = departDateTime.getTime();
-                        System.out.println(format.format(date));
+//                        System.out.println(format.format(date));
 
                         listOfDepartDateTime.add(departDateTime);
                     } catch (IncorrectFormatException ex) {
@@ -279,17 +279,55 @@ public class FlightSchedulePlan {
             listOfFares.clear();
             reenter = false;
             layover = 0;
+            int day = 0;
             System.out.print("Please enter flight number: ");
             String flightNumber = sc.nextLine().trim();
             System.out.print("Please enter frequency of flight schedule you wish to create: ");
             String numFrequencyString = sc.nextLine().trim();
             int numFrequency = Integer.parseInt(numFrequencyString);
 
+            if (numFrequency == 7) {
+                System.out.print("Please enter day of week for schedule to start: ");
+                String dayOfWeek = sc.nextLine().trim();
+
+                if (dayOfWeek.toLowerCase().equals("monday")) {
+                    day = 1;
+                } else if (dayOfWeek.toLowerCase().equals("tuesday")) {
+                    day = 2;
+                } else if (dayOfWeek.toLowerCase().equals("wednesday")) {
+                    day = 3;
+                } else if (dayOfWeek.toLowerCase().equals("thursday")) {
+                    day = 4;
+                } else if (dayOfWeek.toLowerCase().equals("friday")) {
+                    day = 5;
+                } else if (dayOfWeek.toLowerCase().equals("saturday")) {
+                    day = 6;
+                } else if (dayOfWeek.toLowerCase().equals("sunday")) {
+                    day = 7;
+                }
+            }
+
             System.out.print("Please enter departure date and time (Please enter in this format (dd/mm/yyyy/hh/mm) : ");
             String dateTime = sc.nextLine().trim();
             GregorianCalendar departDateTime = null;
             try {
                 departDateTime = createDateTime(dateTime);
+
+                if (numFrequency == 7) {
+                    int dayOfWeek = departDateTime.get(GregorianCalendar.DAY_OF_WEEK);
+                    dayOfWeek--;
+//                System.out.println("Day of week: " + dayOfWeek);
+                    int diff = 0;
+                    if (day < dayOfWeek) {
+                        diff = 7 - dayOfWeek;
+                        diff += day;
+                    } else if (day > dayOfWeek) {
+                        diff = day - dayOfWeek;
+                    }
+
+                    departDateTime.add(GregorianCalendar.DATE, diff);
+                }
+//                System.out.println(format.format(departDateTime.getTime()));
             } catch (IncorrectFormatException ex) {
                 System.out.println(ex.getMessage());
                 reenter = true;
@@ -585,7 +623,7 @@ public class FlightSchedulePlan {
             sc.next();
         }
     }
-    
+
     public void viewSpecificFspForAllFlight(Scanner sc) {
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         try {
@@ -657,7 +695,6 @@ public class FlightSchedulePlan {
             sc.next();
         }
     }
-    
 
     public void createFlight(Scanner sc) {
         String choice = "";
@@ -676,7 +713,7 @@ public class FlightSchedulePlan {
                     } else {
                         returnRouteStr = "Return route does not exists";
                     }
-                    System.out.printf("%-20d%-45s%-45s%-30s", fr.getFlightRouteId(), fr.getOriginLocation().getAirportName(), fr.getDestinationLocation().getAirportName(), returnRouteStr);
+                    System.out.printf("%-20d%-45s%-45s%-30s", fr.getFlightRouteId(), fr.getOriginLocation().getIataAirportCode(), fr.getDestinationLocation().getIataAirportCode(), returnRouteStr);
                     System.out.println();
                 }
             }
@@ -841,7 +878,7 @@ public class FlightSchedulePlan {
                     System.out.println("Please enter a valid choice!");
                     counter++;
                 }
-            } catch (FlightDoesNotExistException | FlightRouteDoesNotExistException | AircraftConfigurationNotExistException | InputMismatchException | FlightHasFlightSchedulePlanException  ex) {
+            } catch (FlightDoesNotExistException | FlightRouteDoesNotExistException | AircraftConfigurationNotExistException | InputMismatchException | FlightHasFlightSchedulePlanException ex) {
                 System.out.println(ex.getMessage());
                 if (ex instanceof InputMismatchException) {
                     sc.next();
@@ -994,14 +1031,9 @@ public class FlightSchedulePlan {
                 FlightScheduleEntity fs = fsp.getListOfFlightSchedule().get(0);
                 FlightScheduleEntity returnFs = null;
                 boolean returnFlight = false;
-//                    if (fs.getFlightSchedulePlan().getReturnFlightSchedulePlan() == null) { // one way flight
+
                 canEdit = flightScheduleSessionBean.checkFlightScheduleSeats(fs);
-//                    } else if (fs.getFlightSchedulePlan().getReturnFlightSchedulePlan() != null) { // two way flight
-//                        canEdit = flightScheduleSessionBean.checkFlightScheduleSeats(fs);
-//                        returnFs = fs.getFlightSchedulePlan().getReturnFlightSchedulePlan().getListOfFlightSchedule().get(0);
-//                        canEdit = flightScheduleSessionBean.checkFlightScheduleSeats(returnFs);
-//                        returnFlight = true;
-//                    }
+
                 //means flight has existing reservations and cannot be edited
                 if (canEdit == false) {
                     System.out.println("Flight Schedule Plan has a flight schedule with reservations made! Changes can not longer be made!");
@@ -1200,6 +1232,8 @@ public class FlightSchedulePlan {
                 int choice = sc.nextInt();
                 sc.nextLine();
 
+                int day = 0;
+
                 if (choice == 1) {
                     boolean reenter = false;
                     int layover = 0;
@@ -1209,11 +1243,47 @@ public class FlightSchedulePlan {
                     String numFrequencyString = sc.nextLine().trim();
                     int numFrequency = Integer.parseInt(numFrequencyString);
 
+                    if (numFrequency == 7) {
+                        System.out.print("Please enter day of week for schedule to start: ");
+                        String dayOfWeek = sc.nextLine().trim();
+
+                        if (dayOfWeek.toLowerCase().equals("monday")) {
+                            day = 1;
+                        } else if (dayOfWeek.toLowerCase().equals("tuesday")) {
+                            day = 2;
+                        } else if (dayOfWeek.toLowerCase().equals("wednesday")) {
+                            day = 3;
+                        } else if (dayOfWeek.toLowerCase().equals("thursday")) {
+                            day = 4;
+                        } else if (dayOfWeek.toLowerCase().equals("friday")) {
+                            day = 5;
+                        } else if (dayOfWeek.toLowerCase().equals("saturday")) {
+                            day = 6;
+                        } else if (dayOfWeek.toLowerCase().equals("sunday")) {
+                            day = 7;
+                        }
+                    }
+
                     System.out.print("Please enter departure date and time (Please enter in this format (dd/mm/yyyy/hh/mm) : ");
                     String dateTime = sc.nextLine().trim();
                     GregorianCalendar departDateTime = null;
                     try {
                         departDateTime = createDateTime(dateTime);
+
+                        if (numFrequency == 7) {
+                            int dayOfWeek = departDateTime.get(GregorianCalendar.DAY_OF_WEEK);
+                            dayOfWeek--;
+                            int diff = 0;
+                            if (day < dayOfWeek) {
+                                diff = 7 - dayOfWeek;
+                                diff += day;
+                            } else if (day > dayOfWeek) {
+                                diff = day - dayOfWeek;
+                            }
+
+                            departDateTime.add(GregorianCalendar.DATE, diff);
+                        }
+
                     } catch (IncorrectFormatException ex) {
                         System.out.println(ex.getMessage());
                         reenter = true;
@@ -1263,8 +1333,7 @@ public class FlightSchedulePlan {
                 } else {
                     System.out.println("Unable to edit Recurring Flight Schedule Plan!");
                 }
-            } else if (mainChoice == 1) { //TO DELETE
-            } else if (mainChoice == 2) {
+            }  else if (mainChoice == 2) {
 
                 int choice = 0;
                 while (choice != 4) {

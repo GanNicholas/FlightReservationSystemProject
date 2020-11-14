@@ -77,7 +77,13 @@ public class PartnerReservationSystem {
     @WebMethod(operationName = "loginPartner")
     public PartnerEntity loginPartner(String loginId, String loginPw) throws CustomerLoginInvalid, AccessFromWrongPortalException {
         PartnerEntity partner = (PartnerEntity) customerSessionBean.customerLoginUnmanaged(loginId, loginPw);
-
+        List<FlightReservationEntity> listOfFlightRes = partner.getListOfFlightReservation();
+        for (FlightReservationEntity fr : listOfFlightRes) {
+            fr.setCustomer(null);
+            for(IndividualFlightReservationEntity indivFr : fr.getListOfIndividualFlightRes()){
+                indivFr.setFlightReservation(null);
+            }
+        }
         return partner;
     }
 
@@ -364,14 +370,14 @@ public class PartnerReservationSystem {
 
     }
 
-    @WebMethod(operationName = "reserveFlight")
-    public void reserveFlight(List<FlightReservationEntity> listOfFlightRes) {
-        for(FlightReservationEntity fr : listOfFlightRes){
-            for(IndividualFlightReservationEntity indivFr : fr.getListOfIndividualFlightRes()){
+    @WebMethod(operationName = "reserveFlightEJB")
+    public void reserveFlightEJB(List<FlightReservationEntity> listOfFlightRes) {
+        for (FlightReservationEntity fr : listOfFlightRes) {
+            for (IndividualFlightReservationEntity indivFr : fr.getListOfIndividualFlightRes()) {
                 indivFr.setFlightReservation(fr);
             }
         }
-        
+
         flightReservationSessionBean.reserveFlights(listOfFlightRes);
     }
 
@@ -380,25 +386,25 @@ public class PartnerReservationSystem {
         FlightReservationEntity flightRes = new FlightReservationEntity(originIATACode, destinationIATACode, totalAmount, customer);
         return flightRes;
     }
-    
+
     @WebMethod(operationName = "createIndivFlightRes")
-    public IndividualFlightReservationEntity createIndivFlightRes(FlightScheduleEntity flightSchedule, CustomerEntity customerInfo, BigDecimal amount, FlightReservationEntity flightReservation){
+    public IndividualFlightReservationEntity createIndivFlightRes(FlightScheduleEntity flightSchedule, CustomerEntity customerInfo, BigDecimal amount, FlightReservationEntity flightReservation) {
         IndividualFlightReservationEntity indivFr = new IndividualFlightReservationEntity(flightSchedule, customerInfo, amount, flightReservation);
         return indivFr;
     }
-    
+
     @WebMethod(operationName = "createPassenger")
-    public PassengerEntity createPassenger(String firstName, String lastName, String passportNumber){
+    public PassengerEntity createPassenger(String firstName, String lastName, String passportNumber) {
         PassengerEntity passenger = new PassengerEntity(firstName, lastName, passportNumber);
         return passenger;
     }
-    
+
     @WebMethod(operationName = "createFare")
-    public FareEntity createFare(String fareBasisCode, BigDecimal fareAmount, CabinClassType cabinType){
+    public FareEntity createFare(String fareBasisCode, BigDecimal fareAmount, CabinClassType cabinType) {
         FareEntity newFare = new FareEntity(fareBasisCode, fareAmount, cabinType);
         return newFare;
     }
-    
+
     @WebMethod(operationName = "convertCalendarExpiryDate")
     public GregorianCalendar convertCalendarExpiryDate(String dateTime) throws IncorrectFormatException {
 
@@ -408,7 +414,7 @@ public class PartnerReservationSystem {
             informationInteger.add(Integer.parseInt(info));
         }
 
-        if (informationInteger.size() <2 ) {
+        if (informationInteger.size() < 2) {
             throw new IncorrectFormatException("Wrong date format!");
         }
 
@@ -416,6 +422,22 @@ public class PartnerReservationSystem {
         GregorianCalendar newCalendar = new GregorianCalendar(informationInteger.get(2), (informationInteger.get(1) - 1), informationInteger.get(0), informationInteger.get(3), informationInteger.get(4));
         return newCalendar;
 
+    }
+
+    @WebMethod(operationName = "loginCustomer")
+    public CustomerEntity loginCustomer(String userId, String password) throws CustomerLoginInvalid {
+        CustomerEntity customer = customerSessionBean.customerLoginUnmanaged(userId, password);
+        List<FlightReservationEntity> listOfFlightRes = customer.getListOfFlightReservation();
+        for (FlightReservationEntity fr : listOfFlightRes) {
+            fr.setCustomer(null);
+            for(IndividualFlightReservationEntity indivFr : fr.getListOfIndividualFlightRes()){
+                indivFr.setFlightReservation(null);
+                indivFr.setCustomerInfo(null);
+                indivFr.setFlightSchedule(null);
+//                indivFr.getFlightSchedule().getFlightSchedulePlan().getListOfFlightSchedule().clear();
+            }
+        }
+        return customer;
     }
 
 }
