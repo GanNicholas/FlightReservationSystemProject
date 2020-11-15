@@ -519,52 +519,55 @@ public class Customer {
                     System.out.println("There is no flights");
                 } catch (NumberFormatException ex) {
                     System.out.println("You have invalid input");
-                    searchFlight();
+                    break;
                 }
-
-                System.out.println("Please enter the flight you want to reserve for flying over:");
-                List<FlightBundle> passingOverToReservation = new ArrayList<>();
-                String flight = sc.nextLine();
-                FlightBundle fb = listOfFlightBundles.get(Integer.parseInt(flight) - 1);
-                AirportEntity origin = fb.getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation();
-                AirportEntity destination = fb.getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
-                if (fb.getDepartTwo() != null) {
-                    destination = fb.getDepartTwo().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
-                }
-                if (fb.getDepartThree() != null) {
-                    destination = fb.getDepartThree().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
-                }
-                passingOverToReservation.add(fb);
-                while (!flight.equalsIgnoreCase("Y")) {
-                    System.out.println("Do you still want to add? Y/N");
-                    flight = sc.nextLine();
-                    if (!flight.equalsIgnoreCase("Y")) {
-                        break;
-                    }
+                try {
                     System.out.println("Please enter the flight you want to reserve for flying over:");
-                    flight = sc.nextLine();
-
-                    FlightBundle f2 = listOfFlightBundles.get(Integer.parseInt(flight) - 1);
-                    passingOverToReservation.add(f2);
-                }
-                for (int i = 0; i < passingOverToReservation.size(); i++) {
-                    System.out.println("---------------------");
-                    System.out.println("flight no:" + passingOverToReservation.get(i).getDepartOne().getFlightSchedulePlan().getFlightNumber() + " || departure date time" + format.format(passingOverToReservation.get(i).getDepartOne().getDepartureDateTime().getTime()) + " cabin type: " + passingOverToReservation.get(i).getDepartOneCabinClassType() + " fare :" + passingOverToReservation.get(i).getDepartOneFare().getFareAmount());
-                    if (passingOverToReservation.get(i).getDepartTwo() != null) {
-                        System.out.println("flight no:" + passingOverToReservation.get(i).getDepartTwo().getFlightSchedulePlan().getFlightNumber() + " || departure date time" + format.format(passingOverToReservation.get(i).getDepartTwo().getDepartureDateTime().getTime()) + " cabin type: " + passingOverToReservation.get(i).getDepartTwoCabinClassType() + " fare :" + passingOverToReservation.get(i).getDepartTwoFare().getFareAmount());
-
+                    List<FlightBundle> passingOverToReservation = new ArrayList<>();
+                    String flight = sc.nextLine();
+                    FlightBundle fb = listOfFlightBundles.get(Integer.parseInt(flight) - 1);
+                    AirportEntity origin = fb.getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation();
+                    AirportEntity destination = fb.getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
+                    if (fb.getDepartTwo() != null) {
+                        destination = fb.getDepartTwo().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
                     }
-                    if (passingOverToReservation.get(i).getDepartThree() != null) {
-                        System.out.println("flight no:" + passingOverToReservation.get(i).getDepartThree().getFlightSchedulePlan().getFlightNumber() + " || departure date time" + format.format(passingOverToReservation.get(i).getDepartThree().getDepartureDateTime().getTime()) + " cabin type: " + passingOverToReservation.get(i).getDepartThreeCabinClassType() + " fare :" + passingOverToReservation.get(i).getDepartThreeFare().getFareAmount());
-
+                    if (fb.getDepartThree() != null) {
+                        destination = fb.getDepartThree().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
                     }
-                    System.out.println("---------------------");
-                }
-                reserveFlight(passingOverToReservation, origin, destination, Integer.parseInt(passenger));
+                    passingOverToReservation.add(fb);
+                    while (!flight.equalsIgnoreCase("Y")) {
+                        System.out.println("Do you still want to add? Y/N");
+                        flight = sc.nextLine();
+                        if (!flight.equalsIgnoreCase("Y")) {
+                            break;
+                        }
+                        System.out.println("Please enter the flight you want to reserve:");
+                        flight = sc.nextLine();
+                      
+                        FlightBundle f2 = listOfFlightBundles.get(Integer.parseInt(flight) - 1);
+                        passingOverToReservation.add(f2);
+                    }
+                    for (int i = 0; i < passingOverToReservation.size(); i++) {
+                        System.out.println("---------------------");
+                        System.out.println("flight no:" + passingOverToReservation.get(i).getDepartOne().getFlightSchedulePlan().getFlightNumber() + " || departure date time" + format.format(passingOverToReservation.get(i).getDepartOne().getDepartureDateTime().getTime()) + " cabin type: " + passingOverToReservation.get(i).getDepartOneCabinClassType() + " fare :" + passingOverToReservation.get(i).getDepartOneFare().getFareAmount());
+                        if (passingOverToReservation.get(i).getDepartTwo() != null) {
+                            System.out.println("flight no:" + passingOverToReservation.get(i).getDepartTwo().getFlightSchedulePlan().getFlightNumber() + " || departure date time" + format.format(passingOverToReservation.get(i).getDepartTwo().getDepartureDateTime().getTime()) + " cabin type: " + passingOverToReservation.get(i).getDepartTwoCabinClassType() + " fare :" + passingOverToReservation.get(i).getDepartTwoFare().getFareAmount());
 
+                        }
+                        if (passingOverToReservation.get(i).getDepartThree() != null) {
+                            System.out.println("flight no:" + passingOverToReservation.get(i).getDepartThree().getFlightSchedulePlan().getFlightNumber() + " || departure date time" + format.format(passingOverToReservation.get(i).getDepartThree().getDepartureDateTime().getTime()) + " cabin type: " + passingOverToReservation.get(i).getDepartThreeCabinClassType() + " fare :" + passingOverToReservation.get(i).getDepartThreeFare().getFareAmount());
+
+                        }
+                        System.out.println("---------------------");
+                    }
+                    reserveFlight(passingOverToReservation, origin, destination, Integer.parseInt(passenger));
+                } catch (NullPointerException | IndexOutOfBoundsException ex) {
+                    System.out.println("You have input invalid id. Please try again");
+                    break;
+                }
             } catch (NumberFormatException ex) {
                 System.out.println("You have invalid input");
-                searchFlight();
+                break;
 
             }
 
