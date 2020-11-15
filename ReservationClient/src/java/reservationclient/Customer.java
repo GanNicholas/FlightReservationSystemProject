@@ -535,8 +535,9 @@ public class Customer {
                         destination = fb.getDepartThree().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
                     }
                     passingOverToReservation.add(fb);
+                    boolean checkSameFlightNumber = false;
                     while (!flight.equalsIgnoreCase("Y")) {
-                        boolean checkSameFlightNumber = false;
+
                         System.out.println("Do you still want to add? Y/N");
                         flight = sc.nextLine();
                         if (!flight.equalsIgnoreCase("Y")) {
@@ -566,11 +567,12 @@ public class Customer {
                             checkSameFlightNumber = true;
                             break;
                         }
-                        if (checkSameFlightNumber) {
-                            break;
-                        }
+
                         FlightBundle f2 = listOfFlightBundles.get(Integer.parseInt(flight) - 1);
                         passingOverToReservation.add(f2);
+                    }
+                    if (checkSameFlightNumber) {
+                        break;
                     }
                     for (int i = 0; i < passingOverToReservation.size(); i++) {
                         System.out.println("---------------------");

@@ -1013,7 +1013,7 @@ public class RunApp {
                     min[3] = new BigDecimal(-999999999);
             }
             BigDecimal actualVal = listOfFe.get(i).getFareAmount();
-            if (min[0].compareTo(actualVal) == 1 && listOfFe.get(i).getCabinType().equals(CabinClassType.F)) {
+            if (min[0].compareTo(actualVal) == -1 && listOfFe.get(i).getCabinType().equals(CabinClassType.F)) {
                 min[0] = actualVal;
                 fe[0] = listOfFe.get(i);
 
