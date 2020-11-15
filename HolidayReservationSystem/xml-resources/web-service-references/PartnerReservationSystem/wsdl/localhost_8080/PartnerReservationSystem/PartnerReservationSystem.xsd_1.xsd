@@ -52,10 +52,6 @@
 
 <xs:element name="listOfConnectingFlightRecordsResponse" type="tns:listOfConnectingFlightRecordsResponse"/>
 
-<xs:element name="loginCustomer" type="tns:loginCustomer"/>
-
-<xs:element name="loginCustomerResponse" type="tns:loginCustomerResponse"/>
-
 <xs:element name="loginPartner" type="tns:loginPartner"/>
 
 <xs:element name="loginPartnerResponse" type="tns:loginPartnerResponse"/>
@@ -374,33 +370,6 @@
 <xs:sequence>
 <xs:element name="return" type="tns:individualFlightReservationEntity" minOccurs="0"/>
 </xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="loginCustomer">
-<xs:sequence>
-<xs:element name="arg0" type="xs:string" minOccurs="0"/>
-<xs:element name="arg1" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="loginCustomerResponse">
-<xs:sequence>
-<xs:element name="return" type="tns:frsCustomerEntity" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="frsCustomerEntity">
-<xs:complexContent>
-<xs:extension base="tns:customerEntity">
-<xs:sequence>
-<xs:element name="address" type="xs:string" minOccurs="0"/>
-<xs:element name="email" type="xs:string" minOccurs="0"/>
-<xs:element name="firstName" type="xs:string" minOccurs="0"/>
-<xs:element name="lastName" type="xs:string" minOccurs="0"/>
-<xs:element name="phoneNumber" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:extension>
-</xs:complexContent>
 </xs:complexType>
 
 <xs:complexType name="createFare">

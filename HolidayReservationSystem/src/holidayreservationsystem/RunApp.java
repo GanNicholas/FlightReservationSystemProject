@@ -32,7 +32,6 @@ import ws.client.FlightReservationEntity;
 import ws.client.FlightRouteDoesNotExistException;
 import ws.client.FlightRouteDoesNotExistException_Exception;
 import ws.client.FlightScheduleEntity;
-import ws.client.FrsCustomerEntity;
 import ws.client.IncorrectFormatException_Exception;
 import ws.client.IndividualFlightReservationEntity;
 import ws.client.PartnerEntity;
@@ -79,10 +78,9 @@ public class RunApp {
                     String password = sc.nextLine();
 
                     //change to login partner
-                    partner = loginCustomer(username, password);
+                    partner = loginPartner(username, password);
                     postlogin();
-//| AccessFromWrongPortalException_Exception
-                } catch (CustomerLoginInvalid_Exception ex) {
+                } catch (CustomerLoginInvalid_Exception | AccessFromWrongPortalException_Exception ex) {
                     System.out.println(ex.getMessage());
                 }
             } else if (choice == 2) {
@@ -1440,11 +1438,11 @@ public class RunApp {
         return port.convertCalendarExpiryDate(arg0);
     }
 
-    private static FrsCustomerEntity loginCustomer(java.lang.String arg0, java.lang.String arg1) throws CustomerLoginInvalid_Exception {
-        ws.client.PartnerReservationSystem_Service service = new ws.client.PartnerReservationSystem_Service();
-        ws.client.PartnerReservationSystem port = service.getPartnerReservationSystemPort();
-        return port.loginCustomer(arg0, arg1);
-    }
+//    private static FrsCustomerEntity loginCustomer(java.lang.String arg0, java.lang.String arg1) throws CustomerLoginInvalid_Exception {
+//        ws.client.PartnerReservationSystem_Service service = new ws.client.PartnerReservationSystem_Service();
+//        ws.client.PartnerReservationSystem port = service.getPartnerReservationSystemPort();
+//        return port.loginCustomer(arg0, arg1);
+//    }
 
     private static FlightReservationEntity retrieveIndividualFlightReservation(java.lang.Long arg0) throws FlightReservationDoesNotExistException_Exception {
         ws.client.PartnerReservationSystem_Service service = new ws.client.PartnerReservationSystem_Service();

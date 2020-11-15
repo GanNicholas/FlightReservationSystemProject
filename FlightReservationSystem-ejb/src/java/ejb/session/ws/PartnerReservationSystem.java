@@ -446,22 +446,22 @@ public class PartnerReservationSystem {
 
     }
 
-    @WebMethod(operationName = "loginCustomer")
-    public FRSCustomerEntity loginCustomer(String userId, String password) throws CustomerLoginInvalid {
-        FRSCustomerEntity customer = (FRSCustomerEntity) customerSessionBean.customerLoginUnmanaged(userId, password);
-        List<FlightReservationEntity> listOfFlightRes = customer.getListOfFlightReservation();
-        for (FlightReservationEntity fr : listOfFlightRes) {
-            fr.setCustomer(null);
-            for (IndividualFlightReservationEntity indivFr : fr.getListOfIndividualFlightRes()) {
-                indivFr.setFlightReservation(null);
-                indivFr.setCustomerInfo(null);
-                indivFr.setFlightSchedule(null);
-//                indivFr.getFlightSchedule().getFlightSchedulePlan().getListOfFlightSchedule().clear();
-            }
-        }
-
-        System.out.println("Customer sending out to SOAP client");
-        return customer;
-    }
+//    @WebMethod(operationName = "loginCustomer")
+//    public FRSCustomerEntity loginCustomer(String userId, String password) throws CustomerLoginInvalid {
+//        FRSCustomerEntity customer = (FRSCustomerEntity) customerSessionBean.customerLoginUnmanaged(userId, password);
+//        List<FlightReservationEntity> listOfFlightRes = customer.getListOfFlightReservation();
+//        for (FlightReservationEntity fr : listOfFlightRes) {
+//            fr.setCustomer(null);
+//            for (IndividualFlightReservationEntity indivFr : fr.getListOfIndividualFlightRes()) {
+//                indivFr.setFlightReservation(null);
+//                indivFr.setCustomerInfo(null);
+//                indivFr.setFlightSchedule(null);
+////                indivFr.getFlightSchedule().getFlightSchedulePlan().getListOfFlightSchedule().clear();
+//            }
+//        }
+//
+//        System.out.println("Customer sending out to SOAP client");
+//        return customer;
+//    }
 
 }
