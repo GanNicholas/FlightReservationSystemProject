@@ -213,7 +213,7 @@ public class RunApp {
 
     }
 
-    public void searchFlight() { // no validation yet
+ public void searchFlight() { // no validation yet
         Scanner sc = new Scanner(System.in);
         boolean invalidInput = false;
         String destinationAirport = "";
@@ -548,17 +548,44 @@ public class RunApp {
                         destination = fb.getDepartThree().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
                     }
                     passingOverToReservation.add(fb);
+                    boolean checkSameFlightNumber = false;
                     while (!flight.equalsIgnoreCase("Y")) {
+
                         System.out.println("Do you still want to add? Y/N");
                         flight = sc.nextLine();
                         if (!flight.equalsIgnoreCase("Y")) {
                             break;
                         }
-                        System.out.println("Please enter the flight you want to reserve for flying over:");
+                        System.out.println("Please enter the flight you want to reserve:");
                         flight = sc.nextLine();
+                        if (fb.getDepartOne().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartOne().getFlightSchedulePlan().getFlightNumber())) {
+                            if (fb.getDepartTwo() != null && listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartTwo() != null) {
+                                if (!fb.getDepartTwo().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartTwo().getFlightSchedulePlan().getFlightNumber())) {
+                                    System.out.println("Invalid flight number. You must only select the same flight number");
+                                    checkSameFlightNumber = true;
+                                    break;
+                                } else if (fb.getDepartTwo().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartTwo().getFlightSchedulePlan().getFlightNumber())) {
+                                    if (fb.getDepartThree() != null && listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartThree() != null) {
+                                        if (!fb.getDepartThree().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartThree().getFlightSchedulePlan().getFlightNumber())) {
+                                            System.out.println("Invalid flight number. You must only select the same flight number");
+                                            checkSameFlightNumber = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                            }
+                        } else if (!fb.getDepartOne().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartOne().getFlightSchedulePlan().getFlightNumber())) {
+                            System.out.println("Invalid flight number. You must only select the same flight number");
+                            checkSameFlightNumber = true;
+                            break;
+                        }
 
                         FlightBundle f2 = listOfFlightBundles.get(Integer.parseInt(flight) - 1);
                         passingOverToReservation.add(f2);
+                    }
+                    if (checkSameFlightNumber) {
+                        break;
                     }
                     for (int i = 0; i < passingOverToReservation.size(); i++) {
                         System.out.println("---------------------");
@@ -586,6 +613,7 @@ public class RunApp {
 
         }
     }
+
 
     public List<FlightBundle> checkCabinClassDisplayable(List<FlightBundle> listOfSearchFlight, List<String> cabinType, int noOfPassenger) {
 
@@ -865,97 +893,8 @@ public class RunApp {
         return max;
     }
 
-    public BigDecimal[] getLowestFare(List<FareEntity> listOfFe) {
-        //first class (F), business class (j), premium econ(W), econ(y)
-        if (listOfFe == null || listOfFe.isEmpty()) {
-            return new BigDecimal[4];
-        }
-        BigDecimal[] min = new BigDecimal[4];
-        for (int i = 0; i < listOfFe.size(); i++) {
-            if (i == 0) {
-                min[0] = new BigDecimal(999999999);
-                min[1] = new BigDecimal(999999999);
-                min[2] = new BigDecimal(999999999);
-                min[3] = new BigDecimal(999999999);
-            }
-            BigDecimal actualVal = listOfFe.get(i).getFareAmount();
-            if (min[0].compareTo(actualVal) == 1 && listOfFe.get(i).getCabinType().equals(CabinClassType.F)) {
-                min[0] = actualVal;
 
-            }
-            if (min[1].compareTo(actualVal) == 1 && listOfFe.get(i).getCabinType().equals(CabinClassType.J)) {
-                min[1] = actualVal;
-
-            }
-            if (min[2].compareTo(actualVal) == 1 && listOfFe.get(i).getCabinType().equals(CabinClassType.W)) {
-                min[2] = actualVal;
-
-            }
-            if (min[3].compareTo(actualVal) == 1 && listOfFe.get(i).getCabinType().equals(CabinClassType.Y)) {
-                min[3] = actualVal;
-
-            }
-        }
-        if (min[0].equals(new BigDecimal("999999999"))) {
-            min[0] = BigDecimal.ZERO;
-
-        }
-        if (min[1].equals(new BigDecimal("999999999"))) {
-            min[1] = BigDecimal.ZERO;
-
-        }
-        if (min[2].equals(new BigDecimal("999999999"))) {
-            min[2] = BigDecimal.ZERO;
-
-        }
-        if (min[3].equals(new BigDecimal("999999999"))) {
-            min[3] = BigDecimal.ZERO;
-
-        }
-        return min;
-    }
-
-    // check if any cabin class has enough capacity to fit the passenger with all cabins
-    public HashMap<String, BigDecimal> getAvaiableCabinType(FlightScheduleEntity fs1, int noOfPassenger) {
-        //first class (F), business class (j), premium econ(W), econ(y)
-        //System.out.println("GetAvailableCabinType:" + fs1.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation().getIataAirportCode() + " : " + fs1.getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation().getIataAirportCode() + " flight no" + fs1.getFlightSchedulePlan().getFlightNumber());
-        HashMap<String, BigDecimal> availableCabinNPrice = new HashMap<String, BigDecimal>();
-        int[] temp = new int[4];
-        for (int i = 0; i < fs1.getSeatingPlan().size(); i++) {
-            if (!fs1.getSeatingPlan().get(i).isReserved()) {
-                if (fs1.getSeatingPlan().get(i).getCabinType().equals(CabinClassType.F)) {
-                    temp[0] = temp[0] + 1;
-                } else if (fs1.getSeatingPlan().get(i).getCabinType().equals(CabinClassType.J)) {
-                    temp[1] = temp[1] + 1;
-                } else if (fs1.getSeatingPlan().get(i).getCabinType().equals(CabinClassType.W)) {
-                    temp[2] = temp[2] + 1;
-                } else if (fs1.getSeatingPlan().get(i).getCabinType().equals(CabinClassType.Y)) {
-                    temp[3] = temp[3] + 1;
-                }
-
-            }
-
-            if (temp[0] >= noOfPassenger && temp[1] >= noOfPassenger && temp[2] >= noOfPassenger && temp[3] >= noOfPassenger) {
-                break;
-            }
-        }
-        BigDecimal[] fare = getLowestFare(fs1.getFlightSchedulePlan().getListOfFare());
-        if (temp[0] >= noOfPassenger) {
-            availableCabinNPrice.put("F", fare[0]);
-        }
-        if (temp[1] >= noOfPassenger) {
-            availableCabinNPrice.put("J", fare[1]);
-        }
-        if (temp[0] >= noOfPassenger) {
-            availableCabinNPrice.put("W", fare[2]);
-        }
-        if (temp[0] >= noOfPassenger) {
-            availableCabinNPrice.put("Y", fare[3]);
-        }
-        // System.out.println("availableCabinNPrice" + availableCabinNPrice.size());
-        return availableCabinNPrice;
-
-    }
+  
 
     public HashMap<String, FareEntity> getAvaiableCabinTypeReturnFareEntity(FlightScheduleEntity fs1, int noOfPassenger) {
         //first class (F), business class (j), premium econ(W), econ(y)
@@ -1010,7 +949,7 @@ public class RunApp {
                 min[0] = new BigDecimal(-999999999);
                 min[1] = new BigDecimal(-999999999);
                 min[2] = new BigDecimal(-999999999);
-                    min[3] = new BigDecimal(-999999999);
+                min[3] = new BigDecimal(-999999999);
             }
             BigDecimal actualVal = listOfFe.get(i).getFareAmount();
             if (min[0].compareTo(actualVal) == -1 && listOfFe.get(i).getCabinType().equals(CabinClassType.F)) {
@@ -1018,38 +957,37 @@ public class RunApp {
                 fe[0] = listOfFe.get(i);
 
             }
-            if (min[1].compareTo(actualVal) == 1 && listOfFe.get(i).getCabinType().equals(CabinClassType.J)) {
+            if (min[1].compareTo(actualVal) == -1 && listOfFe.get(i).getCabinType().equals(CabinClassType.J)) {
                 min[1] = actualVal;
                 fe[1] = listOfFe.get(i);
             }
-            if (min[2].compareTo(actualVal) == 1 && listOfFe.get(i).getCabinType().equals(CabinClassType.W)) {
+            if (min[2].compareTo(actualVal) == -1 && listOfFe.get(i).getCabinType().equals(CabinClassType.W)) {
                 min[2] = actualVal;
                 fe[2] = listOfFe.get(i);
             }
-            if (min[3].compareTo(actualVal) == 1 && listOfFe.get(i).getCabinType().equals(CabinClassType.Y)) {
+            if (min[3].compareTo(actualVal) == -1 && listOfFe.get(i).getCabinType().equals(CabinClassType.Y)) {
                 min[3] = actualVal;
                 fe[3] = listOfFe.get(i);
             }
         }
-        if (min[0].equals(new BigDecimal("999999999"))) {
+        if (min[0].equals(new BigDecimal("-999999999"))) {
             fe[0] = null;
 
         }
-        if (min[1].equals(new BigDecimal("999999999"))) {
+        if (min[1].equals(new BigDecimal("-999999999"))) {
             fe[1] = null;
 
         }
-        if (min[2].equals(new BigDecimal("999999999"))) {
+        if (min[2].equals(new BigDecimal("-999999999"))) {
             fe[2] = null;
 
         }
-        if (min[3].equals(new BigDecimal("999999999"))) {
+        if (min[3].equals(new BigDecimal("-999999999"))) {
             fe[3] = null;
 
         }
         return fe;
     }
-        
 
     public List<FlightBundle> combineAllThreeFlights(List<FlightBundle> threeDaysBefore, List<FlightBundle> onTheDay, List<FlightBundle> threeDaysAfter) {
         List<FlightBundle> combination = new ArrayList<>();

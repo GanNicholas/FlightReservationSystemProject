@@ -545,6 +545,7 @@ public class Customer {
                         }
                         System.out.println("Please enter the flight you want to reserve:");
                         flight = sc.nextLine();
+                        
                         if (fb.getDepartOne().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartOne().getFlightSchedulePlan().getFlightNumber())) {
                             if (fb.getDepartTwo() != null && listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartTwo() != null) {
                                 if (!fb.getDepartTwo().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartTwo().getFlightSchedulePlan().getFlightNumber())) {
@@ -570,6 +571,7 @@ public class Customer {
 
                         FlightBundle f2 = listOfFlightBundles.get(Integer.parseInt(flight) - 1);
                         passingOverToReservation.add(f2);
+                        
                     }
                     if (checkSameFlightNumber) {
                         break;
@@ -588,6 +590,7 @@ public class Customer {
                         System.out.println("---------------------");
                     }
                     reserveFlight(passingOverToReservation, origin, destination, Integer.parseInt(passenger));
+                    break;
                 } catch (NullPointerException | IndexOutOfBoundsException ex) {
                     System.out.println("You have input invalid id. Please try again");
                     break;
