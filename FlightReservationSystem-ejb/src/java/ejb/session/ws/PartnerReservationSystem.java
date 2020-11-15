@@ -10,6 +10,7 @@ import ejb.session.stateless.FlightReservationSessionBeanLocal;
 import ejb.session.stateless.FlightRouteSessionBeanLocal;
 import ejb.session.stateless.FlightScheduleSessionBeanLocal;
 import entity.CustomerEntity;
+import entity.FRSCustomerEntity;
 import entity.FareEntity;
 import entity.FlightBundle;
 import entity.FlightEntity;
@@ -18,8 +19,12 @@ import entity.FlightRouteEntity;
 import entity.FlightScheduleEntity;
 import entity.FlightSchedulePlanEntity;
 import entity.IndividualFlightReservationEntity;
+import entity.MultipleFlightScheduleEntity;
 import entity.PartnerEntity;
 import entity.PassengerEntity;
+import entity.RecurringScheduleEntity;
+import entity.RecurringWeeklyScheduleEntity;
+import entity.SingleFlightScheduleEntity;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -67,8 +72,11 @@ public class PartnerReservationSystem {
     public List<FlightReservationEntity> retrieveListOfReservation(@WebParam(name = "custId") Long custId) throws CustomerHasNoReservationException {
         List<FlightReservationEntity> listOfFlightReservation = flightReservationSessionBean.retrieveListOfUnmanagedReservation(custId);
         for (FlightReservationEntity fr : listOfFlightReservation) {
+            fr.getCustomer().getListOfFlightReservation().clear();
             for (IndividualFlightReservationEntity indivFr : fr.getListOfIndividualFlightRes()) {
                 indivFr.setFlightReservation(null);
+                indivFr.setCustomerInfo(null);
+                indivFr.setFlightSchedule(null);
             }
         }
         return listOfFlightReservation;
@@ -80,8 +88,10 @@ public class PartnerReservationSystem {
         List<FlightReservationEntity> listOfFlightRes = partner.getListOfFlightReservation();
         for (FlightReservationEntity fr : listOfFlightRes) {
             fr.setCustomer(null);
-            for(IndividualFlightReservationEntity indivFr : fr.getListOfIndividualFlightRes()){
+            for (IndividualFlightReservationEntity indivFr : fr.getListOfIndividualFlightRes()) {
                 indivFr.setFlightReservation(null);
+                indivFr.setCustomerInfo(null);
+                indivFr.setFlightSchedule(null);
             }
         }
         return partner;
@@ -90,12 +100,24 @@ public class PartnerReservationSystem {
     @WebMethod(operationName = "retrieveIndividualFlightReservation")
     public FlightReservationEntity retrieveIndividualFlightReservation(Long frId) throws FlightReservationDoesNotExistException {
         FlightReservationEntity fr = flightReservationSessionBean.getIndividualFlightReservationUnmanaged(frId);
+        fr.getCustomer().getListOfFlightReservation().clear();
 
         for (IndividualFlightReservationEntity indivFr : fr.getListOfIndividualFlightRes()) {
             indivFr.setFlightReservation(null);
+            indivFr.setCustomerInfo(null);
             //flightscheudle - flight || flight route - flight route || flight - flight || flightschedule - flightscheduleplan || 
             FlightScheduleEntity fs = indivFr.getFlightSchedule();
             FlightSchedulePlanEntity fsp = fs.getFlightSchedulePlan();
+            if (fsp instanceof SingleFlightScheduleEntity) {
+                fs.setFlightSchedulePlan((SingleFlightScheduleEntity) fsp);
+            } else if (fsp instanceof MultipleFlightScheduleEntity) {
+                fs.setFlightSchedulePlan((MultipleFlightScheduleEntity) fsp);
+            } else if (fsp instanceof RecurringScheduleEntity) {
+                fs.setFlightSchedulePlan((RecurringScheduleEntity) fsp);
+            } else if (fsp instanceof RecurringWeeklyScheduleEntity) {
+                fs.setFlightSchedulePlan((RecurringWeeklyScheduleEntity) fsp);
+            }
+
             fsp.getListOfFlightSchedule().clear(); // clear all associations to list of FS
             fsp.setReturnFlightSchedulePlan(null);
 
@@ -425,18 +447,20 @@ public class PartnerReservationSystem {
     }
 
     @WebMethod(operationName = "loginCustomer")
-    public CustomerEntity loginCustomer(String userId, String password) throws CustomerLoginInvalid {
-        CustomerEntity customer = customerSessionBean.customerLoginUnmanaged(userId, password);
+    public FRSCustomerEntity loginCustomer(String userId, String password) throws CustomerLoginInvalid {
+        FRSCustomerEntity customer = (FRSCustomerEntity) customerSessionBean.customerLoginUnmanaged(userId, password);
         List<FlightReservationEntity> listOfFlightRes = customer.getListOfFlightReservation();
         for (FlightReservationEntity fr : listOfFlightRes) {
             fr.setCustomer(null);
-            for(IndividualFlightReservationEntity indivFr : fr.getListOfIndividualFlightRes()){
+            for (IndividualFlightReservationEntity indivFr : fr.getListOfIndividualFlightRes()) {
                 indivFr.setFlightReservation(null);
                 indivFr.setCustomerInfo(null);
                 indivFr.setFlightSchedule(null);
 //                indivFr.getFlightSchedule().getFlightSchedulePlan().getListOfFlightSchedule().clear();
             }
         }
+
+        System.out.println("Customer sending out to SOAP client");
         return customer;
     }
 

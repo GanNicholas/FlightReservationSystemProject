@@ -174,7 +174,7 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="flightSchedulePlanEntity" abstract="true">
+<xs:complexType name="flightSchedulePlanEntity">
 <xs:sequence>
 <xs:element name="flightEntity" type="tns:flightEntity" minOccurs="0"/>
 <xs:element name="flightNumber" type="xs:string" minOccurs="0"/>
@@ -278,24 +278,6 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="convertCalendar">
-<xs:sequence>
-<xs:element name="arg0" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="convertCalendarResponse">
-<xs:sequence>
-<xs:element name="return" type="xs:dateTime" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="IncorrectFormatException">
-<xs:sequence>
-<xs:element name="message" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="loginPartner">
 <xs:sequence>
 <xs:element name="arg0" type="xs:string" minOccurs="0"/>
@@ -326,6 +308,24 @@
 </xs:complexType>
 
 <xs:complexType name="AccessFromWrongPortalException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="convertCalendar">
+<xs:sequence>
+<xs:element name="arg0" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="convertCalendarResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:dateTime" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="IncorrectFormatException">
 <xs:sequence>
 <xs:element name="message" type="xs:string" minOccurs="0"/>
 </xs:sequence>
@@ -385,8 +385,22 @@
 
 <xs:complexType name="loginCustomerResponse">
 <xs:sequence>
-<xs:element name="return" type="tns:customerEntity" minOccurs="0"/>
+<xs:element name="return" type="tns:frsCustomerEntity" minOccurs="0"/>
 </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="frsCustomerEntity">
+<xs:complexContent>
+<xs:extension base="tns:customerEntity">
+<xs:sequence>
+<xs:element name="address" type="xs:string" minOccurs="0"/>
+<xs:element name="email" type="xs:string" minOccurs="0"/>
+<xs:element name="firstName" type="xs:string" minOccurs="0"/>
+<xs:element name="lastName" type="xs:string" minOccurs="0"/>
+<xs:element name="phoneNumber" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
 </xs:complexType>
 
 <xs:complexType name="createFare">
@@ -450,6 +464,20 @@
 <xs:sequence/>
 </xs:complexType>
 
+<xs:complexType name="listOfConnectingFlightRecords">
+<xs:sequence>
+<xs:element name="arg0" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="arg1" type="xs:string" minOccurs="0"/>
+<xs:element name="arg2" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="listOfConnectingFlightRecordsResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:flightBundle" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="createFlightReservation">
 <xs:sequence>
 <xs:element name="arg0" type="xs:string" minOccurs="0"/>
@@ -462,20 +490,6 @@
 <xs:complexType name="createFlightReservationResponse">
 <xs:sequence>
 <xs:element name="return" type="tns:flightReservationEntity" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="listOfConnectingFlightRecords">
-<xs:sequence>
-<xs:element name="arg0" type="xs:dateTime" minOccurs="0"/>
-<xs:element name="arg1" type="xs:string" minOccurs="0"/>
-<xs:element name="arg2" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="listOfConnectingFlightRecordsResponse">
-<xs:sequence>
-<xs:element name="return" type="tns:flightBundle" minOccurs="0" maxOccurs="unbounded"/>
 </xs:sequence>
 </xs:complexType>
 

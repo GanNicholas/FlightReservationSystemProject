@@ -33,7 +33,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @NamedQuery(name = "queryFSPwithFlightNumber", query = "SELECT c FROM FlightSchedulePlanEntity c WHERE c.flightNumber = :flightNum")
-public abstract class FlightSchedulePlanEntity implements Serializable {
+public class FlightSchedulePlanEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id

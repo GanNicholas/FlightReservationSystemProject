@@ -30,6 +30,7 @@ import javax.validation.constraints.Size;
  * @author nickg
  */
 @Entity
+@NamedQuery(name = "findAirCraftConfig", query = "SELECT a FROM AircraftConfigurationEntity a WHERE a.aircraftName =:name")
 public class AircraftConfigurationEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;

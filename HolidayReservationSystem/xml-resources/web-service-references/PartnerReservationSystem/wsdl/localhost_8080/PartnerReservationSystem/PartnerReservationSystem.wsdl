@@ -4,99 +4,6 @@
 <xsd:import namespace="http://ws.session.ejb/" schemaLocation="http://localhost:8080/PartnerReservationSystem/PartnerReservationSystem?xsd=1"/>
 </xsd:schema>
 </types>
-<message name="retrieveOD">
-<part name="parameters" element="tns:retrieveOD"/>
-</message>
-<message name="retrieveODResponse">
-<part name="parameters" element="tns:retrieveODResponse"/>
-</message>
-<message name="FlightRouteDoesNotExistException">
-<part name="fault" element="tns:FlightRouteDoesNotExistException"/>
-</message>
-<message name="convertCalendar">
-<part name="parameters" element="tns:convertCalendar"/>
-</message>
-<message name="convertCalendarResponse">
-<part name="parameters" element="tns:convertCalendarResponse"/>
-</message>
-<message name="IncorrectFormatException">
-<part name="fault" element="tns:IncorrectFormatException"/>
-</message>
-<message name="createFare">
-<part name="parameters" element="tns:createFare"/>
-</message>
-<message name="createFareResponse">
-<part name="parameters" element="tns:createFareResponse"/>
-</message>
-<message name="getDirectFlight">
-<part name="parameters" element="tns:getDirectFlight"/>
-</message>
-<message name="getDirectFlightResponse">
-<part name="parameters" element="tns:getDirectFlightResponse"/>
-</message>
-<message name="reserveFlightEJB">
-<part name="parameters" element="tns:reserveFlightEJB"/>
-</message>
-<message name="reserveFlightEJBResponse">
-<part name="parameters" element="tns:reserveFlightEJBResponse"/>
-</message>
-<message name="loginCustomer">
-<part name="parameters" element="tns:loginCustomer"/>
-</message>
-<message name="loginCustomerResponse">
-<part name="parameters" element="tns:loginCustomerResponse"/>
-</message>
-<message name="CustomerLoginInvalid">
-<part name="fault" element="tns:CustomerLoginInvalid"/>
-</message>
-<message name="loginPartner">
-<part name="parameters" element="tns:loginPartner"/>
-</message>
-<message name="loginPartnerResponse">
-<part name="parameters" element="tns:loginPartnerResponse"/>
-</message>
-<message name="AccessFromWrongPortalException">
-<part name="fault" element="tns:AccessFromWrongPortalException"/>
-</message>
-<message name="createPassenger">
-<part name="parameters" element="tns:createPassenger"/>
-</message>
-<message name="createPassengerResponse">
-<part name="parameters" element="tns:createPassengerResponse"/>
-</message>
-<message name="listOfConnectingFlightRecordsLessThreeDays">
-<part name="parameters" element="tns:listOfConnectingFlightRecordsLessThreeDays"/>
-</message>
-<message name="listOfConnectingFlightRecordsLessThreeDaysResponse">
-<part name="parameters" element="tns:listOfConnectingFlightRecordsLessThreeDaysResponse"/>
-</message>
-<message name="retrieveIndividualFlightReservation">
-<part name="parameters" element="tns:retrieveIndividualFlightReservation"/>
-</message>
-<message name="retrieveIndividualFlightReservationResponse">
-<part name="parameters" element="tns:retrieveIndividualFlightReservationResponse"/>
-</message>
-<message name="FlightReservationDoesNotExistException">
-<part name="fault" element="tns:FlightReservationDoesNotExistException"/>
-</message>
-<message name="listOfConnectingFlightRecordsAftThreeDays">
-<part name="parameters" element="tns:listOfConnectingFlightRecordsAftThreeDays"/>
-</message>
-<message name="listOfConnectingFlightRecordsAftThreeDaysResponse">
-<part name="parameters" element="tns:listOfConnectingFlightRecordsAftThreeDaysResponse"/>
-</message>
-<message name="createFlightReservation">
-<part name="parameters" element="tns:createFlightReservation"/>
-</message>
-<message name="createFlightReservationResponse">
-<part name="parameters" element="tns:createFlightReservationResponse"/>
-</message>
-<message name="createIndivFlightRes">
-<part name="parameters" element="tns:createIndivFlightRes"/>
-</message>
-<message name="createIndivFlightResResponse">
-<part name="parameters" element="tns:createIndivFlightResResponse"/>
-</message>
 <message name="retrieveListOfReservation">
 <part name="parameters" element="tns:retrieveListOfReservation"/>
 </message>
@@ -112,74 +19,106 @@
 <message name="listOfConnectingFlightRecordsResponse">
 <part name="parameters" element="tns:listOfConnectingFlightRecordsResponse"/>
 </message>
+<message name="FlightRouteDoesNotExistException">
+<part name="fault" element="tns:FlightRouteDoesNotExistException"/>
+</message>
+<message name="createFlightReservation">
+<part name="parameters" element="tns:createFlightReservation"/>
+</message>
+<message name="createFlightReservationResponse">
+<part name="parameters" element="tns:createFlightReservationResponse"/>
+</message>
+<message name="createIndivFlightRes">
+<part name="parameters" element="tns:createIndivFlightRes"/>
+</message>
+<message name="createIndivFlightResResponse">
+<part name="parameters" element="tns:createIndivFlightResResponse"/>
+</message>
 <message name="convertCalendarExpiryDate">
 <part name="parameters" element="tns:convertCalendarExpiryDate"/>
 </message>
 <message name="convertCalendarExpiryDateResponse">
 <part name="parameters" element="tns:convertCalendarExpiryDateResponse"/>
 </message>
+<message name="IncorrectFormatException">
+<part name="fault" element="tns:IncorrectFormatException"/>
+</message>
+<message name="retrieveOD">
+<part name="parameters" element="tns:retrieveOD"/>
+</message>
+<message name="retrieveODResponse">
+<part name="parameters" element="tns:retrieveODResponse"/>
+</message>
+<message name="createFare">
+<part name="parameters" element="tns:createFare"/>
+</message>
+<message name="createFareResponse">
+<part name="parameters" element="tns:createFareResponse"/>
+</message>
+<message name="reserveFlightEJB">
+<part name="parameters" element="tns:reserveFlightEJB"/>
+</message>
+<message name="reserveFlightEJBResponse">
+<part name="parameters" element="tns:reserveFlightEJBResponse"/>
+</message>
+<message name="loginPartner">
+<part name="parameters" element="tns:loginPartner"/>
+</message>
+<message name="loginPartnerResponse">
+<part name="parameters" element="tns:loginPartnerResponse"/>
+</message>
+<message name="CustomerLoginInvalid">
+<part name="fault" element="tns:CustomerLoginInvalid"/>
+</message>
+<message name="AccessFromWrongPortalException">
+<part name="fault" element="tns:AccessFromWrongPortalException"/>
+</message>
+<message name="loginCustomer">
+<part name="parameters" element="tns:loginCustomer"/>
+</message>
+<message name="loginCustomerResponse">
+<part name="parameters" element="tns:loginCustomerResponse"/>
+</message>
+<message name="createPassenger">
+<part name="parameters" element="tns:createPassenger"/>
+</message>
+<message name="createPassengerResponse">
+<part name="parameters" element="tns:createPassengerResponse"/>
+</message>
+<message name="convertCalendar">
+<part name="parameters" element="tns:convertCalendar"/>
+</message>
+<message name="convertCalendarResponse">
+<part name="parameters" element="tns:convertCalendarResponse"/>
+</message>
+<message name="getDirectFlight">
+<part name="parameters" element="tns:getDirectFlight"/>
+</message>
+<message name="getDirectFlightResponse">
+<part name="parameters" element="tns:getDirectFlightResponse"/>
+</message>
+<message name="retrieveIndividualFlightReservation">
+<part name="parameters" element="tns:retrieveIndividualFlightReservation"/>
+</message>
+<message name="retrieveIndividualFlightReservationResponse">
+<part name="parameters" element="tns:retrieveIndividualFlightReservationResponse"/>
+</message>
+<message name="FlightReservationDoesNotExistException">
+<part name="fault" element="tns:FlightReservationDoesNotExistException"/>
+</message>
+<message name="listOfConnectingFlightRecordsLessThreeDays">
+<part name="parameters" element="tns:listOfConnectingFlightRecordsLessThreeDays"/>
+</message>
+<message name="listOfConnectingFlightRecordsLessThreeDaysResponse">
+<part name="parameters" element="tns:listOfConnectingFlightRecordsLessThreeDaysResponse"/>
+</message>
+<message name="listOfConnectingFlightRecordsAftThreeDays">
+<part name="parameters" element="tns:listOfConnectingFlightRecordsAftThreeDays"/>
+</message>
+<message name="listOfConnectingFlightRecordsAftThreeDaysResponse">
+<part name="parameters" element="tns:listOfConnectingFlightRecordsAftThreeDaysResponse"/>
+</message>
 <portType name="PartnerReservationSystem">
-<operation name="retrieveOD">
-<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/retrieveODRequest" message="tns:retrieveOD"/>
-<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/retrieveODResponse" message="tns:retrieveODResponse"/>
-<fault message="tns:FlightRouteDoesNotExistException" name="FlightRouteDoesNotExistException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/retrieveOD/Fault/FlightRouteDoesNotExistException"/>
-</operation>
-<operation name="convertCalendar">
-<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/convertCalendarRequest" message="tns:convertCalendar"/>
-<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/convertCalendarResponse" message="tns:convertCalendarResponse"/>
-<fault message="tns:IncorrectFormatException" name="IncorrectFormatException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/convertCalendar/Fault/IncorrectFormatException"/>
-</operation>
-<operation name="createFare">
-<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createFareRequest" message="tns:createFare"/>
-<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createFareResponse" message="tns:createFareResponse"/>
-</operation>
-<operation name="getDirectFlight">
-<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/getDirectFlightRequest" message="tns:getDirectFlight"/>
-<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/getDirectFlightResponse" message="tns:getDirectFlightResponse"/>
-<fault message="tns:FlightRouteDoesNotExistException" name="FlightRouteDoesNotExistException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/getDirectFlight/Fault/FlightRouteDoesNotExistException"/>
-</operation>
-<operation name="reserveFlightEJB">
-<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/reserveFlightEJBRequest" message="tns:reserveFlightEJB"/>
-<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/reserveFlightEJBResponse" message="tns:reserveFlightEJBResponse"/>
-</operation>
-<operation name="loginCustomer">
-<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/loginCustomerRequest" message="tns:loginCustomer"/>
-<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/loginCustomerResponse" message="tns:loginCustomerResponse"/>
-<fault message="tns:CustomerLoginInvalid" name="CustomerLoginInvalid" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/loginCustomer/Fault/CustomerLoginInvalid"/>
-</operation>
-<operation name="loginPartner">
-<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/loginPartnerRequest" message="tns:loginPartner"/>
-<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/loginPartnerResponse" message="tns:loginPartnerResponse"/>
-<fault message="tns:CustomerLoginInvalid" name="CustomerLoginInvalid" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/loginPartner/Fault/CustomerLoginInvalid"/>
-<fault message="tns:AccessFromWrongPortalException" name="AccessFromWrongPortalException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/loginPartner/Fault/AccessFromWrongPortalException"/>
-</operation>
-<operation name="createPassenger">
-<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createPassengerRequest" message="tns:createPassenger"/>
-<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createPassengerResponse" message="tns:createPassengerResponse"/>
-</operation>
-<operation name="listOfConnectingFlightRecordsLessThreeDays">
-<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/listOfConnectingFlightRecordsLessThreeDaysRequest" message="tns:listOfConnectingFlightRecordsLessThreeDays"/>
-<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/listOfConnectingFlightRecordsLessThreeDaysResponse" message="tns:listOfConnectingFlightRecordsLessThreeDaysResponse"/>
-<fault message="tns:FlightRouteDoesNotExistException" name="FlightRouteDoesNotExistException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/listOfConnectingFlightRecordsLessThreeDays/Fault/FlightRouteDoesNotExistException"/>
-</operation>
-<operation name="retrieveIndividualFlightReservation">
-<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/retrieveIndividualFlightReservationRequest" message="tns:retrieveIndividualFlightReservation"/>
-<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/retrieveIndividualFlightReservationResponse" message="tns:retrieveIndividualFlightReservationResponse"/>
-<fault message="tns:FlightReservationDoesNotExistException" name="FlightReservationDoesNotExistException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/retrieveIndividualFlightReservation/Fault/FlightReservationDoesNotExistException"/>
-</operation>
-<operation name="listOfConnectingFlightRecordsAftThreeDays">
-<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/listOfConnectingFlightRecordsAftThreeDaysRequest" message="tns:listOfConnectingFlightRecordsAftThreeDays"/>
-<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/listOfConnectingFlightRecordsAftThreeDaysResponse" message="tns:listOfConnectingFlightRecordsAftThreeDaysResponse"/>
-<fault message="tns:FlightRouteDoesNotExistException" name="FlightRouteDoesNotExistException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/listOfConnectingFlightRecordsAftThreeDays/Fault/FlightRouteDoesNotExistException"/>
-</operation>
-<operation name="createFlightReservation">
-<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createFlightReservationRequest" message="tns:createFlightReservation"/>
-<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createFlightReservationResponse" message="tns:createFlightReservationResponse"/>
-</operation>
-<operation name="createIndivFlightRes">
-<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createIndivFlightResRequest" message="tns:createIndivFlightRes"/>
-<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createIndivFlightResResponse" message="tns:createIndivFlightResResponse"/>
-</operation>
 <operation name="retrieveListOfReservation">
 <input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/retrieveListOfReservationRequest" message="tns:retrieveListOfReservation"/>
 <output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/retrieveListOfReservationResponse" message="tns:retrieveListOfReservationResponse"/>
@@ -190,158 +129,75 @@
 <output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/listOfConnectingFlightRecordsResponse" message="tns:listOfConnectingFlightRecordsResponse"/>
 <fault message="tns:FlightRouteDoesNotExistException" name="FlightRouteDoesNotExistException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/listOfConnectingFlightRecords/Fault/FlightRouteDoesNotExistException"/>
 </operation>
+<operation name="createFlightReservation">
+<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createFlightReservationRequest" message="tns:createFlightReservation"/>
+<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createFlightReservationResponse" message="tns:createFlightReservationResponse"/>
+</operation>
+<operation name="createIndivFlightRes">
+<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createIndivFlightResRequest" message="tns:createIndivFlightRes"/>
+<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createIndivFlightResResponse" message="tns:createIndivFlightResResponse"/>
+</operation>
 <operation name="convertCalendarExpiryDate">
 <input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/convertCalendarExpiryDateRequest" message="tns:convertCalendarExpiryDate"/>
 <output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/convertCalendarExpiryDateResponse" message="tns:convertCalendarExpiryDateResponse"/>
 <fault message="tns:IncorrectFormatException" name="IncorrectFormatException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/convertCalendarExpiryDate/Fault/IncorrectFormatException"/>
 </operation>
+<operation name="retrieveOD">
+<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/retrieveODRequest" message="tns:retrieveOD"/>
+<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/retrieveODResponse" message="tns:retrieveODResponse"/>
+<fault message="tns:FlightRouteDoesNotExistException" name="FlightRouteDoesNotExistException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/retrieveOD/Fault/FlightRouteDoesNotExistException"/>
+</operation>
+<operation name="createFare">
+<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createFareRequest" message="tns:createFare"/>
+<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createFareResponse" message="tns:createFareResponse"/>
+</operation>
+<operation name="reserveFlightEJB">
+<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/reserveFlightEJBRequest" message="tns:reserveFlightEJB"/>
+<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/reserveFlightEJBResponse" message="tns:reserveFlightEJBResponse"/>
+</operation>
+<operation name="loginPartner">
+<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/loginPartnerRequest" message="tns:loginPartner"/>
+<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/loginPartnerResponse" message="tns:loginPartnerResponse"/>
+<fault message="tns:CustomerLoginInvalid" name="CustomerLoginInvalid" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/loginPartner/Fault/CustomerLoginInvalid"/>
+<fault message="tns:AccessFromWrongPortalException" name="AccessFromWrongPortalException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/loginPartner/Fault/AccessFromWrongPortalException"/>
+</operation>
+<operation name="loginCustomer">
+<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/loginCustomerRequest" message="tns:loginCustomer"/>
+<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/loginCustomerResponse" message="tns:loginCustomerResponse"/>
+<fault message="tns:CustomerLoginInvalid" name="CustomerLoginInvalid" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/loginCustomer/Fault/CustomerLoginInvalid"/>
+</operation>
+<operation name="createPassenger">
+<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createPassengerRequest" message="tns:createPassenger"/>
+<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/createPassengerResponse" message="tns:createPassengerResponse"/>
+</operation>
+<operation name="convertCalendar">
+<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/convertCalendarRequest" message="tns:convertCalendar"/>
+<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/convertCalendarResponse" message="tns:convertCalendarResponse"/>
+<fault message="tns:IncorrectFormatException" name="IncorrectFormatException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/convertCalendar/Fault/IncorrectFormatException"/>
+</operation>
+<operation name="getDirectFlight">
+<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/getDirectFlightRequest" message="tns:getDirectFlight"/>
+<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/getDirectFlightResponse" message="tns:getDirectFlightResponse"/>
+<fault message="tns:FlightRouteDoesNotExistException" name="FlightRouteDoesNotExistException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/getDirectFlight/Fault/FlightRouteDoesNotExistException"/>
+</operation>
+<operation name="retrieveIndividualFlightReservation">
+<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/retrieveIndividualFlightReservationRequest" message="tns:retrieveIndividualFlightReservation"/>
+<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/retrieveIndividualFlightReservationResponse" message="tns:retrieveIndividualFlightReservationResponse"/>
+<fault message="tns:FlightReservationDoesNotExistException" name="FlightReservationDoesNotExistException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/retrieveIndividualFlightReservation/Fault/FlightReservationDoesNotExistException"/>
+</operation>
+<operation name="listOfConnectingFlightRecordsLessThreeDays">
+<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/listOfConnectingFlightRecordsLessThreeDaysRequest" message="tns:listOfConnectingFlightRecordsLessThreeDays"/>
+<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/listOfConnectingFlightRecordsLessThreeDaysResponse" message="tns:listOfConnectingFlightRecordsLessThreeDaysResponse"/>
+<fault message="tns:FlightRouteDoesNotExistException" name="FlightRouteDoesNotExistException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/listOfConnectingFlightRecordsLessThreeDays/Fault/FlightRouteDoesNotExistException"/>
+</operation>
+<operation name="listOfConnectingFlightRecordsAftThreeDays">
+<input wsam:Action="http://ws.session.ejb/PartnerReservationSystem/listOfConnectingFlightRecordsAftThreeDaysRequest" message="tns:listOfConnectingFlightRecordsAftThreeDays"/>
+<output wsam:Action="http://ws.session.ejb/PartnerReservationSystem/listOfConnectingFlightRecordsAftThreeDaysResponse" message="tns:listOfConnectingFlightRecordsAftThreeDaysResponse"/>
+<fault message="tns:FlightRouteDoesNotExistException" name="FlightRouteDoesNotExistException" wsam:Action="http://ws.session.ejb/PartnerReservationSystem/listOfConnectingFlightRecordsAftThreeDays/Fault/FlightRouteDoesNotExistException"/>
+</operation>
 </portType>
 <binding name="PartnerReservationSystemPortBinding" type="tns:PartnerReservationSystem">
 <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-<operation name="retrieveOD">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="FlightRouteDoesNotExistException">
-<soap:fault name="FlightRouteDoesNotExistException" use="literal"/>
-</fault>
-</operation>
-<operation name="convertCalendar">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="IncorrectFormatException">
-<soap:fault name="IncorrectFormatException" use="literal"/>
-</fault>
-</operation>
-<operation name="createFare">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-</operation>
-<operation name="getDirectFlight">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="FlightRouteDoesNotExistException">
-<soap:fault name="FlightRouteDoesNotExistException" use="literal"/>
-</fault>
-</operation>
-<operation name="reserveFlightEJB">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-</operation>
-<operation name="loginCustomer">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="CustomerLoginInvalid">
-<soap:fault name="CustomerLoginInvalid" use="literal"/>
-</fault>
-</operation>
-<operation name="loginPartner">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="CustomerLoginInvalid">
-<soap:fault name="CustomerLoginInvalid" use="literal"/>
-</fault>
-<fault name="AccessFromWrongPortalException">
-<soap:fault name="AccessFromWrongPortalException" use="literal"/>
-</fault>
-</operation>
-<operation name="createPassenger">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-</operation>
-<operation name="listOfConnectingFlightRecordsLessThreeDays">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="FlightRouteDoesNotExistException">
-<soap:fault name="FlightRouteDoesNotExistException" use="literal"/>
-</fault>
-</operation>
-<operation name="retrieveIndividualFlightReservation">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="FlightReservationDoesNotExistException">
-<soap:fault name="FlightReservationDoesNotExistException" use="literal"/>
-</fault>
-</operation>
-<operation name="listOfConnectingFlightRecordsAftThreeDays">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="FlightRouteDoesNotExistException">
-<soap:fault name="FlightRouteDoesNotExistException" use="literal"/>
-</fault>
-</operation>
-<operation name="createFlightReservation">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-</operation>
-<operation name="createIndivFlightRes">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-</operation>
 <operation name="retrieveListOfReservation">
 <soap:operation soapAction=""/>
 <input>
@@ -366,6 +222,24 @@
 <soap:fault name="FlightRouteDoesNotExistException" use="literal"/>
 </fault>
 </operation>
+<operation name="createFlightReservation">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="createIndivFlightRes">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
 <operation name="convertCalendarExpiryDate">
 <soap:operation soapAction=""/>
 <input>
@@ -376,6 +250,132 @@
 </output>
 <fault name="IncorrectFormatException">
 <soap:fault name="IncorrectFormatException" use="literal"/>
+</fault>
+</operation>
+<operation name="retrieveOD">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="FlightRouteDoesNotExistException">
+<soap:fault name="FlightRouteDoesNotExistException" use="literal"/>
+</fault>
+</operation>
+<operation name="createFare">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="reserveFlightEJB">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="loginPartner">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="CustomerLoginInvalid">
+<soap:fault name="CustomerLoginInvalid" use="literal"/>
+</fault>
+<fault name="AccessFromWrongPortalException">
+<soap:fault name="AccessFromWrongPortalException" use="literal"/>
+</fault>
+</operation>
+<operation name="loginCustomer">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="CustomerLoginInvalid">
+<soap:fault name="CustomerLoginInvalid" use="literal"/>
+</fault>
+</operation>
+<operation name="createPassenger">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="convertCalendar">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="IncorrectFormatException">
+<soap:fault name="IncorrectFormatException" use="literal"/>
+</fault>
+</operation>
+<operation name="getDirectFlight">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="FlightRouteDoesNotExistException">
+<soap:fault name="FlightRouteDoesNotExistException" use="literal"/>
+</fault>
+</operation>
+<operation name="retrieveIndividualFlightReservation">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="FlightReservationDoesNotExistException">
+<soap:fault name="FlightReservationDoesNotExistException" use="literal"/>
+</fault>
+</operation>
+<operation name="listOfConnectingFlightRecordsLessThreeDays">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="FlightRouteDoesNotExistException">
+<soap:fault name="FlightRouteDoesNotExistException" use="literal"/>
+</fault>
+</operation>
+<operation name="listOfConnectingFlightRecordsAftThreeDays">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="FlightRouteDoesNotExistException">
+<soap:fault name="FlightRouteDoesNotExistException" use="literal"/>
 </fault>
 </operation>
 </binding>

@@ -23,6 +23,7 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 @NamedQuery(name = "findFlightRoute", query = "SELECT a FROM FlightRouteEntity a WHERE a.originLocation =:origin AND a.destinationLocation =:destination")
+@NamedQuery(name = "findFlightRouteWithAirportName", query = "SELECT a FROM FlightRouteEntity a WHERE a.originLocation.iataAirportCode =:origin AND a.destinationLocation.iataAirportCode =:destination")
 public class FlightRouteEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
