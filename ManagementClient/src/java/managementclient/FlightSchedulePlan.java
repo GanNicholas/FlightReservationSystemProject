@@ -188,12 +188,12 @@ public class FlightSchedulePlan {
 
                 // run a for loop to take in a list of date and time
                 for (int i = 0; i < numSchedule; i++) {
-                    System.out.print("Please enter departure date and time (Please enter in this format: dd/mm/yyyy/hh/mm) ");
+                    System.out.print("Please enter departure date and time (Please enter in this format: dd/mm/yyyy/hh/mm, 24hours format) ");
                     String dateTime = sc.nextLine().trim();
                     try {
                         GregorianCalendar departDateTime = createDateTime(dateTime);
                         Date date = departDateTime.getTime();
-                        System.out.println(format.format(date));
+//                        System.out.println(format.format(date));
 
                         listOfDepartDateTime.add(departDateTime);
                     } catch (IncorrectFormatException ex) {
@@ -217,7 +217,7 @@ public class FlightSchedulePlan {
                         int choice = Integer.parseInt(choiceInString);
                         if (choice == 1) {
                             returnFlight = true;
-                            System.out.print("Please enter layover duration: ");
+                            System.out.print("Please enter layover duration (in minutes) : ");
                             layover = sc.nextInt();
                             sc.nextLine();
                         } else {
@@ -279,17 +279,55 @@ public class FlightSchedulePlan {
             listOfFares.clear();
             reenter = false;
             layover = 0;
+            int day = 0;
             System.out.print("Please enter flight number: ");
             String flightNumber = sc.nextLine().trim();
             System.out.print("Please enter frequency of flight schedule you wish to create: ");
             String numFrequencyString = sc.nextLine().trim();
             int numFrequency = Integer.parseInt(numFrequencyString);
 
-            System.out.print("Please enter departure date and time (Please enter in this format (dd/mm/yyyy/hh/mm) : ");
+            if (numFrequency == 7) {
+                System.out.print("Please enter day of week for schedule to start: ");
+                String dayOfWeek = sc.nextLine().trim();
+
+                if (dayOfWeek.toLowerCase().equals("monday")) {
+                    day = 1;
+                } else if (dayOfWeek.toLowerCase().equals("tuesday")) {
+                    day = 2;
+                } else if (dayOfWeek.toLowerCase().equals("wednesday")) {
+                    day = 3;
+                } else if (dayOfWeek.toLowerCase().equals("thursday")) {
+                    day = 4;
+                } else if (dayOfWeek.toLowerCase().equals("friday")) {
+                    day = 5;
+                } else if (dayOfWeek.toLowerCase().equals("saturday")) {
+                    day = 6;
+                } else if (dayOfWeek.toLowerCase().equals("sunday")) {
+                    day = 7;
+                }
+            }
+
+            System.out.print("Please enter departure date and time (Please enter in this format (dd/mm/yyyy/hh/mm), 24hours format : ");
             String dateTime = sc.nextLine().trim();
             GregorianCalendar departDateTime = null;
             try {
                 departDateTime = createDateTime(dateTime);
+
+                if (numFrequency == 7) {
+                    int dayOfWeek = departDateTime.get(GregorianCalendar.DAY_OF_WEEK);
+                    dayOfWeek--;
+//                System.out.println("Day of week: " + dayOfWeek);
+                    int diff = 0;
+                    if (day < dayOfWeek) {
+                        diff = 7 - dayOfWeek;
+                        diff += day;
+                    } else if (day > dayOfWeek) {
+                        diff = day - dayOfWeek;
+                    }
+
+                    departDateTime.add(GregorianCalendar.DATE, diff);
+                }
+//                System.out.println(format.format(departDateTime.getTime()));
             } catch (IncorrectFormatException ex) {
                 System.out.println(ex.getMessage());
                 reenter = true;
@@ -318,7 +356,7 @@ public class FlightSchedulePlan {
                     sc.nextLine();
                     if (choice == 1) {
                         returnFlight = true;
-                        System.out.print("Please enter layover duration: ");
+                        System.out.print("Please enter layover duration (in minutes) : ");
                         layover = sc.nextInt();
                         sc.nextLine();
                     } else {
@@ -396,7 +434,7 @@ public class FlightSchedulePlan {
                     while (stillHaveFare) {
 
                         if (cabinType.equals(CabinClassType.F) && !firstClass) {
-                            System.out.print("Please enter your fare basis code for First Class Cabin : ");
+                            System.out.print("Please enter your fare basis code for First Class Cabin : F ");
                             String fbc = "F" + sc.nextLine().trim();
                             System.out.print("Please enter fare amount: $");
                             BigDecimal fareAmount = sc.nextBigDecimal();
@@ -410,7 +448,7 @@ public class FlightSchedulePlan {
                                 firstClass = true;
                             }
                         } else if (cabinType.equals(CabinClassType.J) && !businessClass) {
-                            System.out.print("Please enter your fare basis code for Business Class Cabin : ");
+                            System.out.print("Please enter your fare basis code for Business Class Cabin : J ");
                             String fbc = "J" + sc.nextLine().trim();
                             System.out.print("Please enter fare amount: $");
                             BigDecimal fareAmount = sc.nextBigDecimal();
@@ -424,7 +462,7 @@ public class FlightSchedulePlan {
                                 businessClass = true;
                             }
                         } else if (cabinType.equals(CabinClassType.W) && !premiumEconomyClass) {
-                            System.out.print("Please enter your fare basis code for Premium Economy Class : ");
+                            System.out.print("Please enter your fare basis code for Premium Economy Class : W ");
                             String fbc = "W" + sc.nextLine().trim();
                             System.out.print("Please enter fare amount: $");
                             BigDecimal fareAmount = sc.nextBigDecimal();
@@ -438,7 +476,7 @@ public class FlightSchedulePlan {
                                 premiumEconomyClass = true;
                             }
                         } else if (cabinType.equals(CabinClassType.Y) && !economyClass) {
-                            System.out.print("Please enter your fare basis code for Economy Class : ");
+                            System.out.print("Please enter your fare basis code for Economy Class : Y ");
                             String fbc = "Y" + sc.nextLine().trim();
                             System.out.print("Please enter fare amount: $");
                             BigDecimal fareAmount = sc.nextBigDecimal();
@@ -585,7 +623,7 @@ public class FlightSchedulePlan {
             sc.next();
         }
     }
-    
+
     public void viewSpecificFspForAllFlight(Scanner sc) {
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         try {
@@ -657,7 +695,6 @@ public class FlightSchedulePlan {
             sc.next();
         }
     }
-    
 
     public void createFlight(Scanner sc) {
         String choice = "";
@@ -676,7 +713,7 @@ public class FlightSchedulePlan {
                     } else {
                         returnRouteStr = "Return route does not exists";
                     }
-                    System.out.printf("%-20d%-45s%-45s%-30s", fr.getFlightRouteId(), fr.getOriginLocation().getAirportName(), fr.getDestinationLocation().getAirportName(), returnRouteStr);
+                    System.out.printf("%-20d%-45s%-45s%-30s", fr.getFlightRouteId(), fr.getOriginLocation().getIataAirportCode(), fr.getDestinationLocation().getIataAirportCode(), returnRouteStr);
                     System.out.println();
                 }
             }
@@ -797,12 +834,6 @@ public class FlightSchedulePlan {
                             System.out.println();
                             break;
                         } else {
-//                            if (!flight.isIsMainRoute()) {
-//                                System.out.println("Flight is not the main flight! Please select the main flight to update!");
-//                                System.out.println();
-//                            } else if (flight.isIsDeleted()) {
-//                                System.out.println("Flight is no longer active! Please select another flight!");
-//                            }
                             System.out.println("You cannot pick the same flight route! Please select a different flight route!");
                             System.out.println();
                         }
@@ -841,7 +872,7 @@ public class FlightSchedulePlan {
                     System.out.println("Please enter a valid choice!");
                     counter++;
                 }
-            } catch (FlightDoesNotExistException | FlightRouteDoesNotExistException | AircraftConfigurationNotExistException | InputMismatchException | FlightHasFlightSchedulePlanException  ex) {
+            } catch (FlightDoesNotExistException | FlightRouteDoesNotExistException | AircraftConfigurationNotExistException | InputMismatchException | FlightHasFlightSchedulePlanException ex) {
                 System.out.println(ex.getMessage());
                 if (ex instanceof InputMismatchException) {
                     sc.next();
@@ -994,14 +1025,9 @@ public class FlightSchedulePlan {
                 FlightScheduleEntity fs = fsp.getListOfFlightSchedule().get(0);
                 FlightScheduleEntity returnFs = null;
                 boolean returnFlight = false;
-//                    if (fs.getFlightSchedulePlan().getReturnFlightSchedulePlan() == null) { // one way flight
+
                 canEdit = flightScheduleSessionBean.checkFlightScheduleSeats(fs);
-//                    } else if (fs.getFlightSchedulePlan().getReturnFlightSchedulePlan() != null) { // two way flight
-//                        canEdit = flightScheduleSessionBean.checkFlightScheduleSeats(fs);
-//                        returnFs = fs.getFlightSchedulePlan().getReturnFlightSchedulePlan().getListOfFlightSchedule().get(0);
-//                        canEdit = flightScheduleSessionBean.checkFlightScheduleSeats(returnFs);
-//                        returnFlight = true;
-//                    }
+
                 //means flight has existing reservations and cannot be edited
                 if (canEdit == false) {
                     System.out.println("Flight Schedule Plan has a flight schedule with reservations made! Changes can not longer be made!");
@@ -1019,7 +1045,7 @@ public class FlightSchedulePlan {
 
                         if (fsChoice == 1) {
                             System.out.println();
-                            System.out.print("Please enter departure date and time (Please enter in this format: dd/mm/yyyy/hh/mm) ");
+                            System.out.print("Please enter departure date and time (Please enter in this format: dd/mm/yyyy/hh/mm, 24hours format) ");
                             String dateTime = sc.nextLine().trim();
                             try {
                                 GregorianCalendar departDateTime = createDateTime(dateTime);
@@ -1031,7 +1057,7 @@ public class FlightSchedulePlan {
 
                                 if (choice.toLowerCase().equals("y")) {
 
-                                    System.out.println("What is the new flight duration: ");
+                                    System.out.println("What is the new flight duration (in minutes) : ");
                                     int newFlightDuration = sc.nextInt();
                                     sc.nextLine();
 
@@ -1081,7 +1107,7 @@ public class FlightSchedulePlan {
                     if (subchoice == 1) {
 
                         try {
-                            System.out.print("Please enter departure date and time (Please enter in this format: dd/mm/yyyy/hh/mm) ");
+                            System.out.print("Please enter departure date and time (Please enter in this format: dd/mm/yyyy/hh/mm, 24hours format) ");
                             String dateTime = sc.nextLine().trim();
                             GregorianCalendar departDateTime = createDateTime(dateTime);
                             Date date = departDateTime.getTime();
@@ -1111,7 +1137,7 @@ public class FlightSchedulePlan {
                                     sc.nextLine();
                                     System.out.println();
                                     if (decision == 1) {
-                                        System.out.print("Please enter departure date and time (Please enter in this format: dd/mm/yyyy/hh/mm) ");
+                                        System.out.print("Please enter departure date and time (Please enter in this format: dd/mm/yyyy/hh/mm, 24hours format) ");
                                         String dateTime = sc.nextLine().trim();
                                         try {
                                             GregorianCalendar departDateTime = createDateTime(dateTime);
@@ -1123,7 +1149,7 @@ public class FlightSchedulePlan {
 
                                             if (choice.toLowerCase().equals("y")) {
 
-                                                System.out.println("What is the new flight duration: ");
+                                                System.out.println("What is the new flight duration (in minutes) : ");
                                                 int newFlightDuration = sc.nextInt();
                                                 sc.nextLine();
 
@@ -1200,6 +1226,8 @@ public class FlightSchedulePlan {
                 int choice = sc.nextInt();
                 sc.nextLine();
 
+                int day = 0;
+
                 if (choice == 1) {
                     boolean reenter = false;
                     int layover = 0;
@@ -1209,17 +1237,53 @@ public class FlightSchedulePlan {
                     String numFrequencyString = sc.nextLine().trim();
                     int numFrequency = Integer.parseInt(numFrequencyString);
 
-                    System.out.print("Please enter departure date and time (Please enter in this format (dd/mm/yyyy/hh/mm) : ");
+                    if (numFrequency == 7) {
+                        System.out.print("Please enter day of week for schedule to start: ");
+                        String dayOfWeek = sc.nextLine().trim();
+
+                        if (dayOfWeek.toLowerCase().equals("monday")) {
+                            day = 1;
+                        } else if (dayOfWeek.toLowerCase().equals("tuesday")) {
+                            day = 2;
+                        } else if (dayOfWeek.toLowerCase().equals("wednesday")) {
+                            day = 3;
+                        } else if (dayOfWeek.toLowerCase().equals("thursday")) {
+                            day = 4;
+                        } else if (dayOfWeek.toLowerCase().equals("friday")) {
+                            day = 5;
+                        } else if (dayOfWeek.toLowerCase().equals("saturday")) {
+                            day = 6;
+                        } else if (dayOfWeek.toLowerCase().equals("sunday")) {
+                            day = 7;
+                        }
+                    }
+
+                    System.out.print("Please enter departure date and time (Please enter in this format (dd/mm/yyyy/hh/mm, 24hours format) : ");
                     String dateTime = sc.nextLine().trim();
                     GregorianCalendar departDateTime = null;
                     try {
                         departDateTime = createDateTime(dateTime);
+
+                        if (numFrequency == 7) {
+                            int dayOfWeek = departDateTime.get(GregorianCalendar.DAY_OF_WEEK);
+                            dayOfWeek--;
+                            int diff = 0;
+                            if (day < dayOfWeek) {
+                                diff = 7 - dayOfWeek;
+                                diff += day;
+                            } else if (day > dayOfWeek) {
+                                diff = day - dayOfWeek;
+                            }
+
+                            departDateTime.add(GregorianCalendar.DATE, diff);
+                        }
+
                     } catch (IncorrectFormatException ex) {
                         System.out.println(ex.getMessage());
                         reenter = true;
                     }
                     //maybe can add if statement for reenter
-                    System.out.print("Please enter end date (dd/mm/yyyy/hh/mm) : ");
+                    System.out.print("Please enter end date (dd/mm/yyyy/hh/mm, 24hours format) : ");
                     String endDateTimeStr = sc.nextLine().trim();
                     GregorianCalendar endDateTime = null;
                     try {
@@ -1238,33 +1302,12 @@ public class FlightSchedulePlan {
                         flightSchedulePlanSessionBean.updateRecurrentFSP(flightNumber, departDateTime, endDateTime, flightDuration, numFrequency, fsp);
                         System.out.println("Flight Schedule Plan for Flight " + fsp.getFlightNumber() + " has been updated!");
 
-//                        FlightEntity flight = null;
-//                        boolean returnFlight = false;
-//                        try {
-//                            flight = flightSessionBean.viewFlightDetails(flightNumber);
-//                            if (flight.getReturnFlight() != null) {
-//                                System.out.println("Please enter if you would like to create a return flight schedule plan for your existing flight? (1 for yes)");
-//                                System.out.print("Please enter your choice: ");
-//                                int choice3 = sc.nextInt();
-//                                sc.nextLine();
-//                                if (choice3 == 1) {
-//                                    returnFlight = true;
-//                                    System.out.print("Please enter layover duration: ");
-//                                    layover = sc.nextInt();
-//                                    sc.nextLine();
-//                                } else {
-//                                    returnFlight = false;
-//                                }
-//                            }
-//                        } catch (FlightDoesNotExistException ex) {
-//                            System.out.println(ex.getMessage());
-//                        }
+
                     }
                 } else {
                     System.out.println("Unable to edit Recurring Flight Schedule Plan!");
                 }
-            } else if (mainChoice == 1) { //TO DELETE
-            } else if (mainChoice == 2) {
+            }  else if (mainChoice == 2) {
 
                 int choice = 0;
                 while (choice != 4) {
@@ -1290,7 +1333,7 @@ public class FlightSchedulePlan {
                         sc.nextLine();
 
                         if (fareChoice == 1) {
-                            System.out.print("Please enter your fare basis code for First Class Cabin : ");
+                            System.out.print("Please enter your fare basis code for First Class Cabin : F ");
                             String fbc = "F" + sc.nextLine().trim();
                             System.out.print("Please enter fare amount: $");
                             BigDecimal fareAmount = sc.nextBigDecimal();
@@ -1299,7 +1342,7 @@ public class FlightSchedulePlan {
                             fsp.getListOfFare().add(newFare);
                             topersist = true;
                         } else if (fareChoice == 2) {
-                            System.out.print("Please enter your fare basis code for Business Class Cabin : ");
+                            System.out.print("Please enter your fare basis code for Business Class Cabin : J ");
                             String fbc = "J" + sc.nextLine().trim();
                             System.out.print("Please enter fare amount: $");
                             BigDecimal fareAmount = sc.nextBigDecimal();
@@ -1308,7 +1351,7 @@ public class FlightSchedulePlan {
                             fsp.getListOfFare().add(newFare);
                             topersist = true;
                         } else if (fareChoice == 3) {
-                            System.out.print("Please enter your fare basis code for Premium Economy Class : ");
+                            System.out.print("Please enter your fare basis code for Premium Economy Class : W ");
                             String fbc = "W" + sc.nextLine().trim();
                             System.out.print("Please enter fare amount: $");
                             BigDecimal fareAmount = sc.nextBigDecimal();
@@ -1317,7 +1360,7 @@ public class FlightSchedulePlan {
                             fsp.getListOfFare().add(newFare);
                             topersist = true;
                         } else if (fareChoice == 4) {
-                            System.out.print("Please enter your fare basis code for Economy Class : ");
+                            System.out.print("Please enter your fare basis code for Economy Class : Y ");
                             String fbc = "Y" + sc.nextLine().trim();
                             System.out.print("Please enter fare amount: $");
                             BigDecimal fareAmount = sc.nextBigDecimal();
@@ -1357,7 +1400,7 @@ public class FlightSchedulePlan {
                         int fareChoice = sc.nextInt();
                         sc.nextLine();
                         if (fareChoice == 1) {
-                            System.out.print("Please enter the new fare basis code: ");
+                            System.out.print("Please enter the new fare basis code: " + fare.getCabinType() + " ");
                             String fareBasis = fare.getCabinType() + sc.nextLine().trim();
                             fare.setFareBasisCode(fareBasis);
                             flightSchedulePlanSessionBean.mergeFare(fare);
@@ -1389,7 +1432,7 @@ public class FlightSchedulePlan {
 
                         flightSchedulePlanSessionBean.deleteFare(fareId, fsp);
                         System.out.println("Fare " + fareId + " has been deleted for flight " + fsp.getFlightNumber());
-
+                        
                     }
                 }
 

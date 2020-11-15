@@ -11,6 +11,7 @@ import ejb.session.stateless.FlightReservationSessionBeanRemote;
 import ejb.session.stateless.FlightRouteSessionBeanRemote;
 import ejb.session.stateless.FlightScheduleSessionBeanRemote;
 import ejb.session.stateless.FlightSessionBeanRemote;
+import entity.AircraftConfigurationEntity;
 import entity.AircraftTypeEntity;
 import entity.AirportEntity;
 import entity.CabinClassConfigurationEntity;
@@ -122,7 +123,7 @@ public class Customer {
         while (!input.equals("4")) {
             System.out.println("Welcome ");
             Scanner sc = new Scanner(System.in);
-            System.out.println("1. Seach for flight");
+            System.out.println("1. Search for flight");
             System.out.println("2. View my flight reservations");
             System.out.println("3. View my flight reservation details");
             System.out.println("4. Log out");
@@ -283,10 +284,10 @@ public class Customer {
                         cabinType.add("All");
                     }
                 }
-                System.out.print("Enter departure airport: ");
+                System.out.print("Enter departure airport: (IATA CODE) ");
                 departureAirport = sc.nextLine().trim();
 
-                System.out.print("Enter destination airport: ");
+                System.out.print("Enter destination airport:(IATA CODE) ");
                 destinationAirport = sc.nextLine().trim();
 
                 System.out.print("Enter depature date:(dd/mm/yyyy) ");
@@ -349,10 +350,6 @@ public class Customer {
 
                     returnDateThreeDateAfter = (GregorianCalendar) currentSearchReturnDate.clone();
                     returnDateThreeDateAfter.add(GregorianCalendar.DATE, 4);
-                    System.out.println("three days before : " + format.format(returnDateThreeDateBefore.getTime()));
-                    System.out.println("on the actual days  : " + format.format(currentSearchReturnDate.getTime()));
-                    System.out.println("on the end actual days  : " + format.format(returnGActualEnd.getTime()));
-                    System.out.println("three days after : " + format.format(returnDateThreeDateAfter.getTime()));
 
                 }
                 Comparator<FlightBundle> sortFlightScheduleDepart = (FlightBundle p1, FlightBundle p2) -> (int) p1.getDepartOne().getDepartureDateTime().getTime().getTime() - (int) p2.getDepartOne().getDepartureDateTime().getTime().getTime();
@@ -540,25 +537,30 @@ public class Customer {
                 passingOverToReservation.add(fb);
                 while (!flight.equalsIgnoreCase("Y")) {
                     System.out.println("Do you still want to add? Y/N");
+                    flight = sc.nextLine();
+                    if (!flight.equalsIgnoreCase("Y")) {
+                        break;
+                    }
                     System.out.println("Please enter the flight you want to reserve for flying over:");
                     flight = sc.nextLine();
+
                     FlightBundle f2 = listOfFlightBundles.get(Integer.parseInt(flight) - 1);
                     passingOverToReservation.add(f2);
                 }
                 for (int i = 0; i < passingOverToReservation.size(); i++) {
                     System.out.println("---------------------");
-                    System.out.println("flight no:" + passingOverToReservation.get(i).getDepartOne().getFlightSchedulePlan().getFlightNumber() + " || departure date time" + passingOverToReservation.get(i).getDepartOne().getDepartureDateTime() + " cabin type: " + passingOverToReservation.get(i).getDepartOneCabinClassType() + " fare :" + passingOverToReservation.get(i).getDepartOneFare().getFareAmount());
+                    System.out.println("flight no:" + passingOverToReservation.get(i).getDepartOne().getFlightSchedulePlan().getFlightNumber() + " || departure date time" + format.format(passingOverToReservation.get(i).getDepartOne().getDepartureDateTime().getTime()) + " cabin type: " + passingOverToReservation.get(i).getDepartOneCabinClassType() + " fare :" + passingOverToReservation.get(i).getDepartOneFare().getFareAmount());
                     if (passingOverToReservation.get(i).getDepartTwo() != null) {
-                        System.out.println("flight no:" + passingOverToReservation.get(i).getDepartTwo().getFlightSchedulePlan().getFlightNumber() + " || departure date time" + passingOverToReservation.get(i).getDepartTwo().getDepartureDateTime() + " cabin type: " + passingOverToReservation.get(i).getDepartTwoCabinClassType() + " fare :" + passingOverToReservation.get(i).getDepartTwoFare().getFareAmount());
+                        System.out.println("flight no:" + passingOverToReservation.get(i).getDepartTwo().getFlightSchedulePlan().getFlightNumber() + " || departure date time" + format.format(passingOverToReservation.get(i).getDepartTwo().getDepartureDateTime().getTime()) + " cabin type: " + passingOverToReservation.get(i).getDepartTwoCabinClassType() + " fare :" + passingOverToReservation.get(i).getDepartTwoFare().getFareAmount());
 
                     }
                     if (passingOverToReservation.get(i).getDepartThree() != null) {
-                        System.out.println("flight no:" + passingOverToReservation.get(i).getDepartThree().getFlightSchedulePlan().getFlightNumber() + " || departure date time" + passingOverToReservation.get(i).getDepartThree().getDepartureDateTime() + " cabin type: " + passingOverToReservation.get(i).getDepartThreeCabinClassType() + " fare :" + passingOverToReservation.get(i).getDepartThreeFare().getFareAmount());
+                        System.out.println("flight no:" + passingOverToReservation.get(i).getDepartThree().getFlightSchedulePlan().getFlightNumber() + " || departure date time" + format.format(passingOverToReservation.get(i).getDepartThree().getDepartureDateTime().getTime()) + " cabin type: " + passingOverToReservation.get(i).getDepartThreeCabinClassType() + " fare :" + passingOverToReservation.get(i).getDepartThreeFare().getFareAmount());
 
                     }
                     System.out.println("---------------------");
                 }
-                reserveFlight(fb, origin, destination, Integer.parseInt(passenger));
+                reserveFlight(passingOverToReservation, origin, destination, Integer.parseInt(passenger));
 
             } catch (NumberFormatException ex) {
                 System.out.println("You have invalid input");
@@ -1113,85 +1115,82 @@ public class Customer {
     }
 
     //index 0 start flight, index 1 connecting/end flight/returnflight, index 2 connecting/end flight
-    public void reserveFlight(FlightBundle flightBundleForReservation, AirportEntity origin, AirportEntity destination, int numberOfPassengers) {
+    public void reserveFlight(List<FlightBundle> listOfflightBundleForReservation, AirportEntity origin, AirportEntity destination, int numberOfPassengers) {
         Scanner sc = new Scanner(System.in);
-
-        FlightScheduleEntity fs1 = flightBundleForReservation.getDepartOne();
-        CabinClassType cabinForFs1 = flightBundleForReservation.getDepartOneCabinClassType();
-        FareEntity fareForFs1 = flightBundleForReservation.getDepartOneFare();
-
-        FlightScheduleEntity fs2 = flightBundleForReservation.getDepartTwo();
-        CabinClassType cabinForFs2 = flightBundleForReservation.getDepartTwoCabinClassType();
-        FareEntity fareForFs2 = flightBundleForReservation.getDepartTwoFare();
-
-        FlightScheduleEntity fs3 = flightBundleForReservation.getDepartThree();
-        CabinClassType cabinForFs3 = flightBundleForReservation.getDepartThreeCabinClassType();
-        FareEntity fareForFs3 = flightBundleForReservation.getDepartThreeFare();
-
-        FlightScheduleEntity returnFs1 = flightBundleForReservation.getReturnOne();
-        CabinClassType cabinForReturnFs1 = flightBundleForReservation.getReturnOneCabinClassType();
-        FareEntity fareForReturnFs1 = flightBundleForReservation.getReturnOneFare();
-
-        FlightScheduleEntity returnFs2 = flightBundleForReservation.getReturnTwo();
-        CabinClassType cabinForReturnFs2 = flightBundleForReservation.getReturnTwoCabinClassType();
-        FareEntity fareForReturnFs2 = flightBundleForReservation.getReturnTwoFare();
-
-        FlightScheduleEntity returnFs3 = flightBundleForReservation.getReturnThree();
-        CabinClassType cabinForReturnFs3 = flightBundleForReservation.getReturnThreeCabinClassType();
-        FareEntity fareForReturnFs3 = flightBundleForReservation.getReturnThreeFare();
-
+        List<FlightReservationEntity> listOfFlightRes = new ArrayList<>();
         List<PassengerEntity> listOfPassengers = new ArrayList<>();
 
-        List<FlightReservationEntity> listOfFlightRes = new ArrayList<>();
+        FlightBundle firstBundle = listOfflightBundleForReservation.get(0);
+        FlightScheduleEntity fs1 = firstBundle.getDepartOne();
+        CabinClassType cabinForFs1 = firstBundle.getDepartOneCabinClassType();
+        FareEntity fareForFs1 = firstBundle.getDepartOneFare();
+
+        FlightScheduleEntity fs2 = firstBundle.getDepartTwo();
+        CabinClassType cabinForFs2 = firstBundle.getDepartTwoCabinClassType();
+        FareEntity fareForFs2 = firstBundle.getDepartTwoFare();
+
+        FlightScheduleEntity fs3 = firstBundle.getDepartThree();
+        CabinClassType cabinForFs3 = firstBundle.getDepartThreeCabinClassType();
+        FareEntity fareForFs3 = firstBundle.getDepartThreeFare();
+
+        FlightScheduleEntity returnFs1 = firstBundle.getReturnOne();
+        CabinClassType cabinForReturnFs1 = firstBundle.getReturnOneCabinClassType();
+        FareEntity fareForReturnFs1 = firstBundle.getReturnOneFare();
+
+        FlightScheduleEntity returnFs2 = firstBundle.getReturnTwo();
+        CabinClassType cabinForReturnFs2 = firstBundle.getReturnTwoCabinClassType();
+        FareEntity fareForReturnFs2 = firstBundle.getReturnTwoFare();
+
+        FlightScheduleEntity returnFs3 = firstBundle.getReturnThree();
+        CabinClassType cabinForReturnFs3 = firstBundle.getReturnThreeCabinClassType();
+        FareEntity fareForReturnFs3 = firstBundle.getReturnThreeFare();
 
         FlightReservationEntity flightRes = new FlightReservationEntity(origin.getIataAirportCode(), destination.getIataAirportCode(), BigDecimal.ZERO, customer);
-//            List<IndividualFlightReservationEntity> listOfIndividualFlightRes = new ArrayList<>();
 
-        //3 flights total
-        if (fs2 != null && fs3 != null) {
-            BigDecimal amountForFs1 = fareForFs1.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
-            IndividualFlightReservationEntity indivResForFs1 = new IndividualFlightReservationEntity(fs1, customer, amountForFs1, flightRes);
-            BigDecimal amountForFs2 = fareForFs2.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
-            IndividualFlightReservationEntity indivResForFs2 = new IndividualFlightReservationEntity(fs2, customer, amountForFs2, flightRes);
-            BigDecimal amountForFs3 = fareForFs3.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
-            IndividualFlightReservationEntity indivResForFs3 = new IndividualFlightReservationEntity(fs3, customer, amountForFs3, flightRes);
+        FlightReservationEntity returnFlightRes = null;
+        if (returnFs1 != null) {
+            returnFlightRes = new FlightReservationEntity(destination.getIataAirportCode(), origin.getIataAirportCode(), BigDecimal.ZERO, customer);
+        }
 
-            //  FOR TESTING!!
-//            IndividualFlightReservationEntity indivResForFs1 = new IndividualFlightReservationEntity(fs1, customer, BigDecimal.TEN, flightRes);
-//            IndividualFlightReservationEntity indivResForFs2 = new IndividualFlightReservationEntity(fs2, customer, BigDecimal.TEN, flightRes);
-//            IndividualFlightReservationEntity indivResForFs3 = new IndividualFlightReservationEntity(fs3, customer, BigDecimal.TEN, flightRes);
-            for (int i = 0; i < numberOfPassengers; i++) {
+        IndividualFlightReservationEntity indivResForFs1 = new IndividualFlightReservationEntity(fs1, customer, BigDecimal.ZERO, flightRes);
+        IndividualFlightReservationEntity indivResForFs2 = new IndividualFlightReservationEntity(fs2, customer, BigDecimal.ZERO, flightRes);
+        IndividualFlightReservationEntity indivResForFs3 = new IndividualFlightReservationEntity(fs3, customer, BigDecimal.ZERO, flightRes);
+
+        IndividualFlightReservationEntity indivResForReturnFs1 = new IndividualFlightReservationEntity(returnFs1, customer, BigDecimal.ZERO, returnFlightRes);
+        IndividualFlightReservationEntity indivResForReturnFs2 = new IndividualFlightReservationEntity(returnFs2, customer, BigDecimal.ZERO, returnFlightRes);
+        IndividualFlightReservationEntity indivResForReturnFs3 = new IndividualFlightReservationEntity(returnFs3, customer, BigDecimal.ZERO, returnFlightRes);
+
+        for (FlightBundle flightBundleForReservation : listOfflightBundleForReservation) {
+            System.out.print("Please enter Passenger first name: ");
+            String firstName = sc.nextLine();
+            System.out.print("Please enter Passenger last name: ");
+            String lastName = sc.nextLine();
+            System.out.print("Please enter Passenger passport number: ");
+            String passportNumber = sc.nextLine().trim();
+            PassengerEntity passenger = new PassengerEntity(firstName, lastName, passportNumber);
+            listOfPassengers.add(passenger);
+
+            cabinForFs1 = flightBundleForReservation.getDepartOneCabinClassType();
+
+            cabinForFs2 = flightBundleForReservation.getDepartTwoCabinClassType();
+
+            cabinForFs3 = flightBundleForReservation.getDepartThreeCabinClassType();
+
+            cabinForReturnFs1 = flightBundleForReservation.getReturnOneCabinClassType();
+
+            cabinForReturnFs2 = flightBundleForReservation.getReturnTwoCabinClassType();
+
+            cabinForReturnFs3 = flightBundleForReservation.getReturnThreeCabinClassType();
+
+            numberOfPassengers += 1;
+            //3 flights total
+            if (fs2 != null && fs3 != null) {
+
                 List<SeatEntity> listOfSeatsForFs1 = findSeatsForCustomer(fs1, cabinForFs1);
-//           
 
-                System.out.print("Please enter Passenger first name: ");
-                String firstName = sc.nextLine();
-                System.out.print("Please enter Passenger last name: ");
-                String lastName = sc.nextLine();
-                System.out.print("Please enter Passenger passport number: ");
-                String passportNumber = sc.nextLine().trim();
-                PassengerEntity passenger = new PassengerEntity(firstName, lastName, passportNumber);
-                listOfPassengers.add(passenger);
+                printSeats(listOfSeatsForFs1);
 
-                System.out.printf("%-20s,%-20s%-20s", "Seat ID", "Seat Number", "Cabin Class");
-                System.out.println("\n");
-                for (SeatEntity seat : listOfSeatsForFs1) {
-                    String cabinType = "";
-                    if (seat.getCabinType().equals(CabinClassType.F)) {
-                        cabinType = "First Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.J)) {
-                        cabinType = "Business Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.W)) {
-                        cabinType = "Premium Economy Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.Y)) {
-                        cabinType = "Economy Class";
-                    }
-
-                    System.out.printf("%-20s%-20s%-20s", seat.getSeatId(), seat.getSeatNumber(), cabinType);
-                    System.out.println();
-                }
-
-                System.out.print("Please enter seat number for passenger for first flight: ");
+                System.out.print("Please enter seat number for passenger " + "for passenger " + passenger.getFirstName() + " first flight: ");
                 String seatNumber = sc.nextLine().trim();
                 SeatEntity seat = findSeat(seatNumber, listOfSeatsForFs1);
                 if (seat == null) {
@@ -1202,38 +1201,19 @@ public class Customer {
                     seat.setReserved(true);
                     FareEntity newFareForFs1 = new FareEntity(fareForFs1.getFareBasisCode(), fareForFs1.getFareAmount(), fareForFs1.getCabinType());
                     seat.setFare(newFareForFs1);
-
-//                    FareEntity newFare = new FareEntity("Y1020", BigDecimal.TEN, cabinForFs1);
-//                    seat.setFare(newFare);
                     seat.setPassenger(passenger);
                     indivResForFs1.getListOfSeats().add(seat);
                     indivResForFs1.getListOfPassenger().add(passenger);
-
+                    BigDecimal totalAmt = indivResForFs1.getAmount().add(newFareForFs1.getFareAmount());
+                    indivResForFs1.setAmount(totalAmt);
                 }
 
                 //create fs2
                 List<SeatEntity> listOfSeatsForFs2 = findSeatsForCustomer(fs2, cabinForFs2);
-//            
 
-                System.out.printf("%-20s,%-20s%-20s", "Seat ID", "Seat Number", "Cabin Class");
-                System.out.println("\n");
-                for (SeatEntity seatfs2 : listOfSeatsForFs2) {
-                    String cabinType = "";
-                    if (seat.getCabinType().equals(CabinClassType.F)) {
-                        cabinType = "First Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.J)) {
-                        cabinType = "Business Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.W)) {
-                        cabinType = "Premium Economy Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.Y)) {
-                        cabinType = "Economy Class";
-                    }
+                printSeats(listOfSeatsForFs2);
 
-                    System.out.printf("%-20s%-20s%-20s", seatfs2.getSeatId(), seatfs2.getSeatNumber(), cabinType);
-                    System.out.println();
-                }
-
-                System.out.print("Please enter seat number for passenger second flight: ");
+                System.out.print("Please enter seat number " + "for passenger " + passenger.getFirstName() + " second flight: ");
                 String seatNumberfs2 = sc.nextLine().trim();
                 SeatEntity seatfs2 = findSeat(seatNumberfs2, listOfSeatsForFs2);
                 if (seatfs2 == null) {
@@ -1245,37 +1225,20 @@ public class Customer {
                     FareEntity newFareForFs2 = new FareEntity(fareForFs2.getFareBasisCode(), fareForFs2.getFareAmount(), fareForFs2.getCabinType());
                     seatfs2.setFare(newFareForFs2);
 
-//                    FareEntity newFare = new FareEntity("Y1020", BigDecimal.TEN, cabinForFs2);
-//                    seatfs2.setFare(newFare);
                     seatfs2.setPassenger(passenger);
                     indivResForFs2.getListOfSeats().add(seatfs2);
                     indivResForFs2.getListOfPassenger().add(passenger);
+                    BigDecimal totalAmt = indivResForFs2.getAmount().add(newFareForFs2.getFareAmount());
+                    indivResForFs2.setAmount(totalAmt);
 
                 }
 
                 //create fs3
                 List<SeatEntity> listOfSeatsForFs3 = findSeatsForCustomer(fs3, cabinForFs3);
-//                
 
-                System.out.printf("%-20s,%-20s%-20s", "Seat ID", "Seat Number", "Cabin Class");
-                System.out.println("\n");
-                for (SeatEntity seatfs3 : listOfSeatsForFs3) {
-                    String cabinType = "";
-                    if (seat.getCabinType().equals(CabinClassType.F)) {
-                        cabinType = "First Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.J)) {
-                        cabinType = "Business Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.W)) {
-                        cabinType = "Premium Economy Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.Y)) {
-                        cabinType = "Economy Class";
-                    }
+                printSeats(listOfSeatsForFs3);
 
-                    System.out.printf("%-20s%-20s%-20s", seatfs3.getSeatId(), seatfs3.getSeatNumber(), cabinType);
-                    System.out.println();
-                }
-
-                System.out.print("Please enter seat number for passenger for third flight: ");
+                System.out.print("Please enter seat number " + "for passenger " + passenger.getFirstName() + " third flight: ");
                 String seatNumberfs3 = sc.nextLine().trim();
                 SeatEntity seatfs3 = findSeat(seatNumberfs3, listOfSeatsForFs3);
                 if (seatfs3 == null) {
@@ -1287,170 +1250,33 @@ public class Customer {
                     FareEntity newFareForFs3 = new FareEntity(fareForFs3.getFareBasisCode(), fareForFs3.getFareAmount(), fareForFs3.getCabinType());
                     seatfs3.setFare(newFareForFs3);
 
-//                    FareEntity newFare = new FareEntity("Y1020", BigDecimal.TEN, cabinForFs3);
-//                    seatfs3.setFare(newFare);
                     seatfs3.setPassenger(passenger);
                     indivResForFs3.getListOfSeats().add(seatfs3);
                     indivResForFs3.getListOfPassenger().add(passenger);
+                    BigDecimal totalAmt = indivResForFs3.getAmount().add(newFareForFs3.getFareAmount());
+                    indivResForFs3.setAmount(totalAmt);
 
                 }
                 System.out.println("===================END OF BOOKING FOR CURRENT PASSENGER===================");
                 System.out.println();
 
-            }
-
-            indivResForFs1.setFlightReservation(flightRes);
-            flightRes.getListOfIndividualFlightRes().add(indivResForFs1);
-            indivResForFs2.setFlightReservation(flightRes);
-            flightRes.getListOfIndividualFlightRes().add(indivResForFs2);
-            indivResForFs3.setFlightReservation(flightRes);
-            flightRes.getListOfIndividualFlightRes().add(indivResForFs3);
-
-        } else if (fs2 != null && fs3 == null) { // 2 flights total
-
-            BigDecimal amountForFs1 = fareForFs1.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
-            IndividualFlightReservationEntity indivResForFs1 = new IndividualFlightReservationEntity(fs1, customer, amountForFs1, flightRes);
-            BigDecimal amountForFs2 = fareForFs2.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
-            IndividualFlightReservationEntity indivResForFs2 = new IndividualFlightReservationEntity(fs2, customer, amountForFs2, flightRes);
-//            IndividualFlightReservationEntity indivResForFs1 = new IndividualFlightReservationEntity(fs1, customer, BigDecimal.TEN, flightRes);
-//            IndividualFlightReservationEntity indivResForFs2 = new IndividualFlightReservationEntity(fs2, customer, BigDecimal.TEN, flightRes);
-
-            for (int i = 0; i < numberOfPassengers; i++) {
-                List<SeatEntity> listOfSeatsForFs1 = findSeatsForCustomer(fs1, cabinForFs1);
-//                
-
-                System.out.print("Please enter Passenger first name: ");
-                String firstName = sc.nextLine();
-                System.out.print("Please enter Passenger last name: ");
-                String lastName = sc.nextLine();
-                System.out.print("Please enter Passenger passport number: ");
-                String passportNumber = sc.nextLine().trim();
-                PassengerEntity passenger = new PassengerEntity(firstName, lastName, passportNumber);
-                listOfPassengers.add(passenger);
-
-                System.out.printf("%-20s,%-20s%-20s", "Seat ID", "Seat Number", "Cabin Class");
-                System.out.println("\n");
-                for (SeatEntity seat : listOfSeatsForFs1) {
-                    String cabinType = "";
-                    if (seat.getCabinType().equals(CabinClassType.F)) {
-                        cabinType = "First Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.J)) {
-                        cabinType = "Business Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.W)) {
-                        cabinType = "Premium Economy Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.Y)) {
-                        cabinType = "Economy Class";
-                    }
-
-                    System.out.printf("%-20s%-20s%-20s", seat.getSeatId(), seat.getSeatNumber(), cabinType);
-                    System.out.println();
+                if (!flightRes.getListOfIndividualFlightRes().contains(indivResForFs1) && !flightRes.getListOfIndividualFlightRes().contains(indivResForFs2)
+                        && !flightRes.getListOfIndividualFlightRes().contains(indivResForFs3)) {
+                    indivResForFs1.setFlightReservation(flightRes);
+                    flightRes.getListOfIndividualFlightRes().add(indivResForFs1);
+                    indivResForFs2.setFlightReservation(flightRes);
+                    flightRes.getListOfIndividualFlightRes().add(indivResForFs2);
+                    indivResForFs3.setFlightReservation(flightRes);
+                    flightRes.getListOfIndividualFlightRes().add(indivResForFs3);
                 }
 
-                System.out.print("Please enter seat number for passenger first flight: ");
-                String seatNumber = sc.nextLine().trim();
-                SeatEntity seat = findSeat(seatNumber, listOfSeatsForFs1);
-                if (seat == null) {
-                    System.out.println("Invalid Seat number!");
-                    return;
-                } else {
+            } else if (fs2 != null && fs3 == null) { // 2 flights total
 
-                    seat.setReserved(true);
-                    FareEntity newFareForFs1 = new FareEntity(fareForFs1.getFareBasisCode(), fareForFs1.getFareAmount(), fareForFs1.getCabinType());
-                    seat.setFare(fareForFs1);
-
-//                    FareEntity newFare = new FareEntity("Y1020", BigDecimal.TEN, cabinForFs1);
-//                    seat.setFare(newFare);
-                    seat.setPassenger(passenger);
-                    indivResForFs1.getListOfSeats().add(seat);
-                    indivResForFs1.getListOfPassenger().add(passenger);
-
-                }
-
-                //create fs2
-                List<SeatEntity> listOfSeatsForFs2 = findSeatsForCustomer(fs2, cabinForFs2);
-//               
-
-                System.out.printf("%-20s,%-20s%-20s", "Seat ID", "Seat Number", "Cabin Class");
-                System.out.println("\n");
-                for (SeatEntity seatfs2 : listOfSeatsForFs2) {
-                    String cabinType = "";
-                    if (seat.getCabinType().equals(CabinClassType.F)) {
-                        cabinType = "First Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.J)) {
-                        cabinType = "Business Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.W)) {
-                        cabinType = "Premium Economy Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.Y)) {
-                        cabinType = "Economy Class";
-                    }
-
-                    System.out.printf("%-20s%-20s%-20s", seatfs2.getSeatId(), seatfs2.getSeatNumber(), cabinType);
-                    System.out.println();
-                }
-
-                System.out.print("Please enter seat number for passenger second flight: ");
-                String seatNumberfs2 = sc.nextLine().trim();
-                SeatEntity seatfs2 = findSeat(seatNumberfs2, listOfSeatsForFs2);
-                if (seatfs2 == null) {
-                    System.out.println("Invalid Seat number!");
-                    return;
-                } else {
-
-                    seatfs2.setReserved(true);
-                    FareEntity newFareForFs2 = new FareEntity(fareForFs2.getFareBasisCode(), fareForFs2.getFareAmount(), fareForFs2.getCabinType());
-                    seatfs2.setFare(newFareForFs2);
-
-//                    FareEntity newFare = new FareEntity("Y1020", BigDecimal.TEN, cabinForFs2);
-//                    seatfs2.setFare(newFare);
-                    seatfs2.setPassenger(passenger);
-                    indivResForFs2.getListOfSeats().add(seatfs2);
-                    indivResForFs2.getListOfPassenger().add(passenger);
-
-                }
-                System.out.println("===================END OF BOOKING FOR CURRENT PASSENGER===================");
-                System.out.println();
-            }
-            indivResForFs1.setFlightReservation(flightRes);
-            flightRes.getListOfIndividualFlightRes().add(indivResForFs1);
-            indivResForFs2.setFlightReservation(flightRes);
-            flightRes.getListOfIndividualFlightRes().add(indivResForFs2);
-
-        } else if (fs2 == null && fs3 == null) { //1 flight only
-//            IndividualFlightReservationEntity indivResForFs1 = new IndividualFlightReservationEntity(fs1, customer, BigDecimal.TEN, flightRes);
-            BigDecimal amountForFs1 = fareForFs1.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
-            IndividualFlightReservationEntity indivResForFs1 = new IndividualFlightReservationEntity(fs1, customer, amountForFs1, flightRes);
-
-            for (int i = 0; i < numberOfPassengers; i++) {
                 List<SeatEntity> listOfSeatsForFs1 = findSeatsForCustomer(fs1, cabinForFs1);
 
-                System.out.print("Please enter Passenger first name: ");
-                String firstName = sc.nextLine();
-                System.out.print("Please enter Passenger last name: ");
-                String lastName = sc.nextLine();
-                System.out.print("Please enter Passenger passport number: ");
-                String passportNumber = sc.nextLine().trim();
-                PassengerEntity passenger = new PassengerEntity(firstName, lastName, passportNumber);
-                listOfPassengers.add(passenger);
+                printSeats(listOfSeatsForFs1);
 
-                System.out.printf("%-20s,%-20s%-20s", "Seat ID", "Seat Number", "Cabin Class");
-                System.out.println("\n");
-                for (SeatEntity seat : listOfSeatsForFs1) {
-                    String cabinType = "";
-                    if (seat.getCabinType().equals(CabinClassType.F)) {
-                        cabinType = "First Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.J)) {
-                        cabinType = "Business Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.W)) {
-                        cabinType = "Premium Economy Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.Y)) {
-                        cabinType = "Economy Class";
-                    }
-
-                    System.out.printf("%-20s%-20s%-20s", seat.getSeatId(), seat.getSeatNumber(), cabinType);
-                    System.out.println();
-                }
-
-                System.out.print("Please enter seat number for passenger for first flight: ");
+                System.out.print("Please enter seat number " + "for passenger " + passenger.getFirstName() + " first flight: ");
                 String seatNumber = sc.nextLine().trim();
                 SeatEntity seat = findSeat(seatNumber, listOfSeatsForFs1);
                 if (seat == null) {
@@ -1462,62 +1288,95 @@ public class Customer {
                     FareEntity newFareForFs1 = new FareEntity(fareForFs1.getFareBasisCode(), fareForFs1.getFareAmount(), fareForFs1.getCabinType());
                     seat.setFare(newFareForFs1);
 
-//                    FareEntity newFare = new FareEntity("Y1020", BigDecimal.TEN, cabinForFs1);
-//                    seat.setFare(newFare);
                     seat.setPassenger(passenger);
                     indivResForFs1.getListOfSeats().add(seat);
                     indivResForFs1.getListOfPassenger().add(passenger);
+                    BigDecimal totalAmt = indivResForFs1.getAmount().add(newFareForFs1.getFareAmount());
+                    indivResForFs1.setAmount(totalAmt);
+
+                }
+
+                //create fs2
+                List<SeatEntity> listOfSeatsForFs2 = findSeatsForCustomer(fs2, cabinForFs2);
+
+                printSeats(listOfSeatsForFs2);
+
+                System.out.print("Please enter seat number " + "for passenger " + passenger.getFirstName() + " second flight: ");
+                String seatNumberfs2 = sc.nextLine().trim();
+                SeatEntity seatfs2 = findSeat(seatNumberfs2, listOfSeatsForFs2);
+                if (seatfs2 == null) {
+                    System.out.println("Invalid Seat number!");
+                    return;
+                } else {
+
+                    seatfs2.setReserved(true);
+                    FareEntity newFareForFs2 = new FareEntity(fareForFs2.getFareBasisCode(), fareForFs2.getFareAmount(), fareForFs2.getCabinType());
+                    seatfs2.setFare(newFareForFs2);
+
+                    seatfs2.setPassenger(passenger);
+                    indivResForFs2.getListOfSeats().add(seatfs2);
+                    indivResForFs2.getListOfPassenger().add(passenger);
+                    BigDecimal totalAmt = indivResForFs2.getAmount().add(newFareForFs2.getFareAmount());
+                    indivResForFs2.setAmount(totalAmt);
+
                 }
                 System.out.println("===================END OF BOOKING FOR CURRENT PASSENGER===================");
                 System.out.println();
-            }
-            indivResForFs1.setFlightReservation(flightRes);
-            flightRes.getListOfIndividualFlightRes().add(indivResForFs1);
-
-        }
-
-        listOfFlightRes.add(flightRes);
-
-        FlightReservationEntity returnFlightRes = null;
-        if (returnFs1 != null) {
-            returnFlightRes = new FlightReservationEntity(destination.getIataAirportCode(), origin.getIataAirportCode(), BigDecimal.ZERO, customer);
-        }
-        if (returnFs1 != null && returnFs2 != null && returnFs3 != null) {
-            BigDecimal amountForReturnFs1 = fareForReturnFs1.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
-            IndividualFlightReservationEntity indivResForReturnFs1 = new IndividualFlightReservationEntity(returnFs1, customer, amountForReturnFs1, returnFlightRes);
-
-            BigDecimal amountForReturnFs2 = fareForReturnFs2.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
-            IndividualFlightReservationEntity indivResForReturnFs2 = new IndividualFlightReservationEntity(returnFs2, customer, amountForReturnFs2, returnFlightRes);
-            BigDecimal amountForReturnFs3 = fareForReturnFs3.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
-            IndividualFlightReservationEntity indivResForReturnFs3 = new IndividualFlightReservationEntity(returnFs3, customer, amountForReturnFs3, returnFlightRes);
-//            IndividualFlightReservationEntity indivResForReturnFs1 = new IndividualFlightReservationEntity(returnFs1, customer, BigDecimal.TEN, returnFlightRes);
-//            IndividualFlightReservationEntity indivResForReturnFs2 = new IndividualFlightReservationEntity(returnFs2, customer, BigDecimal.TEN, returnFlightRes);
-//            IndividualFlightReservationEntity indivResForReturnFs3 = new IndividualFlightReservationEntity(returnFs3, customer, BigDecimal.TEN, returnFlightRes);
-
-            for (int i = 0; i < numberOfPassengers; i++) {
-                List<SeatEntity> listOfSeatsForReturnFs1 = findSeatsForCustomer(returnFs1, cabinForReturnFs1);
-
-                PassengerEntity passenger = listOfPassengers.get(i);
-
-                System.out.printf("%-20s,%-20s%-20s", "Seat ID", "Seat Number", "Cabin Class");
-                System.out.println("\n");
-                for (SeatEntity seat : listOfSeatsForReturnFs1) {
-                    String cabinType = "";
-                    if (seat.getCabinType().equals(CabinClassType.F)) {
-                        cabinType = "First Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.J)) {
-                        cabinType = "Business Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.W)) {
-                        cabinType = "Premium Economy Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.Y)) {
-                        cabinType = "Economy Class";
-                    }
-
-                    System.out.printf("%-20s%-20s%-20s", seat.getSeatId(), seat.getSeatNumber(), cabinType);
-                    System.out.println();
+//                }
+                if (!flightRes.getListOfIndividualFlightRes().contains(indivResForFs1)
+                        && !flightRes.getListOfIndividualFlightRes().contains(indivResForFs2)) {
+                    indivResForFs1.setFlightReservation(flightRes);
+                    flightRes.getListOfIndividualFlightRes().add(indivResForFs1);
+                    indivResForFs2.setFlightReservation(flightRes);
+                    flightRes.getListOfIndividualFlightRes().add(indivResForFs2);
                 }
 
-                System.out.print("Please enter seat number for passenger for first flight: ");
+            } else if (fs2 == null && fs3 == null) { //1 flight only
+
+                List<SeatEntity> listOfSeatsForFs1 = findSeatsForCustomer(fs1, cabinForFs1);
+
+//             
+                printSeats(listOfSeatsForFs1);
+
+                System.out.print("Please enter seat number " + "for passenger " + passenger.getFirstName() + " first flight: ");
+                String seatNumber = sc.nextLine().trim();
+                SeatEntity seat = findSeat(seatNumber, listOfSeatsForFs1);
+                if (seat == null) {
+                    System.out.println("Invalid Seat number!");
+                    return;
+                } else {
+                    seat.setReserved(true);
+                    FareEntity newFareForFs1 = new FareEntity(fareForFs1.getFareBasisCode(), fareForFs1.getFareAmount(), fareForFs1.getCabinType());
+                    seat.setFare(newFareForFs1);
+
+                    seat.setPassenger(passenger);
+                    indivResForFs1.getListOfSeats().add(seat);
+                    indivResForFs1.getListOfPassenger().add(passenger);
+                    BigDecimal totalAmt = indivResForFs1.getAmount().add(newFareForFs1.getFareAmount());
+                    indivResForFs1.setAmount(totalAmt);
+
+                }
+                System.out.println("===================END OF BOOKING FOR CURRENT PASSENGER===================");
+                System.out.println();
+
+                if (!flightRes.getListOfIndividualFlightRes().contains(indivResForFs1)) {
+                    indivResForFs1.setFlightReservation(flightRes);
+                    flightRes.getListOfIndividualFlightRes().add(indivResForFs1);
+                }
+
+            }
+
+            if (!listOfFlightRes.contains(flightRes)) {
+                listOfFlightRes.add(flightRes);
+            }
+
+            if (returnFs1 != null && returnFs2 != null && returnFs3 != null) {
+
+                List<SeatEntity> listOfSeatsForReturnFs1 = findSeatsForCustomer(returnFs1, cabinForReturnFs1);
+
+                printSeats(listOfSeatsForReturnFs1);
+
+                System.out.print("Please enter seat number " + "for passenger " + passenger.getFirstName() + " first return flight: ");
                 String seatNumber = sc.nextLine().trim();
                 SeatEntity seat = findSeat(seatNumber, listOfSeatsForReturnFs1);
                 if (seat == null) {
@@ -1528,37 +1387,21 @@ public class Customer {
                     seat.setReserved(true);
                     FareEntity newFareForReturnFs1 = new FareEntity(fareForReturnFs1.getFareBasisCode(), fareForReturnFs1.getFareAmount(), fareForReturnFs1.getCabinType());
                     seat.setFare(newFareForReturnFs1);
-//                    FareEntity newFare = new FareEntity("F1020", BigDecimal.TEN, cabinForReturnFs1);
-//                    seat.setFare(newFare);
 
                     seat.setPassenger(passenger);
                     indivResForReturnFs1.getListOfSeats().add(seat);
                     indivResForReturnFs1.getListOfPassenger().add(passenger);
+                    BigDecimal totalAmt = indivResForReturnFs1.getAmount().add(newFareForReturnFs1.getFareAmount());
+                    indivResForReturnFs1.setAmount(totalAmt);
 
                 }
 
                 //create fs2
                 List<SeatEntity> listOfSeatsForReturnFs2 = findSeatsForCustomer(returnFs2, cabinForReturnFs2);
 
-                System.out.printf("%-20s,%-20s%-20s", "Seat ID", "Seat Number", "Cabin Class");
-                System.out.println("\n");
-                for (SeatEntity seatfs2 : listOfSeatsForReturnFs2) {
-                    String cabinType = "";
-                    if (seat.getCabinType().equals(CabinClassType.F)) {
-                        cabinType = "First Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.J)) {
-                        cabinType = "Business Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.W)) {
-                        cabinType = "Premium Economy Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.Y)) {
-                        cabinType = "Economy Class";
-                    }
+                printSeats(listOfSeatsForReturnFs2);
 
-                    System.out.printf("%-20s%-20s%-20s", seatfs2.getSeatId(), seatfs2.getSeatNumber(), cabinType);
-                    System.out.println();
-                }
-
-                System.out.print("Please enter seat number for passenger for second flight: ");
+                System.out.print("Please enter seat number " + "for passenger " + passenger.getFirstName() + " second return flight: ");
                 String seatNumberfs2 = sc.nextLine().trim();
                 SeatEntity seatfs2 = findSeat(seatNumberfs2, listOfSeatsForReturnFs2);
                 if (seatfs2 == null) {
@@ -1570,36 +1413,20 @@ public class Customer {
                     FareEntity newFareForReturnFs2 = new FareEntity(fareForReturnFs2.getFareBasisCode(), fareForReturnFs2.getFareAmount(), fareForReturnFs2.getCabinType());
                     seatfs2.setFare(newFareForReturnFs2);
 
-//                    FareEntity newFare = new FareEntity("F1020", BigDecimal.TEN, cabinForReturnFs2);
-//                    seatfs2.setFare(newFare);
                     seatfs2.setPassenger(passenger);
                     indivResForReturnFs2.getListOfSeats().add(seatfs2);
                     indivResForReturnFs2.getListOfPassenger().add(passenger);
+                    BigDecimal totalAmt = indivResForReturnFs2.getAmount().add(newFareForReturnFs2.getFareAmount());
+                    indivResForReturnFs2.setAmount(totalAmt);
 
                 }
 
                 //create fs3
                 List<SeatEntity> listOfSeatsForReturnFs3 = findSeatsForCustomer(returnFs3, cabinForReturnFs3);
 
-                System.out.printf("%-20s,%-20s%-20s", "Seat ID", "Seat Number", "Cabin Class");
-                System.out.println("\n");
-                for (SeatEntity seatfs3 : listOfSeatsForReturnFs3) {
-                    String cabinType = "";
-                    if (seat.getCabinType().equals(CabinClassType.F)) {
-                        cabinType = "First Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.J)) {
-                        cabinType = "Business Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.W)) {
-                        cabinType = "Premium Economy Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.Y)) {
-                        cabinType = "Economy Class";
-                    }
+                printSeats(listOfSeatsForReturnFs3);
 
-                    System.out.printf("%-20s%-20s%-20s", seatfs3.getSeatId(), seatfs3.getSeatNumber(), cabinType);
-                    System.out.println();
-                }
-
-                System.out.print("Please enter seat number for passenger for third flight: ");
+                System.out.print("Please enter seat number " + "for passenger " + passenger.getFirstName() + " third return flight: ");
                 String seatNumberfs3 = sc.nextLine().trim();
                 SeatEntity seatfs3 = findSeat(seatNumberfs3, listOfSeatsForReturnFs3);
                 if (seatfs3 == null) {
@@ -1611,151 +1438,33 @@ public class Customer {
                     FareEntity newFareForReturnFs3 = new FareEntity(fareForReturnFs3.getFareBasisCode(), fareForReturnFs3.getFareAmount(), fareForReturnFs3.getCabinType());
                     seatfs3.setFare(newFareForReturnFs3);
 
-//                    FareEntity newFare = new FareEntity("F1020", BigDecimal.TEN, cabinForReturnFs3);
-//                    seatfs3.setFare(newFare);
                     seatfs3.setPassenger(passenger);
                     indivResForReturnFs3.getListOfSeats().add(seatfs3);
                     indivResForReturnFs3.getListOfPassenger().add(passenger);
+                    BigDecimal totalAmt = indivResForReturnFs3.getAmount().add(newFareForReturnFs3.getFareAmount());
+                    indivResForReturnFs3.setAmount(totalAmt);
 
                 }
                 System.out.println("===================END OF BOOKING FOR CURRENT PASSENGER===================");
                 System.out.println();
-            }
-            indivResForReturnFs1.setFlightReservation(returnFlightRes);
-            returnFlightRes.getListOfIndividualFlightRes().add(indivResForReturnFs1);
-            indivResForReturnFs2.setFlightReservation(returnFlightRes);
-            returnFlightRes.getListOfIndividualFlightRes().add(indivResForReturnFs2);
-            indivResForReturnFs3.setFlightReservation(returnFlightRes);
-            returnFlightRes.getListOfIndividualFlightRes().add(indivResForReturnFs3);
+//                }
+                if (!returnFlightRes.getListOfIndividualFlightRes().contains(indivResForReturnFs1) && !returnFlightRes.getListOfIndividualFlightRes().contains(indivResForReturnFs2)
+                        && !returnFlightRes.getListOfIndividualFlightRes().contains(indivResForReturnFs3)) {
+                    indivResForReturnFs1.setFlightReservation(returnFlightRes);
+                    returnFlightRes.getListOfIndividualFlightRes().add(indivResForReturnFs1);
+                    indivResForReturnFs2.setFlightReservation(returnFlightRes);
+                    returnFlightRes.getListOfIndividualFlightRes().add(indivResForReturnFs2);
+                    indivResForReturnFs3.setFlightReservation(returnFlightRes);
+                    returnFlightRes.getListOfIndividualFlightRes().add(indivResForReturnFs3);
+                }
 
-        } else if (returnFs1 != null && returnFs2 != null && returnFs3 == null) { // only 2 flights
-            BigDecimal amountForReturnFs1 = fareForReturnFs1.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
-            IndividualFlightReservationEntity indivResForReturnFs1 = new IndividualFlightReservationEntity(returnFs1, customer, amountForReturnFs1, returnFlightRes);
-            BigDecimal amountForReturnFs2 = fareForReturnFs2.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
-            IndividualFlightReservationEntity indivResForReturnFs2 = new IndividualFlightReservationEntity(returnFs2, customer, amountForReturnFs2, returnFlightRes);
+            } else if (returnFs1 != null && returnFs2 != null && returnFs3 == null) { // only 2 flights
 
-//            IndividualFlightReservationEntity indivResForReturnFs1 = new IndividualFlightReservationEntity(returnFs1, customer, BigDecimal.TEN, returnFlightRes);
-//            IndividualFlightReservationEntity indivResForReturnFs2 = new IndividualFlightReservationEntity(returnFs2, customer, BigDecimal.TEN, returnFlightRes);
-            for (int i = 0; i < numberOfPassengers; i++) {
                 List<SeatEntity> listOfSeatsForReturnFs1 = findSeatsForCustomer(returnFs1, cabinForReturnFs1);
 
-                PassengerEntity passenger = listOfPassengers.get(i);
+                printSeats(listOfSeatsForReturnFs1);
 
-                System.out.printf("%-20s,%-20s%-20s", "Seat ID", "Seat Number", "Cabin Class");
-                System.out.println("\n");
-                for (SeatEntity seat : listOfSeatsForReturnFs1) {
-                    String cabinType = "";
-                    if (seat.getCabinType().equals(CabinClassType.F)) {
-                        cabinType = "First Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.J)) {
-                        cabinType = "Business Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.W)) {
-                        cabinType = "Premium Economy Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.Y)) {
-                        cabinType = "Economy Class";
-                    }
-
-                    System.out.printf("%-20s%-20s%-20s", seat.getSeatId(), seat.getSeatNumber(), cabinType);
-                    System.out.println();
-                }
-
-                System.out.print("Please enter seat number for passenger for first flight: ");
-                String seatNumber = sc.nextLine().trim();
-                SeatEntity seat = findSeat(seatNumber, listOfSeatsForReturnFs1);
-                if (seat == null) {
-                    System.out.println("Invalid Seat number!");
-                    return;
-                } else {
-
-                    seat.setReserved(true);
-                    FareEntity newFareForReturnFs1 = new FareEntity(fareForReturnFs1.getFareBasisCode(), fareForReturnFs1.getFareAmount(), fareForReturnFs1.getCabinType());
-                    seat.setFare(fareForReturnFs1);
-
-//                    FareEntity newFare = new FareEntity("F1020", BigDecimal.TEN, cabinForReturnFs1);
-//                    seat.setFare(newFare);
-                    seat.setPassenger(passenger);
-                    indivResForReturnFs1.getListOfSeats().add(seat);
-                    indivResForReturnFs1.getListOfPassenger().add(passenger);
-
-                }
-
-                //create fs2
-                List<SeatEntity> listOfSeatsForReturnFs2 = findSeatsForCustomer(returnFs2, cabinForReturnFs2);
-
-                System.out.printf("%-20s,%-20s%-20s", "Seat ID", "Seat Number", "Cabin Class");
-                System.out.println("\n");
-                for (SeatEntity seatfs2 : listOfSeatsForReturnFs2) {
-                    String cabinType = "";
-                    if (seat.getCabinType().equals(CabinClassType.F)) {
-                        cabinType = "First Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.J)) {
-                        cabinType = "Business Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.W)) {
-                        cabinType = "Premium Economy Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.Y)) {
-                        cabinType = "Economy Class";
-                    }
-
-                    System.out.printf("%-20s%-20s%-20s", seatfs2.getSeatId(), seatfs2.getSeatNumber(), cabinType);
-                    System.out.println();
-                }
-
-                System.out.print("Please enter seat number for passenger for second flight: ");
-                String seatNumberfs2 = sc.nextLine().trim();
-                SeatEntity seatfs2 = findSeat(seatNumberfs2, listOfSeatsForReturnFs2);
-                if (seatfs2 == null) {
-                    System.out.println("Invalid Seat number!");
-                    return;
-                } else {
-
-                    seatfs2.setReserved(true);
-                    FareEntity newFareForReturnFs2 = new FareEntity(fareForReturnFs2.getFareBasisCode(), fareForReturnFs2.getFareAmount(), fareForReturnFs2.getCabinType());
-                    seatfs2.setFare(newFareForReturnFs2);
-
-//                    FareEntity newFare = new FareEntity("F1020", BigDecimal.TEN, cabinForReturnFs2);
-//                    seatfs2.setFare(newFare);
-                    seatfs2.setPassenger(passenger);
-                    indivResForReturnFs2.getListOfSeats().add(seatfs2);
-                    indivResForReturnFs2.getListOfPassenger().add(passenger);
-
-                }
-                System.out.println("===================END OF BOOKING FOR CURRENT PASSENGER===================");
-                System.out.println();
-            }
-            indivResForReturnFs1.setFlightReservation(returnFlightRes);
-            returnFlightRes.getListOfIndividualFlightRes().add(indivResForReturnFs1);
-            indivResForReturnFs2.setFlightReservation(returnFlightRes);
-            returnFlightRes.getListOfIndividualFlightRes().add(indivResForReturnFs2);
-
-        } else if (returnFs1 != null && returnFs2 == null && returnFs3 == null) {
-            BigDecimal amountForReturnFs1 = fareForReturnFs1.getFareAmount().multiply(BigDecimal.valueOf(numberOfPassengers));
-            IndividualFlightReservationEntity indivResForReturnFs1 = new IndividualFlightReservationEntity(returnFs1, customer, amountForReturnFs1, returnFlightRes);
-
-//            IndividualFlightReservationEntity indivResForReturnFs1 = new IndividualFlightReservationEntity(returnFs1, customer, BigDecimal.TEN, returnFlightRes);
-            for (int i = 0; i < numberOfPassengers; i++) {
-                List<SeatEntity> listOfSeatsForReturnFs1 = findSeatsForCustomer(returnFs1, cabinForReturnFs1);
-
-                PassengerEntity passenger = listOfPassengers.get(i);
-
-                System.out.printf("%-20s,%-20s%-20s", "Seat ID", "Seat Number", "Cabin Class");
-                System.out.println("\n");
-                for (SeatEntity seat : listOfSeatsForReturnFs1) {
-                    String cabinType = "";
-                    if (seat.getCabinType().equals(CabinClassType.F)) {
-                        cabinType = "First Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.J)) {
-                        cabinType = "Business Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.W)) {
-                        cabinType = "Premium Economy Class";
-                    } else if (seat.getCabinType().equals(CabinClassType.Y)) {
-                        cabinType = "Economy Class";
-                    }
-
-                    System.out.printf("%-20s%-20s%-20s", seat.getSeatId(), seat.getSeatNumber(), cabinType);
-                    System.out.println();
-                }
-
-                System.out.print("Please enter seat number for passenger for first flight: ");
+                System.out.print("Please enter seat number " + "for passenger " + passenger.getFirstName() + " first return flight: ");
                 String seatNumber = sc.nextLine().trim();
                 SeatEntity seat = findSeat(seatNumber, listOfSeatsForReturnFs1);
                 if (seat == null) {
@@ -1767,22 +1476,88 @@ public class Customer {
                     FareEntity newFareForReturnFs1 = new FareEntity(fareForReturnFs1.getFareBasisCode(), fareForReturnFs1.getFareAmount(), fareForReturnFs1.getCabinType());
                     seat.setFare(newFareForReturnFs1);
 
-//                    FareEntity newFare = new FareEntity("F1020", BigDecimal.TEN, cabinForReturnFs1);
-//                    seat.setFare(newFare);
                     seat.setPassenger(passenger);
                     indivResForReturnFs1.getListOfSeats().add(seat);
                     indivResForReturnFs1.getListOfPassenger().add(passenger);
+                    BigDecimal totalAmt = indivResForReturnFs1.getAmount().add(newFareForReturnFs1.getFareAmount());
+                    indivResForReturnFs1.setAmount(totalAmt);
+
+                }
+
+                //create fs2
+                List<SeatEntity> listOfSeatsForReturnFs2 = findSeatsForCustomer(returnFs2, cabinForReturnFs2);
+
+                printSeats(listOfSeatsForReturnFs2);
+
+                System.out.print("Please enter seat number " + "for passenger " + passenger.getFirstName() + " second return flight: ");
+                String seatNumberfs2 = sc.nextLine().trim();
+                SeatEntity seatfs2 = findSeat(seatNumberfs2, listOfSeatsForReturnFs2);
+                if (seatfs2 == null) {
+                    System.out.println("Invalid Seat number!");
+                    return;
+                } else {
+
+                    seatfs2.setReserved(true);
+                    FareEntity newFareForReturnFs2 = new FareEntity(fareForReturnFs2.getFareBasisCode(), fareForReturnFs2.getFareAmount(), fareForReturnFs2.getCabinType());
+                    seatfs2.setFare(newFareForReturnFs2);
+
+                    seatfs2.setPassenger(passenger);
+                    indivResForReturnFs2.getListOfSeats().add(seatfs2);
+                    indivResForReturnFs2.getListOfPassenger().add(passenger);
+                    BigDecimal totalAmt = indivResForReturnFs2.getAmount().add(newFareForReturnFs2.getFareAmount());
+                    indivResForReturnFs2.setAmount(totalAmt);
 
                 }
                 System.out.println("===================END OF BOOKING FOR CURRENT PASSENGER===================");
                 System.out.println();
+//                }
+                if (!returnFlightRes.getListOfIndividualFlightRes().contains(indivResForReturnFs1)
+                        && !returnFlightRes.getListOfIndividualFlightRes().contains(indivResForReturnFs2)) {
+                    indivResForReturnFs1.setFlightReservation(returnFlightRes);
+                    returnFlightRes.getListOfIndividualFlightRes().add(indivResForReturnFs1);
+                    indivResForReturnFs2.setFlightReservation(returnFlightRes);
+                    returnFlightRes.getListOfIndividualFlightRes().add(indivResForReturnFs2);
+                }
+
+            } else if (returnFs1 != null && returnFs2 == null && returnFs3 == null) {
+
+                List<SeatEntity> listOfSeatsForReturnFs1 = findSeatsForCustomer(returnFs1, cabinForReturnFs1);
+
+                printSeats(listOfSeatsForReturnFs1);
+
+                System.out.print("Please enter seat number " + "for passenger " + passenger.getFirstName() + " first return flight: ");
+                String seatNumber = sc.nextLine().trim();
+                SeatEntity seat = findSeat(seatNumber, listOfSeatsForReturnFs1);
+                if (seat == null) {
+                    System.out.println("Invalid Seat number!");
+                    return;
+                } else {
+
+                    seat.setReserved(true);
+                    FareEntity newFareForReturnFs1 = new FareEntity(fareForReturnFs1.getFareBasisCode(), fareForReturnFs1.getFareAmount(), fareForReturnFs1.getCabinType());
+                    seat.setFare(newFareForReturnFs1);
+
+                    seat.setPassenger(passenger);
+                    indivResForReturnFs1.getListOfSeats().add(seat);
+                    indivResForReturnFs1.getListOfPassenger().add(passenger);
+                    BigDecimal totalAmt = indivResForReturnFs1.getAmount().add(newFareForReturnFs1.getFareAmount());
+                    indivResForReturnFs1.setAmount(totalAmt);
+
+                }
+                System.out.println("===================END OF BOOKING FOR CURRENT PASSENGER===================");
+                System.out.println();
+
+                if (!returnFlightRes.getListOfIndividualFlightRes().contains(indivResForReturnFs1)) {
+                    indivResForReturnFs1.setFlightReservation(returnFlightRes);
+                    returnFlightRes.getListOfIndividualFlightRes().add(indivResForReturnFs1);
+                }
             }
-            indivResForReturnFs1.setFlightReservation(returnFlightRes);
-            returnFlightRes.getListOfIndividualFlightRes().add(indivResForReturnFs1);
+            if (returnFlightRes != null && !listOfFlightRes.contains(returnFlightRes)) {
+                listOfFlightRes.add(returnFlightRes);
+            }
+
         }
-        if (returnFlightRes != null) {
-            listOfFlightRes.add(returnFlightRes);
-        }
+        //end for loop
 
         //call flight reservation session bean
         System.out.println("Would you like to proceed with the booking? (1 for yes, 2 for no)");
@@ -1822,6 +1597,16 @@ public class Customer {
                 }
             }
             if (goodInput) {
+
+                for (FlightReservationEntity fr : listOfFlightRes) {
+                    BigDecimal totalAmt = BigDecimal.ZERO;
+                    for (IndividualFlightReservationEntity indivFlightRes : fr.getListOfIndividualFlightRes()) {
+                        totalAmt = totalAmt.add(indivFlightRes.getAmount());
+                    }
+
+                    fr.setTotalAmount(totalAmt);
+                }
+
                 flightReservationSessionBean.reserveFlights(listOfFlightRes);
                 System.out.println("Reservation has been made! Have a good day!");
             }
@@ -1915,5 +1700,67 @@ public class Customer {
             System.out.println(ex.getMessage());
         }
 
+    }
+
+    public List<CabinClassType> getCabinTypes(FlightScheduleEntity fs) {
+        AircraftConfigurationEntity aircraftConfig = fs.getFlightSchedulePlan().getFlightEntity().getAircraftConfig();
+        List<CabinClassType> listOfTypes = new ArrayList<>();
+        for (CabinClassConfigurationEntity cabin : aircraftConfig.getCabinClasses()) {
+            if (!listOfTypes.contains(cabin.getCabinclassType())) {
+                listOfTypes.add(cabin.getCabinclassType());
+            }
+        }
+        return listOfTypes;
+    }
+
+    public FareEntity getFare(CabinClassType type, List<FareEntity> listOfFare) {
+        for (FareEntity fare : listOfFare) {
+            if (fare.getCabinType().equals(type)) {
+                return fare;
+            }
+        }
+        return null;
+    }
+
+    public void printSeats(List<SeatEntity> listOfSeats) {
+        System.out.printf("%-15s%-15s%-30s%-15s%-15s%-15s", "Seat ID", "Seat Number", "Cabin Class", "Seat ID", "Seat Number", "Cabin Class");
+        System.out.println("\n");
+        for (int i = 0; i < listOfSeats.size(); i += 2) {
+            SeatEntity seatDisplay1 = listOfSeats.get(i);
+            SeatEntity seatDisplay2 = null;
+            String cabinType1 = "";
+            String cabinType2 = "";
+
+            if (i + 1 < listOfSeats.size()) {
+                seatDisplay2 = listOfSeats.get(i + 1);
+
+                if (seatDisplay2.getCabinType().equals(CabinClassType.F)) {
+                    cabinType2 = "First Class";
+                } else if (seatDisplay2.getCabinType().equals(CabinClassType.J)) {
+                    cabinType2 = "Business Class";
+                } else if (seatDisplay2.getCabinType().equals(CabinClassType.W)) {
+                    cabinType2 = "Premium Economy Class";
+                } else if (seatDisplay2.getCabinType().equals(CabinClassType.Y)) {
+                    cabinType2 = "Economy Class";
+                }
+            }
+
+            if (seatDisplay1.getCabinType().equals(CabinClassType.F)) {
+                cabinType1 = "First Class";
+            } else if (seatDisplay1.getCabinType().equals(CabinClassType.J)) {
+                cabinType1 = "Business Class";
+            } else if (seatDisplay1.getCabinType().equals(CabinClassType.W)) {
+                cabinType1 = "Premium Economy Class";
+            } else if (seatDisplay1.getCabinType().equals(CabinClassType.Y)) {
+                cabinType1 = "Economy Class";
+            }
+
+            if (i + 1 < listOfSeats.size()) {
+                System.out.printf("%-15s%-15s%-30s%-15s%-15s%-15s", seatDisplay1.getSeatId(), seatDisplay1.getSeatNumber(), cabinType1, seatDisplay2.getSeatId(), seatDisplay2.getSeatNumber(), cabinType2);
+            } else {
+                System.out.printf("%-15s%-15s%-30s%-15s%-15s%-15s", seatDisplay1.getSeatId(), seatDisplay1.getSeatNumber(), cabinType1, "-", "-", "-");
+            }
+            System.out.println();
+        }
     }
 }

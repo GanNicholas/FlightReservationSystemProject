@@ -16,5 +16,5 @@ public class HolidayReservationSystem {
         RunApp runApp = new RunApp();
         runApp.runApp();
     }
-        
+    
 }

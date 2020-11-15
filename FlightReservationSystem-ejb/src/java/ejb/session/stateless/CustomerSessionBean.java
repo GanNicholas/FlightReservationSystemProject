@@ -8,6 +8,8 @@ package ejb.session.stateless;
 import entity.AircraftConfigurationEntity;
 import entity.CustomerEntity;
 import entity.FRSCustomerEntity;
+import entity.FlightReservationEntity;
+import entity.IndividualFlightReservationEntity;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -24,10 +26,10 @@ import util.exception.CustomerLoginInvalid;
  */
 @Stateless
 public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerSessionBeanLocal {
-    
+
     @PersistenceContext(unitName = "FlightReservationSystem-ejbPU")
     private EntityManager em;
-    
+
     @Override
     public Long registerCustomer(CustomerEntity c) throws CustomerExistException {
         try {
@@ -35,13 +37,13 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
             em.persist(c);
             em.flush();
             return c.getCustomerId();
-            
+
         } catch (CustomerExistException ex) {
             throw new CustomerExistException("Customer already exist");
         }
-        
+
     }
-    
+
     @Override
     public boolean isCustomerExist(String login) throws CustomerExistException {
         try {
@@ -51,9 +53,9 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         } catch (NoResultException ex) {
             return false;
         }
-        
+
     }
-    
+
     @Override
     public CustomerEntity customerLogin(String username, String password) throws CustomerLoginInvalid {
         try {
@@ -65,7 +67,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
             throw new CustomerLoginInvalid("Invalid customer login");
         }
     }
-    
+
     @Override
     public CustomerEntity retrieveCustomerInfo(Long custId) throws CustomerDoesNotExistException {
         CustomerEntity cust = em.find(CustomerEntity.class, custId);
@@ -75,23 +77,30 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
             return cust;
         }
     }
-    
+
     @Override
     public CustomerEntity customerLoginUnmanaged(String username, String password) throws CustomerLoginInvalid, AccessFromWrongPortalException {
+
         try {
             Query query = em.createQuery("SELECT c FROM CustomerEntity c WHERE c.loginId =:login AND c.loginPw=:password").setParameter("login", username).setParameter("password", password);
             CustomerEntity customer = (CustomerEntity) query.getSingleResult();
-            
-            if(customer instanceof FRSCustomerEntity){
+
+            if (customer instanceof FRSCustomerEntity) {
                 throw new AccessFromWrongPortalException("You are accessing this website using the wrong client!");
             }
-            
-            
+
             em.detach(customer);
+            for (FlightReservationEntity fr : customer.getListOfFlightReservation()) {
+                em.detach(fr);
+                for (IndividualFlightReservationEntity indivFr : fr.getListOfIndividualFlightRes()) {
+                    em.detach(indivFr);
+                }
+            }
+
             return customer;
         } catch (NoResultException ex) {
             throw new CustomerLoginInvalid("Invalid customer login");
         }
     }
-    
+
 }

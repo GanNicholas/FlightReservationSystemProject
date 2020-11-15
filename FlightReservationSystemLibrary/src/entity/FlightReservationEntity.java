@@ -129,7 +129,7 @@ public class FlightReservationEntity implements Serializable {
     public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
     }
-
+    
     public CustomerEntity getCustomer() {
         return customer;
     }
