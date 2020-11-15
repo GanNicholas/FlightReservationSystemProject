@@ -543,7 +543,25 @@ public class Customer {
                         }
                         System.out.println("Please enter the flight you want to reserve:");
                         flight = sc.nextLine();
-                      
+                        if (fb.getDepartOne().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartOne().getFlightSchedulePlan().getFlightNumber())) {
+                            if (fb.getDepartTwo() != null && listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartTwo() != null) {
+                                if (!fb.getDepartTwo().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartTwo().getFlightSchedulePlan().getFlightNumber())) {
+                                    System.out.println("Invalid flight number. You must only select the same flight number");
+                                    break;
+                                } else if (fb.getDepartTwo().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartTwo().getFlightSchedulePlan().getFlightNumber())) {
+                                    if (fb.getDepartThree() != null && listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartThree() != null) {
+                                        if (!fb.getDepartThree().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartThree().getFlightSchedulePlan().getFlightNumber())) {
+                                            System.out.println("Invalid flight number. You must only select the same flight number");
+                                            break;
+                                        }
+                                    }
+                                }
+
+                            }
+                        } else if (!fb.getDepartOne().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartOne().getFlightSchedulePlan().getFlightNumber())) {
+                            System.out.println("Invalid flight number. You must only select the same flight number");
+                            break;
+                        }
                         FlightBundle f2 = listOfFlightBundles.get(Integer.parseInt(flight) - 1);
                         passingOverToReservation.add(f2);
                     }
