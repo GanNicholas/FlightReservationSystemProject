@@ -527,12 +527,12 @@ public class Customer {
                 String flight = sc.nextLine();
                 FlightBundle fb = listOfFlightBundles.get(Integer.parseInt(flight) - 1);
                 AirportEntity origin = fb.getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation();
-                AirportEntity destination = null;
+                AirportEntity destination = fb.getDepartOne().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
                 if (fb.getDepartTwo() != null) {
-                    destination = fb.getDepartTwo().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation();
+                    destination = fb.getDepartTwo().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
                 }
                 if (fb.getDepartThree() != null) {
-                    destination = fb.getDepartThree().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getOriginLocation();
+                    destination = fb.getDepartThree().getFlightSchedulePlan().getFlightEntity().getFlightRoute().getDestinationLocation();
                 }
                 passingOverToReservation.add(fb);
                 while (!flight.equalsIgnoreCase("Y")) {
