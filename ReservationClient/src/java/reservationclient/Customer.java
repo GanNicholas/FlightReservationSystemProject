@@ -536,6 +536,7 @@ public class Customer {
                     }
                     passingOverToReservation.add(fb);
                     while (!flight.equalsIgnoreCase("Y")) {
+                        boolean checkSameFlightNumber = false;
                         System.out.println("Do you still want to add? Y/N");
                         flight = sc.nextLine();
                         if (!flight.equalsIgnoreCase("Y")) {
@@ -547,11 +548,13 @@ public class Customer {
                             if (fb.getDepartTwo() != null && listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartTwo() != null) {
                                 if (!fb.getDepartTwo().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartTwo().getFlightSchedulePlan().getFlightNumber())) {
                                     System.out.println("Invalid flight number. You must only select the same flight number");
+                                    checkSameFlightNumber = true;
                                     break;
                                 } else if (fb.getDepartTwo().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartTwo().getFlightSchedulePlan().getFlightNumber())) {
                                     if (fb.getDepartThree() != null && listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartThree() != null) {
                                         if (!fb.getDepartThree().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartThree().getFlightSchedulePlan().getFlightNumber())) {
                                             System.out.println("Invalid flight number. You must only select the same flight number");
+                                            checkSameFlightNumber = true;
                                             break;
                                         }
                                     }
@@ -560,6 +563,10 @@ public class Customer {
                             }
                         } else if (!fb.getDepartOne().getFlightSchedulePlan().getFlightNumber().equals(listOfFlightBundles.get(Integer.parseInt(flight) - 1).getDepartOne().getFlightSchedulePlan().getFlightNumber())) {
                             System.out.println("Invalid flight number. You must only select the same flight number");
+                            checkSameFlightNumber = true;
+                            break;
+                        }
+                        if (checkSameFlightNumber) {
                             break;
                         }
                         FlightBundle f2 = listOfFlightBundles.get(Integer.parseInt(flight) - 1);

@@ -212,7 +212,8 @@ public class RunApp {
         }
 
     }
- public void searchFlight() { // no validation yet
+
+    public void searchFlight() { // no validation yet
         Scanner sc = new Scanner(System.in);
         boolean invalidInput = false;
         String destinationAirport = "";
@@ -1002,18 +1003,14 @@ public class RunApp {
         if (listOfFe == null || listOfFe.isEmpty()) {
             return null;
         }
-         BigDecimal max = new BigDecimal(-999999);
-        for (int i = 0; i < listOfFe.size(); i++) {
-            BigDecimal actualVal = listOfFe.get(i).getFareAmount();
-            if (max.compareTo(actualVal) == -1) {
         FareEntity[] fe = new FareEntity[4];
         BigDecimal[] min = new BigDecimal[4];
         for (int i = 0; i < listOfFe.size(); i++) {
             if (i == 0) {
-                min[0] = new BigDecimal(-999999);
-                min[1] = new BigDecimal(999999999);
-                min[2] = new BigDecimal(999999999);
-                min[3] = new BigDecimal(999999999);
+                min[0] = new BigDecimal(-999999999);
+                min[1] = new BigDecimal(-999999999);
+                min[2] = new BigDecimal(-999999999);
+                    min[3] = new BigDecimal(-999999999);
             }
             BigDecimal actualVal = listOfFe.get(i).getFareAmount();
             if (min[0].compareTo(actualVal) == 1 && listOfFe.get(i).getCabinType().equals(CabinClassType.F)) {
@@ -1052,6 +1049,7 @@ public class RunApp {
         }
         return fe;
     }
+        
 
     public List<FlightBundle> combineAllThreeFlights(List<FlightBundle> threeDaysBefore, List<FlightBundle> onTheDay, List<FlightBundle> threeDaysAfter) {
         List<FlightBundle> combination = new ArrayList<>();
@@ -1789,7 +1787,6 @@ public class RunApp {
 //        ws.client.PartnerReservationSystem port = service.getPartnerReservationSystemPort();
 //        return port.loginCustomer(arg0, arg1);
 //    }
-
     private static FlightReservationEntity retrieveIndividualFlightReservation(java.lang.Long arg0) throws FlightReservationDoesNotExistException_Exception {
         ws.client.PartnerReservationSystem_Service service = new ws.client.PartnerReservationSystem_Service();
         ws.client.PartnerReservationSystem port = service.getPartnerReservationSystemPort();
