@@ -121,7 +121,6 @@ public class FlightScheduleSessionBean implements FlightScheduleSessionBeanRemot
 
         GregorianCalendar gEndDate = (GregorianCalendar) gDepart.clone();
         gEndDate.add(GregorianCalendar.HOUR_OF_DAY, 24);
-        gEndDate.add(GregorianCalendar.SECOND, -1);
         List<FlightScheduleEntity> listOfFS = null;
 
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
